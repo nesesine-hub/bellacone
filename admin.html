@@ -307,65 +307,80 @@
 <!-- MENÜ PANELİ -->
 <div class="panel active" id="panel-menu">
 
-  <!-- Dondurma -->
+  <!-- Dondurma Çeşitleri -->
   <div class="section-card">
-    <div class="section-header"><h2>Dondurma Çeşitleri</h2></div>
+    <div class="section-header"><h2>🍦 Dondurma Çeşitleri</h2></div>
     <div class="form-row">
-      <div class="form-group" style="flex:0 0 60px;">
-        <label>Emoji</label>
-        <input class="form-input emoji-select" id="d-emoji" type="text" value="🍦" maxlength="2">
-      </div>
-      <div class="form-group">
-        <label>İsim</label>
-        <input class="form-input" id="d-isim" type="text" placeholder="Çikolatalı">
-      </div>
-      <div class="form-group" style="flex:0 0 100px;">
-        <label>Fiyat (₺)</label>
-        <input class="form-input" id="d-fiyat" type="number" placeholder="45">
-      </div>
-      <button class="add-btn" onclick="addDondurma()">Ekle</button>
+      <div class="form-group" style="flex:0 0 60px;"><label>Emoji</label><input class="form-input emoji-select" id="d-emoji" type="text" value="🍦" maxlength="2"></div>
+      <div class="form-group"><label>İsim</label><input class="form-input" id="d-isim" type="text" placeholder="Çikolatalı"></div>
+      <div class="form-group" style="flex:0 0 100px;"><label>Fiyat (₺)</label><input class="form-input" id="d-fiyat" type="number" placeholder="45"></div>
+      <button class="add-btn" onclick="addUrun('dondurma')">Ekle</button>
     </div>
     <div class="item-list" id="dondurma-list"><div class="loading">Yükleniyor...</div></div>
   </div>
 
-  <!-- Malzeme -->
+  <!-- Dondurma Sos -->
   <div class="section-card">
-    <div class="section-header"><h2>Waffle Malzemeleri</h2></div>
+    <div class="section-header"><h2>🍦 Dondurma — Sos</h2></div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Malzeme adı</label>
-        <input class="form-input" id="m-isim" type="text" placeholder="Muz, Çilek...">
-      </div>
-      <button class="add-btn" onclick="addChip('malzeme', 'm-isim')">Ekle</button>
+      <div class="form-group"><label>Sos adı</label><input class="form-input" id="dsos-isim" type="text" placeholder="Çikolata Sosu..."></div>
+      <button class="add-btn" onclick="addChip('dSos', 'dsos-isim')">Ekle</button>
     </div>
-    <div class="chip-list" id="malzeme-list"><div class="loading">Yükleniyor...</div></div>
+    <div class="chip-list" id="dSos-list"><div class="loading">Yükleniyor...</div></div>
   </div>
 
-  <!-- Sos -->
+  <!-- Dondurma Topping -->
   <div class="section-card">
-    <div class="section-header"><h2>Soslar</h2></div>
+    <div class="section-header"><h2>🍦 Dondurma — Topping</h2></div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Sos adı</label>
-        <input class="form-input" id="s-isim" type="text" placeholder="Çikolata Sosu...">
-      </div>
-      <button class="add-btn" onclick="addChip('sos', 's-isim')">Ekle</button>
+      <div class="form-group"><label>Topping adı</label><input class="form-input" id="dtopping-isim" type="text" placeholder="Fındık Tozu..."></div>
+      <button class="add-btn" onclick="addChip('dTopping', 'dtopping-isim')">Ekle</button>
     </div>
-    <div class="chip-list" id="sos-list"><div class="loading">Yükleniyor...</div></div>
+    <div class="chip-list" id="dTopping-list"><div class="loading">Yükleniyor...</div></div>
   </div>
 
-  <!-- Ekstra -->
+  <!-- Waffle Çeşitleri -->
   <div class="section-card">
-    <div class="section-header"><h2>Ekstra Seçenekler</h2></div>
+    <div class="section-header"><h2>🧇 Waffle Çeşitleri</h2></div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Ekstra adı</label>
-        <input class="form-input" id="e-isim" type="text" placeholder="Krem Şanti...">
-      </div>
-      <button class="add-btn" onclick="addChip('ekstra', 'e-isim')">Ekle</button>
+      <div class="form-group" style="flex:0 0 60px;"><label>Emoji</label><input class="form-input emoji-select" id="w-emoji" type="text" value="🧇" maxlength="2"></div>
+      <div class="form-group"><label>İsim</label><input class="form-input" id="w-isim" type="text" placeholder="Klasik Waffle"></div>
+      <div class="form-group" style="flex:0 0 100px;"><label>Fiyat (₺)</label><input class="form-input" id="w-fiyat" type="number" placeholder="60"></div>
+      <button class="add-btn" onclick="addUrun('waffle')">Ekle</button>
     </div>
-    <div class="chip-list" id="ekstra-list"><div class="loading">Yükleniyor...</div></div>
+    <div class="item-list" id="waffle-list"><div class="loading">Yükleniyor...</div></div>
   </div>
+
+  <!-- Waffle Malzeme -->
+  <div class="section-card">
+    <div class="section-header"><h2>🧇 Waffle — İçine Malzeme</h2></div>
+    <div class="form-row">
+      <div class="form-group"><label>Malzeme adı</label><input class="form-input" id="wmalzeme-isim" type="text" placeholder="Muz, Çilek..."></div>
+      <button class="add-btn" onclick="addChip('wMalzeme', 'wmalzeme-isim')">Ekle</button>
+    </div>
+    <div class="chip-list" id="wMalzeme-list"><div class="loading">Yükleniyor...</div></div>
+  </div>
+
+  <!-- Waffle Sos -->
+  <div class="section-card">
+    <div class="section-header"><h2>🧇 Waffle — Üstüne Sos</h2></div>
+    <div class="form-row">
+      <div class="form-group"><label>Sos adı</label><input class="form-input" id="wsos-isim" type="text" placeholder="Çikolata Sosu..."></div>
+      <button class="add-btn" onclick="addChip('wSos', 'wsos-isim')">Ekle</button>
+    </div>
+    <div class="chip-list" id="wSos-list"><div class="loading">Yükleniyor...</div></div>
+  </div>
+
+  <!-- Waffle Topping -->
+  <div class="section-card">
+    <div class="section-header"><h2>🧇 Waffle — Topping</h2></div>
+    <div class="form-row">
+      <div class="form-group"><label>Topping adı</label><input class="form-input" id="wtopping-isim" type="text" placeholder="Fındık Tozu..."></div>
+      <button class="add-btn" onclick="addChip('wTopping', 'wtopping-isim')">Ekle</button>
+    </div>
+    <div class="chip-list" id="wTopping-list"><div class="loading">Yükleniyor...</div></div>
+  </div>
+
 </div>
 
 <!-- QR PANELİ -->
@@ -421,16 +436,19 @@
   // Menü dinle
   onValue(ref(db, 'menu'), (snapshot) => {
     const data = snapshot.val() || {};
-    renderDondurmaList(data.dondurma || {});
-    renderChipList('malzeme', data.malzeme || []);
-    renderChipList('sos', data.sos || []);
-    renderChipList('ekstra', data.ekstra || []);
+    renderUrunList('dondurma', data.dondurma || {});
+    renderUrunList('waffle', data.waffle || {});
+    renderChipList('dSos', data.dSos || []);
+    renderChipList('dTopping', data.dTopping || []);
+    renderChipList('wMalzeme', data.wMalzeme || []);
+    renderChipList('wSos', data.wSos || []);
+    renderChipList('wTopping', data.wTopping || []);
   });
 
-  function renderDondurmaList(dondurmaObj) {
-    const list = document.getElementById('dondurma-list');
-    const items = Object.entries(dondurmaObj);
-    if (!items.length) { list.innerHTML = '<span class="empty-list">Henüz dondurma eklenmedi</span>'; return; }
+  function renderUrunList(type, obj) {
+    const list = document.getElementById(type + '-list');
+    const items = Object.entries(obj);
+    if (!items.length) { list.innerHTML = '<span class="empty-list">Henüz eklenmedi</span>'; return; }
     list.innerHTML = items.map(([key, d]) => `
       <div class="item-row">
         <div class="item-left">
@@ -440,14 +458,14 @@
             <span class="item-price">${d.fiyat} ₺</span>
           </div>
         </div>
-        <button class="del-btn" onclick="delDondurma('${key}')">×</button>
+        <button class="del-btn" onclick="delUrun('${type}','${key}')">×</button>
       </div>
     `).join('');
   }
 
   function renderChipList(type, arr) {
     const list = document.getElementById(type + '-list');
-    if (!arr.length) { list.innerHTML = '<span class="empty-list">Henüz eklenmedi</span>'; return; }
+    if (!arr || !arr.length) { list.innerHTML = '<span class="empty-list">Henüz eklenmedi</span>'; return; }
     list.innerHTML = arr.map((item, i) => `
       <div class="chip-item">
         ${item}
@@ -456,28 +474,26 @@
     `).join('');
   }
 
-  window.addDondurma = async function() {
-    const emoji = document.getElementById('d-emoji').value.trim() || '🍦';
-    const isim = document.getElementById('d-isim').value.trim();
-    const fiyat = parseFloat(document.getElementById('d-fiyat').value);
+  window.addUrun = async function(type) {
+    const emoji = document.getElementById(type === 'dondurma' ? 'd-emoji' : 'w-emoji').value.trim() || '🍦';
+    const isim = document.getElementById(type === 'dondurma' ? 'd-isim' : 'w-isim').value.trim();
+    const fiyat = parseFloat(document.getElementById(type === 'dondurma' ? 'd-fiyat' : 'w-fiyat').value);
     if (!isim || isNaN(fiyat)) { showToast('İsim ve fiyat girin'); return; }
-    const id = 'd' + Date.now();
-    await set(ref(db, 'menu/dondurma/' + id), { id, isim, fiyat, emoji });
-    document.getElementById('d-isim').value = '';
-    document.getElementById('d-fiyat').value = '';
-    showToast('Dondurma eklendi');
+    const id = type[0] + Date.now();
+    await set(ref(db, 'menu/' + type + '/' + id), { id, isim, fiyat, emoji });
+    document.getElementById(type === 'dondurma' ? 'd-isim' : 'w-isim').value = '';
+    document.getElementById(type === 'dondurma' ? 'd-fiyat' : 'w-fiyat').value = '';
+    showToast('Eklendi');
   };
 
-  window.delDondurma = async function(key) {
-    await remove(ref(db, 'menu/dondurma/' + key));
+  window.delUrun = async function(type, key) {
+    await remove(ref(db, 'menu/' + type + '/' + key));
     showToast('Silindi');
   };
 
-  // Chip ekleme için önce mevcut listeyi çek
   window.addChip = function(type, inputId) {
     const val = document.getElementById(inputId).value.trim();
     if (!val) return;
-    // Mevcut listeyi al ve yenisini ekle
     const listEl = document.getElementById(type + '-list');
     const chips = Array.from(listEl.querySelectorAll('.chip-item'))
       .map(el => el.childNodes[0].textContent.trim());
