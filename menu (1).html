@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bellacone — Menü</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fdf6ee;
+    --warm: #f5e6d0;
+    --brown: #5c3d2e;
+    --accent: #c9663c;
+    --soft: #e8d5c0;
+    --text: #2d1f14;
+    --muted: #8a6a56;
+    --card: #fff9f3;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--cream);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 120px;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--brown);
+    color: #fff;
+    padding: 1.5rem 1.25rem 1.25rem;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .header p { font-size: 13px; opacity: 0.75; margin-top: 2px; }
+
+  /* MASA GIRIŞ */
+  .masa-bar {
+    background: var(--warm);
+    border-bottom: 1.5px solid var(--soft);
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .masa-bar label { font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+  .masa-bar input {
+    flex: 1;
+    border: 1.5px solid var(--soft);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 14px;
+    background: #fff;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+  }
+  .masa-bar input:focus { border-color: var(--accent); }
+  .masa-pill {
+    background: var(--brown);
+    color: #fff;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  /* SECTION */
+  .section { padding: 1.25rem 1.25rem 0; }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--brown);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--soft);
+  }
+
+  /* DONDURMA GRID */
+  .dondurma-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+  .dondurma-card {
+    background: var(--card);
+    border: 1.5px solid var(--soft);
+    border-radius: var(--radius);
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .dondurma-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .dondurma-card.selected {
+    border-color: var(--accent);
+    background: #fff1e8;
+  }
+  .dondurma-icon { font-size: 28px; margin-bottom: 6px; }
+  .dondurma-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .dondurma-price { font-size: 13px; color: var(--accent); font-weight: 500; margin-top: 2px; }
+
+  /* CHIPS */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
+  .chip {
+    border: 1.5px solid var(--soft);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    background: var(--card);
+    color: var(--text);
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .chip:hover { border-color: var(--accent); }
+  .chip.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* NOT */
+  .not-input {
+    width: 100%;
+    border: 1.5px solid var(--soft);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    background: var(--card);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    resize: none;
+    outline: none;
+    margin-bottom: 1rem;
+  }
+  .not-input:focus { border-color: var(--accent); }
+
+  /* ALT BAR */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--brown);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 200;
+  }
+  .miktar-ctrl { display: flex; align-items: center; gap: 8px; }
+  .miktar-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    background: transparent;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .miktar-btn:hover { background: rgba(255,255,255,0.1); }
+  .miktar-val { color: #fff; font-size: 16px; font-weight: 500; min-width: 20px; text-align: center; }
+  .siparis-btn {
+    flex: 1;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.15s;
+  }
+  .siparis-btn:hover { opacity: 0.9; }
+  .siparis-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    top: 80px; left: 50%; transform: translateX(-50%);
+    background: #2d1f14;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: 14px;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  /* LOADING */
+  .loading { text-align: center; padding: 2rem; color: var(--muted); font-size: 14px; }
+
+  /* EMPTY */
+  .empty-menu { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+  .empty-menu p { font-size: 14px; margin-top: 0.5rem; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Bellacone</h1>
+  <p>Lütfen masa numaranızı girin ve siparişinizi verin</p>
+</div>
+
+<div class="masa-bar">
+  <label>Masa No</label>
+  <input type="number" id="masa-input" placeholder="Örn: 5" min="1" max="99" />
+  <span class="masa-pill" id="masa-pill">—</span>
+</div>
+
+<div id="menu-container">
+  <div class="loading">Menü yükleniyor...</div>
+</div>
+
+<div class="bottom-bar">
+  <div class="miktar-ctrl">
+    <button class="miktar-btn" onclick="changeMiktar(-1)">−</button>
+    <span class="miktar-val" id="miktar-val">1</span>
+    <button class="miktar-btn" onclick="changeMiktar(1)">+</button>
+  </div>
+  <button class="siparis-btn" id="siparis-btn" onclick="siparisVer()">Sipariş Ver</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getDatabase, ref, push, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+  // ====================================================
+  // BURAYA KENDİ FİREBASE BİLGİLERİNİ GİR
+  // ====================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyC18gKyPhFWEWH_244nDLOW0nQE2QgS6kA",
+    authDomain: "bellacone-7ee34.firebaseapp.com",
+    databaseURL: "https://bellacone-7ee34-default-rtdb.firebaseio.com",
+    projectId: "bellacone-7ee34",
+    storageBucket: "bellacone-7ee34.firebasestorage.app",
+    messagingSenderId: "41187589256",
+    appId: "1:41187589256:web:75e6f2f3c3360c9a3bf33d"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  let menuData = { dondurma: [], malzeme: [], sos: [], ekstra: [] };
+  let state = { dondurma: null, malzeme: [], sos: [], ekstra: [], miktar: 1 };
+
+  // URL'den masa no al (QR kodu ile gelince)
+  const urlParams = new URLSearchParams(window.location.search);
+  const masaUrl = urlParams.get('masa');
+  if (masaUrl) {
+    document.getElementById('masa-input').value = masaUrl;
+    document.getElementById('masa-pill').textContent = 'Masa ' + masaUrl;
+  }
+
+  document.getElementById('masa-input').addEventListener('input', function() {
+    document.getElementById('masa-pill').textContent = this.value ? 'Masa ' + this.value : '—';
+  });
+
+  // Menüyü Firebase'den yükle
+  onValue(ref(db, 'menu'), (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      menuData = {
+        dondurma: data.dondurma ? Object.values(data.dondurma) : [],
+        malzeme: data.malzeme || [],
+        sos: data.sos || [],
+        ekstra: data.ekstra || []
+      };
+    } else {
+      // Eğer menü henüz oluşturulmadıysa varsayılan göster
+      menuData = {
+        dondurma: [
+          { id: 'd1', isim: 'Çikolatalı', fiyat: 45, emoji: '🍫' },
+          { id: 'd2', isim: 'Vanilyalı', fiyat: 40, emoji: '🍦' },
+          { id: 'd3', isim: 'Çilekli', fiyat: 40, emoji: '🍓' },
+          { id: 'd4', isim: 'Fıstıklı', fiyat: 50, emoji: '🥜' },
+          { id: 'd5', isim: 'Karamelli', fiyat: 48, emoji: '🍮' },
+          { id: 'd6', isim: 'Magnolya', fiyat: 55, emoji: '🌸' },
+        ],
+        malzeme: ['Muz', 'Çilek', 'Ahududu', 'Oreo', 'Marshmallow', 'Granola'],
+        sos: ['Çikolata Sosu', 'Karamel Sosu', 'Çilek Sosu', 'Nutella'],
+        ekstra: ['Waffle Topingi', 'Krem Şanti', 'Renkli Şeker']
+      };
+    }
+    renderMenu();
+  });
+
+  function renderMenu() {
+    const container = document.getElementById('menu-container');
+    if (!menuData.dondurma.length) {
+      container.innerHTML = '<div class="empty-menu"><p>Menü henüz hazırlanmadı. Lütfen admin panelinden ürün ekleyin.</p></div>';
+      return;
+    }
+
+    container.innerHTML = `
+      <div class="section">
+        <div class="section-title">Dondurma Çeşitleri</div>
+        <div class="dondurma-grid" id="dondurma-grid">
+          ${menuData.dondurma.map(d => `
+            <div class="dondurma-card" id="dc-${d.id}" onclick="selectDondurma('${d.id}')">
+              <div class="dondurma-icon">${d.emoji || '🍦'}</div>
+              <div class="dondurma-name">${d.isim}</div>
+              <div class="dondurma-price">${d.fiyat} ₺</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="section-title">Waffle Malzemeleri</div>
+        <div class="chips" id="malzeme-chips">
+          ${menuData.malzeme.map(m => `<span class="chip" onclick="toggleChip(this,'malzeme','${m}')">${m}</span>`).join('')}
+        </div>
+
+        <div class="section-title">Soslar</div>
+        <div class="chips" id="sos-chips">
+          ${menuData.sos.map(s => `<span class="chip" onclick="toggleChip(this,'sos','${s}')">${s}</span>`).join('')}
+        </div>
+
+        <div class="section-title">Ekstra</div>
+        <div class="chips" id="ekstra-chips">
+          ${menuData.ekstra.map(e => `<span class="chip" onclick="toggleChip(this,'ekstra','${e}')">${e}</span>`).join('')}
+        </div>
+
+        <div class="section-title">Özel Not</div>
+        <textarea class="not-input" id="siparis-notu" rows="2" placeholder="Örn: Az şekerli, allerji bilgisi..."></textarea>
+      </div>
+    `;
+    state = { dondurma: null, malzeme: [], sos: [], ekstra: [], miktar: 1 };
+  }
+
+  window.selectDondurma = function(id) {
+    state.dondurma = state.dondurma === id ? null : id;
+    document.querySelectorAll('.dondurma-card').forEach(el => el.classList.remove('selected'));
+    if (state.dondurma) document.getElementById('dc-' + id).classList.add('selected');
+  };
+
+  window.toggleChip = function(el, type, val) {
+    el.classList.toggle('active');
+    const arr = state[type];
+    const idx = arr.indexOf(val);
+    if (idx === -1) arr.push(val); else arr.splice(idx, 1);
+  };
+
+  window.changeMiktar = function(d) {
+    state.miktar = Math.max(1, state.miktar + d);
+    document.getElementById('miktar-val').textContent = state.miktar;
+  };
+
+  window.siparisVer = async function() {
+    const masa = document.getElementById('masa-input').value;
+    if (!masa) { showToast('Lütfen masa numarası girin'); return; }
+    if (!state.dondurma) { showToast('Lütfen bir dondurma seçin'); return; }
+
+    const d = menuData.dondurma.find(x => x.id === state.dondurma);
+    const not = document.getElementById('siparis-notu')?.value?.trim() || '';
+    const btn = document.getElementById('siparis-btn');
+    btn.disabled = true;
+    btn.textContent = 'Gönderiliyor...';
+
+    try {
+      await push(ref(db, 'siparisler'), {
+        masa: Number(masa),
+        dondurma: d.isim,
+        dondurmaFiyat: d.fiyat,
+        miktar: state.miktar,
+        toplamFiyat: d.fiyat * state.miktar,
+        malzeme: state.malzeme,
+        sos: state.sos,
+        ekstra: state.ekstra,
+        not: not,
+        durum: 'bekliyor',
+        zaman: new Date().toISOString(),
+        zamanStr: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+      });
+      showToast('✓ Siparişiniz alındı!');
+      renderMenu();
+      if (masaUrl) {
+        document.getElementById('masa-input').value = masaUrl;
+        document.getElementById('masa-pill').textContent = 'Masa ' + masaUrl;
+      }
+    } catch (e) {
+      showToast('Hata oluştu, tekrar deneyin');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Sipariş Ver';
+    state.miktar = 1;
+    document.getElementById('miktar-val').textContent = '1';
+  };
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>
