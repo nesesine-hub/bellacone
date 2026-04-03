@@ -14,8 +14,8 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--cream); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding-bottom: 120px; }
 
-  .header { background: var(--brown); color: #fff; padding: 1.25rem; text-align: center; position: sticky; top: 0; z-index: 100; }
-  .header h1 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; }
+  .header { background: var(--brown); color: #fff; padding: 0.75rem 1.25rem; text-align: center; position: sticky; top: 0; z-index: 100; }
+  .header img { height: 70px; width: auto; object-fit: contain; }
   .header p { font-size: 12px; opacity: 0.7; margin-top: 2px; }
 
   .masa-bar { background: var(--warm); border-bottom: 1.5px solid var(--soft); padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 10px; }
@@ -69,7 +69,7 @@
 <body>
 
 <div class="header">
-  <h1>Bellacone</h1>
+  <img src="bellacone icon.jpeg" alt="Bellacone" />
   <p>Masa numaranızı girin ve siparişinizi verin</p>
 </div>
 
@@ -173,7 +173,7 @@
       ],
       waffle: data.waffle ? Object.values(data.waffle) : [
         { id: 'w1', isim: 'Klasik Waffle', fiyat: 60, emoji: '🧇' },
-        { id: 'w2', isim: 'Bardak Waffle', fiyat: 70, emoji: '🧇' },
+        { id: 'w2', isim: 'Çikolatalı Waffle', fiyat: 70, emoji: '🍫' },
       ],
       dSos:     data.dSos     || ['Çikolata Sosu', 'Karamel Sosu', 'Çilek Sosu', 'Nutella'],
       dTopping: data.dTopping || ['Fındık Tozu', 'Oreo', 'Krem Şanti', 'Renkli Şeker', 'Marshmallow'],
