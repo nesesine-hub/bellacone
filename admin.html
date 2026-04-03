@@ -23,6 +23,37 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--cream); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
 
+  .login-screen {
+    position: fixed; inset: 0;
+    background: var(--cream);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+  }
+  .login-box {
+    background: #fff;
+    border: 1px solid var(--soft);
+    border-radius: 20px;
+    padding: 2rem;
+    width: 100%; max-width: 340px;
+  }
+  .login-logo { font-size: 22px; font-weight: 600; color: var(--brown); margin-bottom: 4px; }
+  .login-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; }
+  .login-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: block; }
+  .login-input {
+    width: 100%; border: 1px solid var(--soft); border-radius: 10px;
+    padding: 10px 14px; font-size: 14px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; outline: none; margin-bottom: 1rem; background: var(--cream);
+  }
+  .login-input:focus { border-color: var(--accent); }
+  .login-btn {
+    width: 100%; background: var(--brown); color: #fff; border: none;
+    border-radius: 10px; padding: 11px; font-size: 14px; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 0.5rem;
+  }
+  .login-btn:hover { opacity: 0.9; }
+  .login-error { font-size: 12px; color: var(--red); margin-top: 8px; display: none; }
+  .main-app { display: none; }
+
   .header {
     background: var(--brown);
     color: #fff;
@@ -230,6 +261,39 @@
 </head>
 <body>
 
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Bellacone</div>
+    <div class="login-sub">Admin Paneli — Giriş Yap</div>
+    <label class="login-label">Kullanıcı Adı</label>
+    <input class="login-input" id="login-user" type="text" placeholder="bellacone" />
+    <label class="login-label">Şifre</label>
+    <input class="login-input" id="login-pass" type="password" placeholder="••••••••" />
+    <button class="login-btn" onclick="doLogin()">Giriş Yap</button>
+    <div class="login-error" id="login-error">Kullanıcı adı veya şifre hatalı</div>
+  </div>
+</div>
+
+<script>
+  function doLogin() {
+    const user = document.getElementById('login-user').value.trim();
+    const pass = document.getElementById('login-pass').value;
+    if (user === 'bellacone' && pass === 'bilmiyorum!?') {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('main-app').style.display = 'block';
+      sessionStorage.setItem('giris', '1');
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  if (sessionStorage.getItem('giris') === '1') {
+    document.getElementById('login-screen').style.display = 'none';
+    setTimeout(() => { document.getElementById('main-app').style.display = 'block'; }, 0);
+  }
+</script>
+
+<div class="main-app" id="main-app">
 <div class="header">
   <h1>Admin Paneli — Bellacone</h1>
   <span class="header-badge">Yönetim</span>
@@ -488,6 +552,8 @@
     document.getElementById('panel-' + tab).classList.add('active');
     el.classList.add('active');
   };
+
 </script>
+</div>
 </body>
 </html>
