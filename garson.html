@@ -356,10 +356,24 @@
     }
 
     grid.innerHTML = filtered.map(o => {
+      if (o.sorunBildirimi) {
+        return `<div class="order-card" style="border-color:#e07040;">
+          <div class="card-top">
+            <div class="masa-num" style="color:#e07040;">⚠ Sorun</div>
+            <span class="status-badge badge-bekliyor">Masa ${o.masa}</span>
+          </div>
+          <div class="dondurma-row" style="color:#f5ede4;">${o.urun}</div>
+          <div class="zaman-row">${o.zamanStr || ''}</div>
+          <div class="card-actions">
+            <button class="act-btn" onclick="sil('${o.key}')">Kapat</button>
+          </div>
+        </div>`;
+      }
+
       const extras = [
         o.malzeme?.length ? 'Malzeme: ' + o.malzeme.join(', ') : '',
         o.sos?.length ? 'Sos: ' + o.sos.join(', ') : '',
-        o.ekstra?.length ? 'Ekstra: ' + o.ekstra.join(', ') : '',
+        o.topping?.length ? 'Topping: ' + o.topping.join(', ') : '',
       ].filter(Boolean);
 
       return `<div class="order-card ${o.durum === 'bekliyor' ? 'yeni' : ''}">
@@ -369,7 +383,7 @@
             ${o.durum === 'bekliyor' ? 'Bekliyor' : 'Hazır'}
           </span>
         </div>
-        <div class="dondurma-row">${o.dondurma} × ${o.miktar}</div>
+        <div class="dondurma-row">${o.kategori ? o.kategori + ' — ' : ''}${o.urun} × ${o.miktar}</div>
         ${extras.map(e => `<div class="detail-row">${e}</div>`).join('')}
         ${o.not ? `<div class="detail-row" style="color:#e07840;">Not: ${o.not}</div>` : ''}
         <div class="zaman-row">${o.zamanStr || ''} &middot; ${o.toplamFiyat || 0} ₺</div>
