@@ -266,7 +266,7 @@
 <div class="main-content" id="main-content">
   <div class="header-left">
     <div class="live-dot"></div>
-    <h1>Tatlı yiyip tatlı konusalım. </h1>
+    <h1>Garson Ekranı</h1>
   </div>
   <div class="stat-pills">
     <span class="pill pill-bekliyor" id="stat-bekliyor">0 bekliyor</span>
@@ -384,7 +384,7 @@
           </span>
         </div>
         <div class="dondurma-row">${o.kategori ? o.kategori + ' — ' : ''}${o.urun} × ${o.miktar}</div>
-        ${extras.map(e => `<div class="detail-row">${e}</div>`).join('')}
+        ${o.secimMetni ? `<div class="detail-row">${o.secimMetni}</div>` : ''}
         ${o.not ? `<div class="detail-row" style="color:#e07840;">Not: ${o.not}</div>` : ''}
         <div class="zaman-row">${o.zamanStr || ''} &middot; ${o.toplamFiyat || 0} ₺</div>
         <div class="card-actions">

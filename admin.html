@@ -188,9 +188,9 @@
     <div class="kat-detail-card">
       <div class="kat-detail-title" id="aktif-kat-baslik"></div>
 
-      <!-- Ürünler -->
-      <div style="margin-bottom:1rem;">
-        <div style="font-size:13px; font-weight:500; color:var(--muted); margin-bottom:0.5rem;">Ürünler</div>
+      <!-- Ürünler (sabit) -->
+      <div style="margin-bottom:1.25rem;">
+        <div style="font-size:13px; font-weight:600; color:var(--brown); margin-bottom:0.5rem; padding-bottom:0.4rem; border-bottom:1px solid var(--soft);">Ürünler</div>
         <div class="form-row">
           <div class="form-group" style="flex:0 0 50px;"><label>Emoji</label><input class="form-input emoji-select" id="u-emoji" type="text" value="🍦" maxlength="2"></div>
           <div class="form-group"><label>İsim</label><input class="form-input" id="u-isim" type="text" placeholder="Ürün adı"></div>
@@ -200,34 +200,17 @@
         <div class="item-list" id="urun-list"></div>
       </div>
 
-      <!-- Sos -->
-      <div style="margin-bottom:1rem;">
-        <div style="font-size:13px; font-weight:500; color:var(--muted); margin-bottom:0.5rem;">Sos Seçenekleri</div>
-        <div class="form-row">
-          <div class="form-group"><label>Sos adı</label><input class="form-input" id="sos-isim" type="text" placeholder="Çikolata Sosu..."></div>
-          <button class="add-btn" onclick="addChipItem('sos', 'sos-isim')">Ekle</button>
-        </div>
-        <div class="chip-list" id="sos-list"></div>
-      </div>
+      <!-- Dinamik Bölümler -->
+      <div id="dinamik-bolumler"></div>
 
-      <!-- Malzeme -->
-      <div style="margin-bottom:1rem;">
-        <div style="font-size:13px; font-weight:500; color:var(--muted); margin-bottom:0.5rem;">Malzeme Seçenekleri</div>
+      <!-- Yeni Bölüm Ekle -->
+      <div style="background:var(--warm); border-radius:12px; padding:1rem; border:1px dashed var(--soft);">
+        <div style="font-size:13px; font-weight:600; color:var(--brown); margin-bottom:0.5rem;">Yeni Seçenek Bölümü Ekle</div>
+        <p style="font-size:12px; color:var(--muted); margin-bottom:0.75rem;">Örn: "Sos", "Malzeme", "Külah Çeşidi", "Servis Şekli"</p>
         <div class="form-row">
-          <div class="form-group"><label>Malzeme adı</label><input class="form-input" id="malzeme-isim" type="text" placeholder="Muz, Çilek..."></div>
-          <button class="add-btn" onclick="addChipItem('malzeme', 'malzeme-isim')">Ekle</button>
+          <div class="form-group"><label>Bölüm Adı</label><input class="form-input" id="yeni-bolum-adi" type="text" placeholder="Sos, Külah Çeşidi..."></div>
+          <button class="add-btn green" onclick="addBolum()">Bölüm Oluştur</button>
         </div>
-        <div class="chip-list" id="malzeme-list"></div>
-      </div>
-
-      <!-- Topping -->
-      <div>
-        <div style="font-size:13px; font-weight:500; color:var(--muted); margin-bottom:0.5rem;">Topping Seçenekleri</div>
-        <div class="form-row">
-          <div class="form-group"><label>Topping adı</label><input class="form-input" id="topping-isim" type="text" placeholder="Fındık Tozu..."></div>
-          <button class="add-btn" onclick="addChipItem('topping', 'topping-isim')">Ekle</button>
-        </div>
-        <div class="chip-list" id="topping-list"></div>
       </div>
     </div>
   </div>
@@ -364,11 +347,122 @@
     onValue(ref(db, 'menu/' + id), (snap) => {
       const d = snap.val() || {};
       renderUrunList(d.urunler || {});
-      renderChipListAdmin('sos', d.sos || []);
-      renderChipListAdmin('malzeme', d.malzeme || []);
-      renderChipListAdmin('topping', d.topping || []);
+      // Dinamik bölümleri render et
+      const bolumler = d.bolumler || {};
+      renderDinamikBolumler(bolumler);
     }, { onlyOnce: true });
   }
+
+  function renderDinamikBolumler(bolumler) {
+    const container = document.getElementById('dinamik-bolumler');
+    const entries = Object.entries(bolumler);
+    if (!entries.length) { container.innerHTML = ''; return; }
+    container.innerHTML = entries.map(([bolumKey, bolum]) => {
+      const secenekler = bolum.secenekler || [];
+      return `<div style="margin-bottom:1rem; background:var(--cream); border-radius:12px; padding:1rem; border:1px solid var(--soft);">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.6rem; padding-bottom:0.4rem; border-bottom:1px solid var(--soft);">
+          <span style="font-size:13px; font-weight:600; color:var(--brown);">${bolum.isim}</span>
+          <button class="del-btn" onclick="delBolum('${bolumKey}')" title="Bölümü sil">×</button>
+        </div>
+        <div class="form-row" style="margin-bottom:0.5rem;">
+          <div class="form-group"><input class="form-input" id="bolum-inp-${bolumKey}" type="text" placeholder="${bolum.isim} ekle..."></div>
+          <button class="add-btn" onclick="addBolumSecenek('${bolumKey}')">Ekle</button>
+        </div>
+        <div class="chip-list" id="bolum-chip-${bolumKey}">
+          ${secenekler.length ? secenekler.map((s, i) => {
+            const isim = typeof s === 'object' ? s.isim : s;
+            const pasif = typeof s === 'object' ? s.pasif : false;
+            return `<div class="chip-item" style="${pasif ? 'opacity:0.5' : ''}">
+              ${isim}
+              <label class="toggle" style="margin-left:4px;"><input type="checkbox" ${pasif ? '' : 'checked'} onchange="toggleBolumSecenek('${bolumKey}', ${i}, this.checked)"><span class="toggle-slider"></span></label>
+              <button class="chip-del" onclick="delBolumSecenek('${bolumKey}', ${i})">×</button>
+            </div>`;
+          }).join('') : '<span class="empty-list">Henüz seçenek eklenmedi</span>'}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window.addBolum = async function() {
+    if (!aktifKatId) return;
+    const isim = document.getElementById('yeni-bolum-adi').value.trim();
+    if (!isim) { showToast('Bölüm adı girin'); return; }
+    const bolumKey = isim.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') + '_' + Date.now();
+    await set(ref(db, 'menu/' + aktifKatId + '/bolumler/' + bolumKey), { isim, secenekler: [] });
+    document.getElementById('yeni-bolum-adi').value = '';
+    loadKatIcerik(aktifKatId);
+    showToast('"' + isim + '" bölümü oluşturuldu');
+  };
+
+  window.delBolum = async function(bolumKey) {
+    if (!aktifKatId) return;
+    await remove(ref(db, 'menu/' + aktifKatId + '/bolumler/' + bolumKey));
+    loadKatIcerik(aktifKatId);
+    showToast('Bölüm silindi');
+  };
+
+  window.addBolumSecenek = function(bolumKey) {
+    if (!aktifKatId) return;
+    const inp = document.getElementById('bolum-inp-' + bolumKey);
+    const val = inp.value.trim();
+    if (!val) return;
+    const chipList = document.getElementById('bolum-chip-' + bolumKey);
+    const mevcutlar = Array.from(chipList.querySelectorAll('.chip-item')).map(el => el.childNodes[0].textContent.trim());
+    if (mevcutlar.includes(val)) { showToast('Zaten mevcut'); return; }
+    const yeni = [...mevcutlar.map(m => ({ isim: m, pasif: false })), { isim: val, pasif: false }];
+    set(ref(db, 'menu/' + aktifKatId + '/bolumler/' + bolumKey + '/secenekler'), yeni).then(() => {
+      inp.value = '';
+      loadKatIcerik(aktifKatId);
+      showToast('Eklendi');
+    });
+  };
+
+  window.delBolumSecenek = function(bolumKey, idx) {
+    if (!aktifKatId) return;
+    const chipList = document.getElementById('bolum-chip-' + bolumKey);
+    const items = Array.from(chipList.querySelectorAll('.chip-item')).map((el, i) => {
+      const isim = el.childNodes[0].textContent.trim();
+      const cb = el.querySelector('input[type=checkbox]');
+      return { isim, pasif: cb ? !cb.checked : false };
+    });
+    items.splice(idx, 1);
+    set(ref(db, 'menu/' + aktifKatId + '/bolumler/' + bolumKey + '/secenekler'), items).then(() => {
+      loadKatIcerik(aktifKatId);
+      showToast('Silindi');
+    });
+  };
+
+  window.toggleBolumSecenek = function(bolumKey, idx, aktif) {
+    if (!aktifKatId) return;
+    const chipList = document.getElementById('bolum-chip-' + bolumKey);
+    const items = Array.from(chipList.querySelectorAll('.chip-item')).map((el, i) => {
+      const isim = el.childNodes[0].textContent.trim();
+      const cb = el.querySelector('input[type=checkbox]');
+      return { isim, pasif: i === idx ? !aktif : (cb ? !cb.checked : false) };
+    });
+    set(ref(db, 'menu/' + aktifKatId + '/bolumler/' + bolumKey + '/secenekler'), items).then(() => {
+      loadKatIcerik(aktifKatId);
+    });
+  };
+
+  window.addChipItem = function(type, inputId) {
+    if (!aktifKatId) return;
+    const val = document.getElementById(inputId).value.trim();
+    if (!val) return;
+    const listEl = document.getElementById(type + '-list');
+    const rawChips = Array.from(listEl.querySelectorAll('.chip-item')).map(el => {
+      const isim = el.childNodes[0].textContent.trim();
+      const cb = el.querySelector('input[type=checkbox]');
+      return { isim, pasif: cb ? !cb.checked : false };
+    });
+    if (rawChips.find(c => c.isim === val)) { showToast('Zaten mevcut'); return; }
+    rawChips.push({ isim: val, pasif: false });
+    set(ref(db, 'menu/' + aktifKatId + '/' + type), rawChips).then(() => {
+      document.getElementById(inputId).value = '';
+      loadKatIcerik(aktifKatId);
+      showToast('Eklendi');
+    });
+  };
 
   function renderUrunList(obj) {
     const list = document.getElementById('urun-list');

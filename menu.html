@@ -237,12 +237,10 @@
     const tumUrunler = data.urunler ? Object.values(data.urunler) : [];
     const aktifUrunler = tumUrunler.filter(u => !u.pasif);
     const pasifUrunler = tumUrunler.filter(u => u.pasif);
-    const soslar = (data.sos || []).map(s => typeof s === 'object' ? s : { isim: s, pasif: false });
-    const toppingler = (data.topping || []).map(t => typeof t === 'object' ? t : { isim: t, pasif: false });
-    const malzemeler = (data.malzeme || []).map(m => typeof m === 'object' ? m : { isim: m, pasif: false });
+    const bolumler = data.bolumler ? Object.entries(data.bolumler) : [];
 
     document.getElementById('detail-title').textContent = aktifKategori.isim;
-    state = { urun: null, sos: [], topping: [], malzeme: [], miktar: 1 };
+    state = { urun: null, secimler: {}, miktar: 1 };
     document.getElementById('miktar-val').textContent = '1';
 
     let html = '<div class="section">';
@@ -260,7 +258,7 @@
         </div>`;
       });
       pasifUrunler.forEach(u => {
-        html += `<div class="urun-card" style="opacity:0.4; cursor:not-allowed; filter:grayscale(1);">
+        html += `<div class="urun-card" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);">
           <div class="urun-icon">${u.emoji || '🍦'}</div>
           <div class="urun-name">${u.isim}</div>
           <div class="urun-price" style="color:#999;">Stokta yok</div>
@@ -269,32 +267,23 @@
       html += `</div>`;
     }
 
-    const aktifSoslar = soslar.filter(s => !s.pasif);
-    const pasifSoslar = soslar.filter(s => s.pasif);
-    if (soslar.length) {
-      html += `<div class="section-title">Sos</div><div class="chips">`;
-      aktifSoslar.forEach(s => { html += `<span class="chip" onclick="toggleChip(this,'sos','${s.isim}')">${s.isim}</span>`; });
-      pasifSoslar.forEach(s => { html += `<span class="chip" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);" title="Stokta yok">${s.isim}</span>`; });
+    // Dinamik bölümler
+    bolumler.forEach(([bolumKey, bolum]) => {
+      const secenekler = bolum.secenekler || [];
+      const aktifler = secenekler.filter(s => !(typeof s === 'object' ? s.pasif : false));
+      const pasifler = secenekler.filter(s => (typeof s === 'object' ? s.pasif : false));
+      if (!secenekler.length) return;
+      html += `<div class="section-title">${bolum.isim}</div><div class="chips">`;
+      aktifler.forEach(s => {
+        const isim = typeof s === 'object' ? s.isim : s;
+        html += `<span class="chip" onclick="toggleBolumChip(this,'${bolumKey}','${isim}')">${isim}</span>`;
+      });
+      pasifler.forEach(s => {
+        const isim = typeof s === 'object' ? s.isim : s;
+        html += `<span class="chip" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);" title="Stokta yok">${isim}</span>`;
+      });
       html += `</div>`;
-    }
-
-    const aktifMalzemeler = malzemeler.filter(m => !m.pasif);
-    const pasifMalzemeler = malzemeler.filter(m => m.pasif);
-    if (malzemeler.length) {
-      html += `<div class="section-title">Malzeme</div><div class="chips">`;
-      aktifMalzemeler.forEach(m => { html += `<span class="chip" onclick="toggleChip(this,'malzeme','${m.isim}')">${m.isim}</span>`; });
-      pasifMalzemeler.forEach(m => { html += `<span class="chip" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);" title="Stokta yok">${m.isim}</span>`; });
-      html += `</div>`;
-    }
-
-    const aktifToppingler = toppingler.filter(t => !t.pasif);
-    const pasifToppingler = toppingler.filter(t => t.pasif);
-    if (toppingler.length) {
-      html += `<div class="section-title">Topping</div><div class="chips">`;
-      aktifToppingler.forEach(t => { html += `<span class="chip" onclick="toggleChip(this,'topping','${t.isim}')">${t.isim}</span>`; });
-      pasifToppingler.forEach(t => { html += `<span class="chip" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);" title="Stokta yok">${t.isim}</span>`; });
-      html += `</div>`;
-    }
+    });
 
     html += `<div class="section-title">Özel Not</div>
       <textarea class="not-input" id="siparis-not" rows="2" placeholder="Örn: Az şekerli, alerji..."></textarea>
@@ -324,9 +313,19 @@
     });
   };
 
+  window.toggleBolumChip = function(el, bolumKey, val) {
+    el.classList.toggle('active');
+    if (!state.secimler[bolumKey]) state.secimler[bolumKey] = [];
+    const arr = state.secimler[bolumKey];
+    const idx = arr.indexOf(val);
+    if (idx === -1) arr.push(val); else arr.splice(idx, 1);
+  };
+
   window.toggleChip = function(el, key, val) {
     el.classList.toggle('active');
-    const arr = state[key];
+    if (!state.secimler) state.secimler = {};
+    if (!state.secimler[key]) state.secimler[key] = [];
+    const arr = state.secimler[key];
     const idx = arr.indexOf(val);
     if (idx === -1) arr.push(val); else arr.splice(idx, 1);
   };
@@ -347,6 +346,14 @@
     const urun = urunler.find(u => u.id === state.urun);
     const not = document.getElementById('siparis-not')?.value?.trim() || '';
 
+    const bolumler = data.bolumler || {};
+    const secimMetni = Object.entries(state.secimler || {})
+      .filter(([, arr]) => arr.length > 0)
+      .map(([bolumKey, arr]) => {
+        const bolumIsim = bolumler[bolumKey]?.isim || bolumKey;
+        return bolumIsim + ': ' + arr.join(', ');
+      }).join(' | ');
+
     const btn = document.getElementById('siparis-btn');
     btn.disabled = true; btn.textContent = 'Gönderiliyor...';
 
@@ -358,23 +365,22 @@
         fiyat: urun.fiyat,
         miktar: state.miktar,
         toplamFiyat: urun.fiyat * state.miktar,
-        sos: state.sos,
-        topping: state.topping,
-        malzeme: state.malzeme,
+        secimler: state.secimler || {},
+        secimMetni,
         not,
         durum: 'bekliyor',
         zaman: new Date().toISOString(),
         zamanStr: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
       });
       showToast('✓ Siparişiniz alındı!');
-      state = { urun: null, sos: [], topping: [], malzeme: [], miktar: 1 };
+      state = { urun: null, secimler: {}, miktar: 1 };
       document.getElementById('miktar-val').textContent = '1';
       document.querySelectorAll('.urun-card').forEach(e => e.classList.remove('selected'));
       document.querySelectorAll('.chip').forEach(e => e.classList.remove('active'));
       if (document.getElementById('siparis-not')) document.getElementById('siparis-not').value = '';
       if (masaUrl) {
         document.getElementById('masa-input').value = masaUrl;
-        document.getElementById('masa-pill').textContent = 'Masa ' + masaUrl;
+        document.getElementById('masa-pill').textContent = masaGoster || 'Masa ' + masaUrl;
       }
     } catch(e) { showToast('Hata oluştu, tekrar deneyin'); }
 
