@@ -12,11 +12,10 @@
     --muted: #8a6a56; --card: #fff9f3; --radius: 16px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--cream); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding-bottom: 120px; }
+  body { background: var(--cream); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding-bottom: 100px; }
 
   .header { background: var(--brown); color: #fff; padding: 0.75rem 1.25rem; text-align: center; position: sticky; top: 0; z-index: 100; }
-  .header img { height: 70px; width: auto; object-fit: contain; }
-  .header p { font-size: 12px; opacity: 0.7; margin-top: 2px; }
+  .header img { height: 65px; width: auto; object-fit: contain; }
 
   .masa-bar { background: var(--warm); border-bottom: 1.5px solid var(--soft); padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 10px; }
   .masa-bar label { font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; }
@@ -24,12 +23,47 @@
   .masa-bar input:focus { border-color: var(--accent); }
   .masa-pill { background: var(--brown); color: #fff; font-size: 12px; padding: 6px 12px; border-radius: 999px; white-space: nowrap; font-weight: 500; }
 
-  .cat-tabs { display: flex; background: var(--warm); border-bottom: 1.5px solid var(--soft); }
-  .cat-tab { flex: 1; padding: 12px; text-align: center; font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: var(--muted); border-bottom: 2px solid transparent; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
-  .cat-tab.active { color: var(--brown); border-bottom-color: var(--accent); background: var(--cream); }
+  /* EKRANLAR */
+  .screen { display: none; }
+  .screen.active { display: block; }
 
-  .cat-panel { display: none; }
-  .cat-panel.active { display: block; }
+  /* KATEGORİ ANASAYFA */
+  .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 1.25rem; }
+  .cat-card {
+    border-radius: var(--radius); overflow: hidden; cursor: pointer;
+    border: 1.5px solid var(--soft); background: var(--card);
+    transition: transform 0.2s, border-color 0.2s;
+    aspect-ratio: 1;
+    position: relative;
+  }
+  .cat-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .cat-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cat-card .cat-no-img {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: var(--warm);
+    font-size: 36px;
+  }
+  .cat-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(44,24,10,0.85));
+    color: #fff; font-size: 15px; font-weight: 500;
+    padding: 1.5rem 0.75rem 0.75rem;
+    font-family: 'Playfair Display', serif;
+  }
+
+  /* KATEGORİ DETAY SAYFASI */
+  .detail-header {
+    background: var(--warm); border-bottom: 1.5px solid var(--soft);
+    padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 12px;
+  }
+  .back-btn {
+    background: transparent; border: 1.5px solid var(--soft); border-radius: 10px;
+    padding: 6px 14px; font-size: 13px; color: var(--brown); cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-weight: 500;
+  }
+  .back-btn:hover { background: var(--soft); }
+  .detail-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--brown); }
 
   .section { padding: 1.25rem 1.25rem 0; }
   .section-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--brown); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 8px; }
@@ -51,7 +85,9 @@
   .not-input { width: 100%; border: 1.5px solid var(--soft); border-radius: 12px; padding: 10px 14px; font-size: 13px; background: var(--card); color: var(--text); font-family: 'DM Sans', sans-serif; resize: none; outline: none; margin-bottom: 1rem; }
   .not-input:focus { border-color: var(--accent); }
 
-  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--brown); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 12px; z-index: 200; }
+  /* ALT BAR */
+  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--brown); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 10px; z-index: 200; }
+  .sorun-btn { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.3); background: transparent; color: #fff; font-size: 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .miktar-ctrl { display: flex; align-items: center; gap: 8px; }
   .miktar-btn { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.3); background: transparent; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .miktar-btn:hover { background: rgba(255,255,255,0.1); }
@@ -60,7 +96,17 @@
   .siparis-btn:hover { opacity: 0.9; }
   .siparis-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #2d1f14; color: #fff; padding: 10px 20px; border-radius: 999px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  /* SORUN MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: var(--card); border-radius: 16px; padding: 1.5rem; width: 90%; max-width: 340px; }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--brown); margin-bottom: 0.5rem; }
+  .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 1rem; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 1rem; }
+  .modal-cancel { flex: 1; padding: 10px; border: 1.5px solid var(--soft); border-radius: 10px; background: transparent; color: var(--muted); font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .modal-send { flex: 1; padding: 10px; border: none; border-radius: 10px; background: var(--accent); color: #fff; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  .toast { position: fixed; top: 90px; left: 50%; transform: translateX(-50%); background: #2d1f14; color: #fff; padding: 10px 20px; border-radius: 999px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
   .toast.show { opacity: 1; }
   .loading { text-align: center; padding: 2rem; color: var(--muted); font-size: 14px; }
   .empty-msg { font-size: 13px; color: var(--muted); font-style: italic; }
@@ -70,7 +116,6 @@
 
 <div class="header">
   <img src="bellacone_logo.png" alt="Bellacone" />
-  <p>Masa numaranızı girin ve siparişinizi verin</p>
 </div>
 
 <div class="masa-bar">
@@ -79,63 +124,37 @@
   <span class="masa-pill" id="masa-pill">—</span>
 </div>
 
-<div class="cat-tabs">
-  <button class="cat-tab active" onclick="switchCat('dondurma', this)">🍦 Dondurma</button>
-  <button class="cat-tab" onclick="switchCat('waffle', this)">🧇 Waffle</button>
-</div>
-
-<!-- DONDURMA -->
-<div class="cat-panel active" id="panel-dondurma">
-  <div class="section">
-    <div class="section-title">Dondurma Çeşidi</div>
-    <div class="urun-grid" id="dondurma-grid"><div class="loading">Yükleniyor...</div></div>
-
-    <div class="section-title">Sos</div>
-    <div class="chips" id="d-sos-chips"><span class="empty-msg">Yükleniyor...</span></div>
-
-    <div class="section-title">Topping</div>
-    <div class="chips" id="d-topping-chips"><span class="empty-msg">Yükleniyor...</span></div>
-
-    <div class="section-title">Özel Not</div>
-    <textarea class="not-input" id="d-not" rows="2" placeholder="Örn: Az şekerli, alerji bilgisi..."></textarea>
+<!-- ANA KATEGORİ EKRANI -->
+<div class="screen active" id="screen-home">
+  <div class="cat-grid" id="cat-grid">
+    <div class="loading">Yükleniyor...</div>
   </div>
 </div>
 
-<!-- WAFFLE -->
-<div class="cat-panel" id="panel-waffle">
-  <div class="section">
-    <div class="section-title">Waffle Çeşidi</div>
-    <div class="urun-grid" id="waffle-grid"><div class="loading">Yükleniyor...</div></div>
-
-    <div class="section-title">İçine Malzeme</div>
-    <div class="chips" id="w-malzeme-chips"><span class="empty-msg">Yükleniyor...</span></div>
-
-    <div class="section-title">Üstüne Sos</div>
-    <div class="chips" id="w-sos-chips"><span class="empty-msg">Yükleniyor...</span></div>
-
-    <div class="section-title">Topping</div>
-    <div class="chips" id="w-topping-chips"><span class="empty-msg">Yükleniyor...</span></div>
-
-    <div class="section-title">Özel Not</div>
-    <textarea class="not-input" id="w-not" rows="2" placeholder="Örn: Az şekerli, alerji bilgisi..."></textarea>
+<!-- KATEGORİ DETAY EKRANI -->
+<div class="screen" id="screen-detail">
+  <div class="detail-header">
+    <button class="back-btn" onclick="goHome()">← Geri</button>
+    <span class="detail-title" id="detail-title"></span>
   </div>
+  <div id="detail-content"></div>
 </div>
 
 <!-- SORUN BİLDİR MODAL -->
-<div id="sorun-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:500; align-items:center; justify-content:center;">
-  <div style="background:#fff9f3; border-radius:16px; padding:1.5rem; width:90%; max-width:340px; margin:auto;">
-    <div style="font-family:'Playfair Display',serif; font-size:17px; font-weight:600; color:#5c3d2e; margin-bottom:0.5rem;">Sorun Bildir</div>
-    <p style="font-size:13px; color:#8a6a56; margin-bottom:1rem;">Yaşadığınız sorunu yazın, garson ekranına iletilecek.</p>
-    <textarea id="sorun-text" rows="4" placeholder="Örn: Menü yüklenmiyor, sos seçeneği eksik..." style="width:100%; border:1.5px solid #e8d5c0; border-radius:10px; padding:10px 12px; font-size:13px; font-family:'DM Sans',sans-serif; color:#2d1f14; background:#fff; resize:none; outline:none;"></textarea>
-    <div style="display:flex; gap:8px; margin-top:1rem;">
-      <button onclick="sorunKapat()" style="flex:1; padding:10px; border:1.5px solid #e8d5c0; border-radius:10px; background:transparent; color:#8a6a56; font-size:13px; cursor:pointer; font-family:'DM Sans',sans-serif;">İptal</button>
-      <button onclick="sorunGonder()" style="flex:1; padding:10px; border:none; border-radius:10px; background:#c9663c; color:#fff; font-size:13px; font-weight:500; cursor:pointer; font-family:'DM Sans',sans-serif;">Gönder</button>
+<div class="modal-overlay" id="sorun-modal">
+  <div class="modal-box">
+    <div class="modal-title">Sorun Bildir</div>
+    <div class="modal-sub">Yaşadığınız sorunu yazın, garson ekranına iletilecek.</div>
+    <textarea class="not-input" id="sorun-text" rows="4" placeholder="Örn: Menü yüklenmiyor, seçenek eksik..."></textarea>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="sorunKapat()">İptal</button>
+      <button class="modal-send" onclick="sorunGonder()">Gönder</button>
     </div>
   </div>
 </div>
 
 <div class="bottom-bar">
-  <button onclick="sorunAc()" style="width:36px; height:36px; border-radius:50%; border:1.5px solid rgba(255,255,255,0.3); background:transparent; color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;" title="Sorun Bildir">⚠️</button>
+  <button class="sorun-btn" onclick="sorunAc()" title="Sorun Bildir">!</button>
   <div class="miktar-ctrl">
     <button class="miktar-btn" onclick="changeMiktar(-1)">−</button>
     <span class="miktar-val" id="miktar-val">1</span>
@@ -163,8 +182,20 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
+  const VARSAYILAN_KATEGORILER = [
+    { id: 'dondurma', isim: 'Dondurma', emoji: '🍦' },
+    { id: 'waffle',   isim: 'Waffle',   emoji: '🧇' },
+    { id: 'magnolya', isim: 'Magnolya', emoji: '🌸' },
+    { id: 'sansebastian', isim: 'San Sebastian', emoji: '🎂' },
+    { id: 'donut',    isim: 'Donut',    emoji: '🍩' },
+    { id: 'sufle',    isim: 'Sufle',    emoji: '🍮' },
+    { id: 'brownie',  isim: 'Brownie',  emoji: '🍫' },
+  ];
+
   let menuData = {};
-  let state = { kategori: 'dondurma', dondurma: null, waffle: null, dSos: [], dTopping: [], wMalzeme: [], wSos: [], wTopping: [], miktar: 1 };
+  let kategoriler = [];
+  let aktifKategori = null;
+  let state = { urun: null, sos: [], topping: [], malzeme: [], miktar: 1 };
 
   const urlParams = new URLSearchParams(window.location.search);
   const masaUrl = urlParams.get('masa');
@@ -178,77 +209,97 @@
 
   onValue(ref(db, 'menu'), (snapshot) => {
     const data = snapshot.val() || {};
-    menuData = {
-      dondurma: data.dondurma ? Object.values(data.dondurma) : [
-        { id: 'd1', isim: 'Çikolatalı', fiyat: 45, emoji: '🍫' },
-        { id: 'd2', isim: 'Vanilyalı', fiyat: 40, emoji: '🍦' },
-        { id: 'd3', isim: 'Çilekli', fiyat: 40, emoji: '🍓' },
-        { id: 'd4', isim: 'Magnolya', fiyat: 55, emoji: '🌸' },
-      ],
-      waffle: data.waffle ? Object.values(data.waffle) : [
-        { id: 'w1', isim: 'Klasik Waffle', fiyat: 60, emoji: '🧇' },
-        { id: 'w2', isim: 'Çikolatalı Waffle', fiyat: 70, emoji: '🍫' },
-      ],
-      dSos:     data.dSos     || ['Çikolata Sosu', 'Karamel Sosu', 'Çilek Sosu', 'Nutella'],
-      dTopping: data.dTopping || ['Fındık Tozu', 'Oreo', 'Krem Şanti', 'Renkli Şeker', 'Marshmallow'],
-      wMalzeme: data.wMalzeme || ['Muz', 'Çilek', 'Ahududu', 'Oreo', 'Marshmallow', 'Granola'],
-      wSos:     data.wSos     || ['Çikolata Sosu', 'Karamel Sosu', 'Nutella', 'Beyaz Çikolata'],
-      wTopping: data.wTopping || ['Fındık Tozu', 'Krem Şanti', 'Renkli Şeker', 'Oreo', 'Hindistancevizi'],
-    };
-    renderAll();
+    menuData = data;
+    kategoriler = data.kategoriler ? Object.values(data.kategoriler) : VARSAYILAN_KATEGORILER;
+    renderHome();
   });
 
-  function renderUrunGrid(containerId, arr, stateKey) {
-    const el = document.getElementById(containerId);
-    if (!arr || !arr.length) { el.innerHTML = '<span class="empty-msg">Ürün eklenmemiş</span>'; return; }
-    el.innerHTML = arr.map(u => `
-      <div class="urun-card" id="uc-${u.id}" onclick="selectUrun('${stateKey}','${u.id}')">
-        <div class="urun-icon">${u.emoji || '🍦'}</div>
-        <div class="urun-name">${u.isim}</div>
-        <div class="urun-price">${u.fiyat} ₺</div>
-      </div>
-    `).join('');
+  function renderHome() {
+    const grid = document.getElementById('cat-grid');
+    grid.innerHTML = kategoriler.map(k => {
+      const foto = k.foto || '';
+      return `<div class="cat-card" onclick="openKategori('${k.id}')">
+        ${foto
+          ? `<img src="${foto}" alt="${k.isim}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="cat-no-img" style="display:none"><span>${k.emoji || '🍦'}</span></div>`
+          : `<div class="cat-no-img"><span style="font-size:40px">${k.emoji || '🍦'}</span></div>`
+        }
+        <div class="cat-label">${k.isim}</div>
+      </div>`;
+    }).join('');
   }
 
-  function renderChips(containerId, arr, stateKey) {
-    const el = document.getElementById(containerId);
-    if (!arr || !arr.length) { el.innerHTML = '<span class="empty-msg">Seçenek yok</span>'; return; }
-    el.innerHTML = arr.map(v => `<span class="chip" onclick="toggleChip(this,'${stateKey}','${v}')">${v}</span>`).join('');
-  }
+  window.openKategori = function(id) {
+    aktifKategori = kategoriler.find(k => k.id === id);
+    if (!aktifKategori) return;
+    const data = menuData[id] || {};
+    const urunler = data.urunler ? Object.values(data.urunler) : [];
+    const soslar = data.sos || [];
+    const toppingler = data.topping || [];
+    const malzemeler = data.malzeme || [];
 
-  function renderAll() {
-    renderUrunGrid('dondurma-grid', menuData.dondurma, 'dondurma');
-    renderUrunGrid('waffle-grid', menuData.waffle, 'waffle');
-    renderChips('d-sos-chips', menuData.dSos, 'dSos');
-    renderChips('d-topping-chips', menuData.dTopping, 'dTopping');
-    renderChips('w-malzeme-chips', menuData.wMalzeme, 'wMalzeme');
-    renderChips('w-sos-chips', menuData.wSos, 'wSos');
-    renderChips('w-topping-chips', menuData.wTopping, 'wTopping');
-    resetState();
-  }
-
-  function resetState() {
-    state = { kategori: state.kategori, dondurma: null, waffle: null, dSos: [], dTopping: [], wMalzeme: [], wSos: [], wTopping: [], miktar: 1 };
+    document.getElementById('detail-title').textContent = aktifKategori.isim;
+    state = { urun: null, sos: [], topping: [], malzeme: [], miktar: 1 };
     document.getElementById('miktar-val').textContent = '1';
-    document.querySelectorAll('.urun-card').forEach(e => e.classList.remove('selected'));
-    document.querySelectorAll('.chip').forEach(e => e.classList.remove('active'));
-    document.getElementById('d-not').value = '';
-    document.getElementById('w-not').value = '';
-  }
 
-  window.switchCat = function(cat, el) {
-    state.kategori = cat;
-    document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.cat-panel').forEach(p => p.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('panel-' + cat).classList.add('active');
+    let html = '<div class="section">';
+
+    html += `<div class="section-title">Ürünler</div>`;
+    if (!urunler.length) {
+      html += '<p class="empty-msg">Henüz ürün eklenmedi</p>';
+    } else {
+      html += `<div class="urun-grid">` + urunler.map(u => `
+        <div class="urun-card" id="uc-${u.id}" onclick="selectUrun('${u.id}')">
+          <div class="urun-icon">${u.emoji || '🍦'}</div>
+          <div class="urun-name">${u.isim}</div>
+          <div class="urun-price">${u.fiyat} ₺</div>
+        </div>
+      `).join('') + `</div>`;
+    }
+
+    if (soslar.length) {
+      html += `<div class="section-title">Sos</div><div class="chips">` +
+        soslar.map(s => `<span class="chip" onclick="toggleChip(this,'sos','${s}')">${s}</span>`).join('') +
+        `</div>`;
+    }
+
+    if (malzemeler.length) {
+      html += `<div class="section-title">Malzeme</div><div class="chips">` +
+        malzemeler.map(m => `<span class="chip" onclick="toggleChip(this,'malzeme','${m}')">${m}</span>`).join('') +
+        `</div>`;
+    }
+
+    if (toppingler.length) {
+      html += `<div class="section-title">Topping</div><div class="chips">` +
+        toppingler.map(t => `<span class="chip" onclick="toggleChip(this,'topping','${t}')">${t}</span>`).join('') +
+        `</div>`;
+    }
+
+    html += `<div class="section-title">Özel Not</div>
+      <textarea class="not-input" id="siparis-not" rows="2" placeholder="Örn: Az şekerli, alerji..."></textarea>
+    </div>`;
+
+    document.getElementById('detail-content').innerHTML = html;
+    showScreen('detail');
   };
 
-  window.selectUrun = function(key, id) {
-    state[key] = state[key] === id ? null : id;
-    const gridId = key === 'dondurma' ? 'dondurma-grid' : 'waffle-grid';
-    document.querySelectorAll('#' + gridId + ' .urun-card').forEach(e => e.classList.remove('selected'));
-    if (state[key]) document.getElementById('uc-' + id)?.classList.add('selected');
+  window.goHome = function() {
+    showScreen('home');
+    aktifKategori = null;
+  };
+
+  function showScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + name).classList.add('active');
+  }
+
+  window.selectUrun = function(id) {
+    const data = menuData[aktifKategori.id] || {};
+    const urunler = data.urunler ? Object.values(data.urunler) : [];
+    state.urun = state.urun === id ? null : id;
+    urunler.forEach(u => {
+      const el = document.getElementById('uc-' + u.id);
+      if (el) el.classList.toggle('selected', u.id === state.urun);
+    });
   };
 
   window.toggleChip = function(el, key, val) {
@@ -266,67 +317,53 @@
   window.siparisVer = async function() {
     const masa = document.getElementById('masa-input').value;
     if (!masa) { showToast('Lütfen masa numarası girin'); return; }
+    if (!aktifKategori) { showToast('Lütfen bir kategori seçin'); return; }
+    if (!state.urun) { showToast('Lütfen bir ürün seçin'); return; }
 
-    const kat = state.kategori;
-    const urunId = kat === 'dondurma' ? state.dondurma : state.waffle;
-    if (!urunId) { showToast('Lütfen bir ürün seçin'); return; }
-
-    const urunList = kat === 'dondurma' ? menuData.dondurma : menuData.waffle;
-    const urun = urunList.find(x => x.id === urunId);
-    const not = document.getElementById(kat === 'dondurma' ? 'd-not' : 'w-not').value.trim();
+    const data = menuData[aktifKategori.id] || {};
+    const urunler = data.urunler ? Object.values(data.urunler) : [];
+    const urun = urunler.find(u => u.id === state.urun);
+    const not = document.getElementById('siparis-not')?.value?.trim() || '';
 
     const btn = document.getElementById('siparis-btn');
-    btn.disabled = true;
-    btn.textContent = 'Gönderiliyor...';
+    btn.disabled = true; btn.textContent = 'Gönderiliyor...';
 
     try {
-      const siparis = {
+      await push(ref(db, 'siparisler'), {
         masa: Number(masa),
-        kategori: kat === 'dondurma' ? 'Dondurma' : 'Waffle',
+        kategori: aktifKategori.isim,
         urun: urun.isim,
         fiyat: urun.fiyat,
         miktar: state.miktar,
         toplamFiyat: urun.fiyat * state.miktar,
+        sos: state.sos,
+        topping: state.topping,
+        malzeme: state.malzeme,
         not,
         durum: 'bekliyor',
         zaman: new Date().toISOString(),
         zamanStr: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-      };
-
-      if (kat === 'dondurma') {
-        siparis.sos = state.dSos;
-        siparis.topping = state.dTopping;
-      } else {
-        siparis.malzeme = state.wMalzeme;
-        siparis.sos = state.wSos;
-        siparis.topping = state.wTopping;
-      }
-
-      await push(ref(db, 'siparisler'), siparis);
+      });
       showToast('✓ Siparişiniz alındı!');
-      resetState();
+      state = { urun: null, sos: [], topping: [], malzeme: [], miktar: 1 };
+      document.getElementById('miktar-val').textContent = '1';
+      document.querySelectorAll('.urun-card').forEach(e => e.classList.remove('selected'));
+      document.querySelectorAll('.chip').forEach(e => e.classList.remove('active'));
+      if (document.getElementById('siparis-not')) document.getElementById('siparis-not').value = '';
       if (masaUrl) {
         document.getElementById('masa-input').value = masaUrl;
         document.getElementById('masa-pill').textContent = 'Masa ' + masaUrl;
       }
-    } catch (e) {
-      showToast('Hata oluştu, tekrar deneyin');
-    }
+    } catch(e) { showToast('Hata oluştu, tekrar deneyin'); }
 
-    btn.disabled = false;
-    btn.textContent = 'Sipariş Ver';
+    btn.disabled = false; btn.textContent = 'Sipariş Ver';
   };
 
-  window.sorunAc = function() {
-    const modal = document.getElementById('sorun-modal');
-    modal.style.display = 'flex';
-  };
-
+  window.sorunAc = function() { document.getElementById('sorun-modal').classList.add('open'); };
   window.sorunKapat = function() {
-    document.getElementById('sorun-modal').style.display = 'none';
+    document.getElementById('sorun-modal').classList.remove('open');
     document.getElementById('sorun-text').value = '';
   };
-
   window.sorunGonder = async function() {
     const masa = document.getElementById('masa-input').value;
     const mesaj = document.getElementById('sorun-text').value.trim();
@@ -336,9 +373,7 @@
         masa: masa ? Number(masa) : '?',
         kategori: 'Sorun Bildirimi',
         urun: mesaj,
-        fiyat: 0,
-        miktar: 1,
-        toplamFiyat: 0,
+        fiyat: 0, miktar: 1, toplamFiyat: 0,
         durum: 'bekliyor',
         zaman: new Date().toISOString(),
         zamanStr: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
@@ -346,15 +381,12 @@
       });
       sorunKapat();
       showToast('Sorun bildirildi, teşekkürler!');
-    } catch(e) {
-      showToast('Gönderilemedi, tekrar deneyin');
-    }
+    } catch(e) { showToast('Gönderilemedi, tekrar deneyin'); }
   };
 
   function showToast(msg) {
     const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
+    t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 </script>
