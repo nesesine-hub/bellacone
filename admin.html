@@ -53,6 +53,16 @@
   .add-btn:hover { opacity: 0.85; }
   .add-btn.green { background: var(--green); }
 
+  /* TOGGLE */
+  .toggle-wrap { display: flex; align-items: center; gap: 8px; }
+  .toggle { position: relative; width: 36px; height: 20px; cursor: pointer; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider { position: absolute; inset: 0; background: #ccc; border-radius: 20px; transition: 0.2s; }
+  .toggle-slider:before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.2s; }
+  .toggle input:checked + .toggle-slider { background: var(--green); }
+  .toggle input:checked + .toggle-slider:before { transform: translateX(16px); }
+  .pasif-label { font-size: 11px; color: var(--red); font-weight: 500; }
+
   .item-list { display: flex; flex-direction: column; gap: 6px; }
   .item-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--cream); border-radius: 10px; border: 1px solid var(--soft); }
   .item-left { display: flex; align-items: center; gap: 8px; }
@@ -238,15 +248,19 @@
 <div class="panel" id="panel-qr">
   <div class="section-card">
     <div class="section-header"><h2>QR Kod Oluştur</h2></div>
-    <p style="font-size:13px; color:var(--muted); margin-bottom:1rem;">Her masa için ayrı QR kod oluştur ve indir.</p>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:1rem;">Bölge adı + masa aralığı gir. Her masa için ayrı QR oluşturulur.</p>
     <div class="form-row">
-      <div class="form-group"><label>Menü URL</label><input class="form-input" id="menu-url" type="text" placeholder="https://bellacone.site/menu.html"></div>
+      <div class="form-group"><label>Menü URL</label><input class="form-input" id="menu-url" type="text" placeholder="https://bellacone.site/menu.html" value="https://bellacone.site/menu.html"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Bölge Adı</label><input class="form-input" id="bolge-adi" type="text" placeholder="Yan Bahçe, İçeri, Ön Bahçe..."></div>
     </div>
     <div class="form-row">
       <div class="form-group" style="flex:0 0 120px;"><label>Başlangıç masa</label><input class="form-input" id="masa-start" type="number" value="1" min="1"></div>
-      <div class="form-group" style="flex:0 0 120px;"><label>Bitiş masa</label><input class="form-input" id="masa-end" type="number" value="10" min="1"></div>
+      <div class="form-group" style="flex:0 0 120px;"><label>Bitiş masa</label><input class="form-input" id="masa-end" type="number" value="5" min="1"></div>
       <button class="gen-btn" onclick="generateQRs()">Oluştur</button>
     </div>
+    <p style="font-size:12px; color:var(--muted); margin-bottom:0.5rem;">Her bölge için ayrı ayrı oluşturabilirsin. Örn: önce "Yan Bahçe" 1-5, sonra "İçeri" 1-8.</p>
     <div class="qr-grid" id="qr-grid"></div>
   </div>
 </div>
@@ -361,7 +375,7 @@
     const items = Object.entries(obj);
     if (!items.length) { list.innerHTML = '<span class="empty-list">Henüz ürün eklenmedi</span>'; return; }
     list.innerHTML = items.map(([key, u]) => `
-      <div class="item-row">
+      <div class="item-row" style="${u.pasif ? 'opacity:0.5' : ''}">
         <div class="item-left">
           <span class="item-emoji">${u.emoji || '🍦'}</span>
           <div class="item-info">
@@ -369,7 +383,13 @@
             <span class="item-price">${u.fiyat} ₺</span>
           </div>
         </div>
-        <button class="del-btn" onclick="delUrun('${key}')">×</button>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="toggle-wrap">
+            <label class="toggle"><input type="checkbox" ${u.pasif ? '' : 'checked'} onchange="toggleUrun('${key}', this.checked)"><span class="toggle-slider"></span></label>
+            ${u.pasif ? '<span class="pasif-label">Pasif</span>' : ''}
+          </div>
+          <button class="del-btn" onclick="delUrun('${key}')">×</button>
+        </div>
       </div>
     `).join('');
   }
@@ -377,9 +397,16 @@
   function renderChipListAdmin(type, arr) {
     const list = document.getElementById(type + '-list');
     if (!arr.length) { list.innerHTML = '<span class="empty-list">Henüz eklenmedi</span>'; return; }
-    list.innerHTML = arr.map((item, i) => `
-      <div class="chip-item">${item}<button class="chip-del" onclick="delChipItem('${type}', ${i})">×</button></div>
-    `).join('');
+    list.innerHTML = arr.map((item, i) => {
+      const isObj = typeof item === 'object';
+      const isim = isObj ? item.isim : item;
+      const pasif = isObj ? item.pasif : false;
+      return `<div class="chip-item" style="${pasif ? 'opacity:0.5' : ''}">
+        ${isim}
+        <label class="toggle" style="margin-left:4px;"><input type="checkbox" ${pasif ? '' : 'checked'} onchange="toggleChipItem('${type}', ${i}, this.checked)"><span class="toggle-slider"></span></label>
+        <button class="chip-del" onclick="delChipItem('${type}', ${i})">×</button>
+      </div>`;
+    }).join('');
   }
 
   window.fotoOnizle = function(id) {
@@ -458,15 +485,38 @@
     showToast('Silindi');
   };
 
+  window.toggleUrun = async function(key, aktif) {
+    if (!aktifKatId) return;
+    await set(ref(db, 'menu/' + aktifKatId + '/urunler/' + key + '/pasif'), !aktif);
+    loadKatIcerik(aktifKatId);
+  };
+
+  window.toggleChipItem = function(type, idx, aktif) {
+    if (!aktifKatId) return;
+    const listEl = document.getElementById(type + '-list');
+    const rawChips = Array.from(listEl.querySelectorAll('.chip-item')).map((el, i) => {
+      const isim = el.childNodes[0].textContent.trim();
+      const cb = el.querySelector('input[type=checkbox]');
+      return { isim, pasif: i === idx ? !aktif : !cb.checked };
+    });
+    set(ref(db, 'menu/' + aktifKatId + '/' + type), rawChips).then(() => {
+      loadKatIcerik(aktifKatId);
+    });
+  };
+
   window.addChipItem = function(type, inputId) {
     if (!aktifKatId) return;
     const val = document.getElementById(inputId).value.trim();
     if (!val) return;
     const listEl = document.getElementById(type + '-list');
-    const chips = Array.from(listEl.querySelectorAll('.chip-item')).map(el => el.childNodes[0].textContent.trim());
-    if (chips.includes(val)) { showToast('Zaten mevcut'); return; }
-    chips.push(val);
-    set(ref(db, 'menu/' + aktifKatId + '/' + type), chips).then(() => {
+    const rawChips = Array.from(listEl.querySelectorAll('.chip-item')).map(el => {
+      const isim = el.childNodes[0].textContent.trim();
+      const cb = el.querySelector('input[type=checkbox]');
+      return { isim, pasif: cb ? !cb.checked : false };
+    });
+    if (rawChips.find(c => c.isim === val)) { showToast('Zaten mevcut'); return; }
+    rawChips.push({ isim: val, pasif: false });
+    set(ref(db, 'menu/' + aktifKatId + '/' + type), rawChips).then(() => {
       document.getElementById(inputId).value = '';
       loadKatIcerik(aktifKatId);
       showToast('Eklendi');
@@ -476,9 +526,13 @@
   window.delChipItem = function(type, idx) {
     if (!aktifKatId) return;
     const listEl = document.getElementById(type + '-list');
-    const chips = Array.from(listEl.querySelectorAll('.chip-item')).map(el => el.childNodes[0].textContent.trim());
-    chips.splice(idx, 1);
-    set(ref(db, 'menu/' + aktifKatId + '/' + type), chips).then(() => {
+    const rawChips = Array.from(listEl.querySelectorAll('.chip-item')).map(el => {
+      const isim = el.childNodes[0].textContent.trim();
+      const cb = el.querySelector('input[type=checkbox]');
+      return { isim, pasif: cb ? !cb.checked : false };
+    });
+    rawChips.splice(idx, 1);
+    set(ref(db, 'menu/' + aktifKatId + '/' + type), rawChips).then(() => {
       loadKatIcerik(aktifKatId);
       showToast('Silindi');
     });
@@ -486,19 +540,22 @@
 
   window.generateQRs = function() {
     const baseUrl = document.getElementById('menu-url').value.trim();
+    const bolge = document.getElementById('bolge-adi').value.trim();
     const start = parseInt(document.getElementById('masa-start').value);
     const end = parseInt(document.getElementById('masa-end').value);
     if (!baseUrl) { showToast('Menü URL girin'); return; }
+    if (!bolge) { showToast('Bölge adı girin'); return; }
     if (isNaN(start) || isNaN(end) || start > end) { showToast('Geçerli masa aralığı girin'); return; }
     const grid = document.getElementById('qr-grid');
     grid.innerHTML = '';
     for (let masa = start; masa <= end; masa++) {
-      const url = baseUrl + (baseUrl.includes('?') ? '&' : '?') + 'masa=' + masa;
+      const masaAdi = encodeURIComponent(bolge + ' Masa ' + masa);
+      const url = baseUrl + (baseUrl.includes('?') ? '&' : '?') + 'masa=' + encodeURIComponent(bolge + ' ' + masa) + '&masaadi=' + masaAdi;
       const card = document.createElement('div'); card.className = 'qr-card';
       const canvas = document.createElement('canvas'); card.appendChild(canvas);
-      const label = document.createElement('div'); label.className = 'qr-masa'; label.textContent = 'Masa ' + masa; card.appendChild(label);
+      const label = document.createElement('div'); label.className = 'qr-masa'; label.textContent = bolge + ' — Masa ' + masa; card.appendChild(label);
       const dlBtn = document.createElement('button'); dlBtn.className = 'qr-download'; dlBtn.textContent = 'İndir';
-      dlBtn.onclick = () => { const a = document.createElement('a'); a.download = 'masa-' + masa + '.png'; a.href = canvas.toDataURL(); a.click(); };
+      dlBtn.onclick = () => { const a = document.createElement('a'); a.download = bolge + '-masa-' + masa + '.png'; a.href = canvas.toDataURL(); a.click(); };
       card.appendChild(dlBtn); grid.appendChild(card);
       QRCode.toCanvas(canvas, url, { width: 150, margin: 1, color: { dark: '#5c3d2e', light: '#fff9f3' } });
     }
