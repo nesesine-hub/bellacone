@@ -283,7 +283,11 @@
 
   onValue(ref(db, 'menu'), (snapshot) => {
     const data = snapshot.val() || {};
-    kategoriler = data.kategoriler ? Object.values(data.kategoriler) : VARSAYILAN;
+    if (data.kategoriler) {
+      kategoriler = Object.values(data.kategoriler).sort((a, b) => (a.sira ?? 999) - (b.sira ?? 999));
+    } else {
+      kategoriler = VARSAYILAN;
+    }
     renderKategorilerList();
     renderKatSelector();
     if (aktifKatId) loadKatIcerik(aktifKatId);
@@ -538,6 +542,8 @@
     if (yeniIdx < 0 || yeniIdx >= kategoriler.length) return;
     const yeni = [...kategoriler];
     [yeni[idx], yeni[yeniIdx]] = [yeni[yeniIdx], yeni[idx]];
+    // Sıra numaralarını güncelle
+    yeni.forEach((k, i) => { k.sira = i; });
     const obj = {};
     yeni.forEach(k => { obj[k.id] = k; });
     await set(ref(db, 'menu/kategoriler'), obj);

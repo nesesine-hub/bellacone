@@ -212,7 +212,7 @@
   onValue(ref(db, 'menu'), (snapshot) => {
     const data = snapshot.val() || {};
     menuData = data;
-    kategoriler = data.kategoriler ? Object.values(data.kategoriler) : VARSAYILAN_KATEGORILER;
+    kategoriler = data.kategoriler ? Object.values(data.kategoriler).sort((a, b) => (a.sira ?? 999) - (b.sira ?? 999)) : VARSAYILAN_KATEGORILER;
     renderHome();
   });
 
