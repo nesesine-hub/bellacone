@@ -292,13 +292,17 @@
   function renderKategorilerList() {
     const list = document.getElementById('kategoriler-list');
     if (!kategoriler.length) { list.innerHTML = '<span class="empty-list">Henüz kategori yok</span>'; return; }
-    list.innerHTML = kategoriler.map(k => `
+    list.innerHTML = kategoriler.map((k, i) => `
       <div class="item-row">
         <div class="item-left">
           ${k.foto ? `<img src="${k.foto}" class="foto-preview" onerror="this.style.display='none'">` : `<span class="item-emoji">${k.emoji || '🍦'}</span>`}
           <div class="item-info"><span class="item-name">${k.isim}</span></div>
         </div>
-        <button class="del-btn" onclick="delKategori('${k.id}')">×</button>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <button onclick="tasiKategori(${i}, -1)" style="width:28px;height:28px;border-radius:8px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;" ${i === 0 ? 'disabled style="opacity:0.3;cursor:default;"' : ''}>↑</button>
+          <button onclick="tasiKategori(${i}, 1)" style="width:28px;height:28px;border-radius:8px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;" ${i === kategoriler.length - 1 ? 'disabled style="opacity:0.3;cursor:default;"' : ''}>↓</button>
+          <button class="del-btn" onclick="delKategori('${k.id}')">×</button>
+        </div>
       </div>
     `).join('');
     renderFotoListesi();
@@ -527,6 +531,17 @@
     yeniListe.forEach(k => { obj[k.id] = k; });
     await set(ref(db, 'menu/kategoriler'), obj);
     showToast('Fotoğraf kaydedildi!');
+  };
+
+  window.tasiKategori = async function(idx, yon) {
+    const yeniIdx = idx + yon;
+    if (yeniIdx < 0 || yeniIdx >= kategoriler.length) return;
+    const yeni = [...kategoriler];
+    [yeni[idx], yeni[yeniIdx]] = [yeni[yeniIdx], yeni[idx]];
+    const obj = {};
+    yeni.forEach(k => { obj[k.id] = k; });
+    await set(ref(db, 'menu/kategoriler'), obj);
+    showToast('Sıralama güncellendi');
   };
 
   window.addKategori = async function() {
