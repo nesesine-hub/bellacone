@@ -5,249 +5,115 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Garson Ekranı — Bellacone</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <style>
   :root {
-    --bg: #1a1108;
-    --surface: #251a0e;
-    --surface2: #2e2010;
-    --border: rgba(255,255,255,0.08);
-    --accent: #e07840;
-    --green: #4caf7a;
-    --yellow: #f0b840;
-    --text: #f5ede4;
-    --muted: #8a7060;
-    --radius: 14px;
+    --bg: #1a1108; --surface: #251a0e; --surface2: #2e2010;
+    --border: rgba(255,255,255,0.08); --accent: #e07840;
+    --green: #4caf7a; --yellow: #f0b840; --blue: #5b9cf6;
+    --purple: #a78bfa; --text: #f5ede4; --muted: #8a7060; --radius: 14px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-  }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
 
   /* LOGIN */
-  .login-screen {
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-  }
-  .login-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 2rem;
-    width: 100%;
-    max-width: 340px;
-  }
+  .login-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+  .login-box { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 2rem; width: 100%; max-width: 340px; }
   .login-logo { font-size: 22px; font-weight: 600; color: var(--accent); margin-bottom: 4px; }
   .login-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; }
   .login-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: block; }
-  .login-input {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 14px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    outline: none;
-    margin-bottom: 1rem;
-  }
+  .login-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 14px; color: var(--text); font-family: 'DM Sans', sans-serif; outline: none; margin-bottom: 1rem; }
   .login-input:focus { border-color: var(--accent); }
-  .login-btn {
-    width: 100%;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 11px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    margin-top: 0.5rem;
-  }
-  .login-btn:hover { opacity: 0.9; }
+  .login-btn { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 11px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
   .login-error { font-size: 12px; color: #e07070; margin-top: 8px; display: none; }
-  .main-content { display: none; }
+  .main-app { display: none; }
 
   /* HEADER */
-  .header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 1rem 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .header-left { display: flex; align-items: center; gap: 12px; }
-  .header h1 { font-size: 18px; font-weight: 600; }
-  .live-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--green);
-    animation: pulse 1.5s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
-  .stat-pills { display: flex; gap: 8px; }
-  .pill {
-    font-size: 12px;
-    padding: 5px 12px;
-    border-radius: 999px;
-    font-weight: 500;
-  }
+  .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .header h1 { font-size: 17px; font-weight: 600; }
+  .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+  .stat-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill { font-size: 11px; padding: 4px 10px; border-radius: 999px; font-weight: 500; }
   .pill-bekliyor { background: rgba(240,184,64,0.15); color: var(--yellow); }
   .pill-hazir { background: rgba(76,175,122,0.15); color: var(--green); }
+  .pill-odeme { background: rgba(91,156,246,0.15); color: var(--blue); }
 
-  /* FILTERS */
-  .filter-bar {
-    padding: 0.75rem 1.5rem;
-    display: flex;
-    gap: 8px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-  }
-  .filter-btn {
-    padding: 6px 16px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    font-size: 13px;
-    cursor: pointer;
-    white-space: nowrap;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.15s;
-  }
-  .filter-btn.active {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
-  }
+  /* SEKMELER */
+  .tabs { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; overflow-x: auto; }
+  .tab-btn { padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: var(--muted); border-bottom: 2px solid transparent; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: all 0.15s; }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-  /* GRID */
-  .orders-grid {
-    padding: 1.25rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 12px;
-  }
+  /* STOK UYARI */
+  .stok-uyari { display: none; background: rgba(224,100,60,0.08); border-bottom: 1px solid rgba(224,100,60,0.2); padding: 0.5rem 1.5rem; font-size: 12px; color: #e0643c; }
 
-  /* CARD */
-  .order-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1rem;
-    transition: border-color 0.2s;
-    animation: slideIn 0.3s ease;
-  }
+  /* FILTER BAR */
+  .filter-bar { padding: 0.6rem 1.5rem; display: flex; gap: 6px; background: var(--surface2); border-bottom: 1px solid var(--border); overflow-x: auto; }
+  .filter-btn { padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; white-space: nowrap; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* SİPARİŞ PANELİ */
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .orders-grid { padding: 1.25rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+
+  /* KART */
+  .order-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; animation: slideIn 0.3s ease; }
   .order-card.yeni { border-color: var(--accent); }
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .card-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-  .masa-num {
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--accent);
-  }
-  .status-badge {
-    font-size: 11px;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-weight: 500;
-  }
+  .order-card.hazir-kart { border-color: var(--green); }
+  .order-card.odeme-kart { border-color: var(--blue); }
+  .order-card.odendi-kart { border-color: var(--purple); opacity: 0.7; }
+  @keyframes slideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .masa-num { font-size: 20px; font-weight: 600; color: var(--accent); }
+  .status-badge { font-size: 11px; padding: 3px 9px; border-radius: 999px; font-weight: 500; }
   .badge-bekliyor { background: rgba(240,184,64,0.15); color: var(--yellow); }
   .badge-hazir { background: rgba(76,175,122,0.15); color: var(--green); }
-
-  .dondurma-row {
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-  .detail-row {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 3px;
-    line-height: 1.5;
-  }
-  .zaman-row {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 8px;
-  }
-
-  .card-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
-    border-top: 1px solid var(--border);
-    padding-top: 10px;
-  }
-  .act-btn {
-    flex: 1;
-    padding: 8px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.15s;
-  }
+  .badge-odeme { background: rgba(91,156,246,0.15); color: var(--blue); }
+  .badge-odendi { background: rgba(167,139,250,0.15); color: var(--purple); }
+  .dondurma-row { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .detail-row { font-size: 12px; color: var(--muted); margin-bottom: 2px; line-height: 1.5; }
+  .zaman-row { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .card-actions { display: flex; gap: 6px; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; flex-wrap: wrap; }
+  .act-btn { flex: 1; min-width: 60px; padding: 7px 6px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 11px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap; }
   .act-btn:hover { background: var(--surface2); color: var(--text); }
-  .act-btn.primary {
-    background: var(--green);
-    color: #fff;
-    border-color: var(--green);
-  }
+  .act-btn.primary { background: var(--green); color: #fff; border-color: var(--green); }
   .act-btn.primary:hover { opacity: 0.85; }
-  .act-btn.geri {
-    background: var(--surface2);
-    color: var(--yellow);
-    border-color: rgba(240,184,64,0.3);
-  }
-
-  /* EMPTY */
-  .empty {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 4rem;
-    color: var(--muted);
-  }
+  .act-btn.blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .act-btn.purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+  .act-btn.geri { color: var(--yellow); border-color: rgba(240,184,64,0.3); }
+  .empty { grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--muted); }
   .empty-icon { font-size: 48px; margin-bottom: 1rem; }
-  .empty p { font-size: 15px; }
 
-  /* LOADING */
-  .loading { text-align: center; padding: 4rem; color: var(--muted); }
+  /* RAPOR PANELİ */
+  .rapor-panel { padding: 1.25rem; }
+  .rapor-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; }
+  .rapor-card h2 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 1rem; }
+  .rapor-filtre { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .rapor-btn { padding: 6px 16px; border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .rapor-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .excel-btn { padding: 8px 18px; background: var(--green); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .rapor-ozet { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1rem; }
+  .ozet-kart { background: var(--surface2); border-radius: 12px; padding: 1rem; text-align: center; }
+  .ozet-kart .sayi { font-size: 24px; font-weight: 600; color: var(--accent); }
+  .ozet-kart .etiket { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .rapor-tablo { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .rapor-tablo th { text-align: left; padding: 8px 10px; color: var(--muted); border-bottom: 1px solid var(--border); font-weight: 500; }
+  .rapor-tablo td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); }
+  .rapor-tablo tr:hover td { background: var(--surface2); }
+
+  /* GEÇMİŞ PANELİ */
+  .gecmis-panel { padding: 1.25rem; }
+  .gecmis-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+  .gecmis-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .gecmis-info { flex: 1; }
+  .gecmis-baslik { font-size: 13px; font-weight: 500; color: var(--text); }
+  .gecmis-detay { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .gecmis-zaman { font-size: 11px; color: var(--muted); text-align: right; white-space: nowrap; }
 </style>
 </head>
 <body>
-
 
 <!-- LOGIN -->
 <div class="login-screen" id="login-screen">
@@ -263,32 +129,91 @@
   </div>
 </div>
 
-<div class="main-content" id="main-content">
-  <div class="header-left">
-    <div class="live-dot"></div>
-    <h1>Garson Ekranı</h1>
+<div class="main-app" id="main-app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="live-dot"></div>
+      <h1>Garson Ekranı</h1>
+    </div>
+    <div class="stat-pills">
+      <span class="pill pill-bekliyor" id="stat-bekliyor">0 bekliyor</span>
+      <span class="pill pill-hazir" id="stat-hazir">0 hazır</span>
+      <span class="pill pill-odeme" id="stat-odeme">0 ödeme</span>
+      <span class="pill" id="stat-stok" style="display:none;background:rgba(224,100,60,0.15);color:#e0643c;">⚠ Stok</span>
+    </div>
   </div>
-  <div class="stat-pills">
-    <span class="pill pill-bekliyor" id="stat-bekliyor">0 bekliyor</span>
-    <span class="pill pill-hazir" id="stat-hazir">0 hazır</span>
-    <span class="pill" id="stat-stok" style="display:none;background:rgba(224,100,60,0.15);color:#e0643c;">⚠ Stok</span>
+
+  <!-- STOK UYARI -->
+  <div class="stok-uyari" id="stok-uyari">
+    <span id="stok-uyari-listesi"></span>
   </div>
-</div>
 
-<!-- STOK UYARI BÖLÜMÜ -->
-<div id="stok-uyari" style="display:none;background:rgba(224,100,60,0.08);border-bottom:1px solid rgba(224,100,60,0.2);padding:0.6rem 1.5rem;">
-  <div style="font-size:12px;font-weight:500;color:#e0643c;margin-bottom:4px;">⚠ Azalan Stok</div>
-  <div id="stok-uyari-listesi" style="font-size:12px;color:#8a7060;"></div>
-</div>
+  <!-- SEKMELER -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('siparisler', this)">Siparişler</button>
+    <button class="tab-btn" onclick="switchTab('rapor', this)">Rapor</button>
+    <button class="tab-btn" onclick="switchTab('gecmis', this)">İşlem Geçmişi</button>
+  </div>
 
-<div class="filter-bar" id="filter-bar" style="display:none;">
-  <button class="filter-btn active" onclick="setFilter('hepsi', this)">Hepsi</button>
-  <button class="filter-btn" onclick="setFilter('bekliyor', this)">Bekleyenler</button>
-  <button class="filter-btn" onclick="setFilter('hazir', this)">Hazırlar</button>
-</div>
+  <!-- SİPARİŞLER PANELİ -->
+  <div class="panel active" id="panel-siparisler">
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="setFilter('hepsi',this)">Hepsi</button>
+      <button class="filter-btn" onclick="setFilter('bekliyor',this)">Bekliyor</button>
+      <button class="filter-btn" onclick="setFilter('hazir',this)">Hazır</button>
+      <button class="filter-btn" onclick="setFilter('odeme_alinacak',this)">Ödemesi Alınacak</button>
+      <button class="filter-btn" onclick="setFilter('odeme_alindi',this)">Ödemesi Alındı</button>
+    </div>
+    <div class="orders-grid" id="orders-grid">
+      <div class="empty"><div class="empty-icon">🍦</div><p>Siparişler yükleniyor...</p></div>
+    </div>
+  </div>
 
-<div class="orders-grid" id="orders-grid" style="display:none;">
-  <div class="loading">Siparişler yükleniyor...</div>
+  <!-- RAPOR PANELİ -->
+  <div class="panel" id="panel-rapor">
+    <div class="rapor-panel">
+      <div class="rapor-card">
+        <h2>Satış Raporu</h2>
+        <div class="rapor-filtre">
+          <button class="rapor-btn active" onclick="raporFiltre('gun',this)">Bugün</button>
+          <button class="rapor-btn" onclick="raporFiltre('hafta',this)">Bu Hafta</button>
+          <button class="rapor-btn" onclick="raporFiltre('ay',this)">Bu Ay</button>
+          <button class="excel-btn" onclick="excelIndir()">Excel İndir</button>
+        </div>
+        <div class="rapor-ozet" id="rapor-ozet"></div>
+        <div style="overflow-x:auto;">
+          <table class="rapor-tablo" id="rapor-tablo">
+            <thead>
+              <tr>
+                <th>Tarih/Saat</th>
+                <th>Masa</th>
+                <th>Kategori</th>
+                <th>Ürün</th>
+                <th>Miktar</th>
+                <th>Tutar</th>
+                <th>Durum</th>
+              </tr>
+            </thead>
+            <tbody id="rapor-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GEÇMİŞ PANELİ -->
+  <div class="panel" id="panel-gecmis">
+    <div class="gecmis-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <span style="font-size:15px;font-weight:600;">İşlem Geçmişi</span>
+        <button onclick="gecmisSil()" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;">Temizle</button>
+      </div>
+      <div id="gecmis-listesi"><p style="color:var(--muted);font-size:13px;">Henüz işlem yok</p></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -297,9 +222,7 @@
     const pass = document.getElementById('login-pass').value;
     if (user === 'bellacone' && pass === 'bilmiyorum!?') {
       document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('main-content').style.display = 'flex';
-      document.getElementById('filter-bar').style.display = 'flex';
-      document.getElementById('orders-grid').style.display = 'grid';
+      document.getElementById('main-app').style.display = 'block';
       sessionStorage.setItem('giris', '1');
     } else {
       document.getElementById('login-error').style.display = 'block';
@@ -308,19 +231,23 @@
   document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
   if (sessionStorage.getItem('giris') === '1') {
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-content').style.display = 'flex';
-    document.getElementById('filter-bar').style.display = 'flex';
-    document.getElementById('orders-grid').style.display = 'grid';
+    document.getElementById('main-app').style.display = 'block';
+  }
+
+  function switchTab(tab, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + tab).classList.add('active');
+    el.classList.add('active');
+    if (tab === 'rapor') renderRapor();
+    if (tab === 'gecmis') renderGecmis();
   }
 </script>
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getDatabase, ref, onValue, update, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+  import { getDatabase, ref, onValue, update, remove, push, set } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
-  // ====================================================
-  // BURAYA KENDİ FİREBASE BİLGİLERİNİ GİR
-  // ====================================================
   const firebaseConfig = {
     apiKey: "AIzaSyC18gKyPhFWEWH_244nDLOW0nQE2QgS6kA",
     authDomain: "bellacone-7ee34.firebaseapp.com",
@@ -335,55 +262,72 @@
   const db = getDatabase(app);
 
   let allOrders = [];
+  let allGecmis = [];
   let currentFilter = 'hepsi';
+  let currentRaporFiltre = 'gun';
   let isFirstLoad = true;
 
-  // Stok takibi - yeni stok yapısı
+  function simdi() {
+    return new Date().toLocaleString('tr-TR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  }
+
+  // Siparişler
+  onValue(ref(db, 'siparisler'), (snapshot) => {
+    const data = snapshot.val() || {};
+    const yeni = Object.entries(data).map(([key, val]) => ({ key, ...val }))
+      .sort((a, b) => new Date(a.zaman) - new Date(b.zaman));
+    
+    if (!isFirstLoad && yeni.length > allOrders.length) playSound();
+    allOrders = yeni;
+    isFirstLoad = false;
+    renderOrders();
+    renderStats();
+  });
+
+  // Stok takibi
   onValue(ref(db, 'stok'), (snap) => {
     const stokData = snap.val() || {};
     const azalanlar = [];
-    Object.entries(stokData).forEach(([katId, items]) => {
+    Object.values(stokData).forEach(items => {
       Object.values(items).forEach(s => {
-        if (s.miktar !== undefined && s.miktar <= 5) {
-          azalanlar.push(`${s.isim}: ${s.miktar} adet kaldı`);
-        }
+        if (s.miktar !== undefined && s.miktar <= 5) azalanlar.push(`${s.isim}: ${s.miktar}`);
       });
     });
     const stokDiv = document.getElementById('stok-uyari');
     const stokPill = document.getElementById('stat-stok');
-    const stokListe = document.getElementById('stok-uyari-listesi');
-    if (stokDiv && azalanlar.length) {
+    if (azalanlar.length) {
       stokDiv.style.display = 'block';
       stokPill.style.display = 'inline-flex';
-      stokPill.textContent = `⚠ ${azalanlar.length} ürün`;
-      stokListe.textContent = azalanlar.join(' · ');
-    } else if (stokDiv) {
+      stokPill.textContent = `⚠ ${azalanlar.length}`;
+      document.getElementById('stok-uyari-listesi').textContent = '⚠ Az stok: ' + azalanlar.join(' · ');
+    } else {
       stokDiv.style.display = 'none';
       stokPill.style.display = 'none';
     }
   });
 
-  onValue(ref(db, 'siparisler'), (snapshot) => {
-    const data = snapshot.val() || {};
-    allOrders = Object.entries(data).map(([key, val]) => ({ key, ...val }))
-      .sort((a, b) => new Date(a.zaman) - new Date(b.zaman));
-    renderOrders();
-    if (!isFirstLoad) playSound();
-    isFirstLoad = false;
+  // Geçmiş
+  onValue(ref(db, 'gecmis'), (snap) => {
+    const data = snap.val() || {};
+    allGecmis = Object.entries(data).map(([key, val]) => ({ key, ...val }))
+      .sort((a, b) => new Date(b.zaman) - new Date(a.zaman));
   });
+
+  function renderStats() {
+    const bekliyor = allOrders.filter(o => o.durum === 'bekliyor').length;
+    const hazir = allOrders.filter(o => o.durum === 'hazir').length;
+    const odeme = allOrders.filter(o => o.durum === 'odeme_alinacak').length;
+    document.getElementById('stat-bekliyor').textContent = bekliyor + ' bekliyor';
+    document.getElementById('stat-hazir').textContent = hazir + ' hazır';
+    document.getElementById('stat-odeme').textContent = odeme + ' ödeme';
+  }
 
   function renderOrders() {
     const grid = document.getElementById('orders-grid');
-    const bekliyor = allOrders.filter(o => o.durum === 'bekliyor').length;
-    const hazir = allOrders.filter(o => o.durum === 'hazir').length;
-    document.getElementById('stat-bekliyor').textContent = bekliyor + ' bekliyor';
-    document.getElementById('stat-hazir').textContent = hazir + ' hazır';
-
-    const filtered = currentFilter === 'hepsi' ? allOrders
-      : allOrders.filter(o => o.durum === currentFilter);
+    let filtered = currentFilter === 'hepsi' ? allOrders : allOrders.filter(o => o.durum === currentFilter);
 
     if (!filtered.length) {
-      grid.innerHTML = `<div class="empty"><div class="empty-icon">🍦</div><p>Şu an ${currentFilter === 'hepsi' ? 'sipariş yok' : currentFilter === 'bekliyor' ? 'bekleyen sipariş yok' : 'hazır sipariş yok'}</p></div>`;
+      grid.innerHTML = `<div class="empty"><div class="empty-icon">🍦</div><p>Sipariş yok</p></div>`;
       return;
     }
 
@@ -394,7 +338,7 @@
             <div class="masa-num" style="color:#e07040;">⚠ Sorun</div>
             <span class="status-badge badge-bekliyor">Masa ${o.masa}</span>
           </div>
-          <div class="dondurma-row" style="color:#f5ede4;">${o.urun}</div>
+          <div class="dondurma-row">${o.urun}</div>
           <div class="zaman-row">${o.zamanStr || ''}</div>
           <div class="card-actions">
             <button class="act-btn" onclick="sil('${o.key}')">Kapat</button>
@@ -402,31 +346,25 @@
         </div>`;
       }
 
-      const extras = [
-        o.malzeme?.length ? 'Malzeme: ' + o.malzeme.join(', ') : '',
-        o.sos?.length ? 'Sos: ' + o.sos.join(', ') : '',
-        o.topping?.length ? 'Topping: ' + o.topping.join(', ') : '',
-      ].filter(Boolean);
+      const durumClass = {bekliyor:'yeni', hazir:'hazir-kart', odeme_alinacak:'odeme-kart', odeme_alindi:'odendi-kart'}[o.durum] || '';
+      const durumBadge = {bekliyor:'badge-bekliyor', hazir:'badge-hazir', odeme_alinacak:'badge-odeme', odeme_alindi:'badge-odendi'}[o.durum] || '';
+      const durumYazi = {bekliyor:'Bekliyor', hazir:'Hazır', odeme_alinacak:'Öd. Alınacak', odeme_alindi:'Öd. Alındı'}[o.durum] || o.durum;
 
-      return `<div class="order-card ${o.durum === 'bekliyor' ? 'yeni' : ''}">
+      return `<div class="order-card ${durumClass}">
         <div class="card-top">
           <div class="masa-num">Masa ${o.masa}</div>
-          <span class="status-badge ${o.durum === 'bekliyor' ? 'badge-bekliyor' : 'badge-hazir'}">
-            ${o.durum === 'bekliyor' ? 'Bekliyor' : 'Hazır'}
-          </span>
+          <span class="status-badge ${durumBadge}">${durumYazi}</span>
         </div>
         <div class="dondurma-row">${o.kategori ? o.kategori + ' — ' : ''}${o.urun} × ${o.miktar}</div>
-        ${o.toplar && o.toplar.length ? `<div class="detail-row" style="margin-top:4px;">
-          ${o.toplar.map((t, i) => `<span style="display:inline-block;background:rgba(224,120,64,0.15);color:#e07840;border-radius:6px;padding:2px 8px;font-size:11px;margin:2px 2px 2px 0;">${i+1}. top: ${t}</span>`).join('')}
-        </div>` : ''}
+        ${o.toplar && o.toplar.length ? `<div class="detail-row">${o.toplar.map((t,i) => `<span style="background:rgba(224,120,64,0.15);color:#e07840;border-radius:5px;padding:1px 6px;font-size:10px;margin:1px;">${i+1}. ${t}</span>`).join('')}</div>` : ''}
         ${o.secimMetni ? `<div class="detail-row">${o.secimMetni}</div>` : ''}
         ${o.not ? `<div class="detail-row" style="color:#e07840;">Not: ${o.not}</div>` : ''}
-        <div class="zaman-row">${o.zamanStr || ''} &middot; ${o.toplamFiyat || 0} ₺</div>
+        <div class="zaman-row">${o.zamanStr || ''} · ${o.toplamFiyat || 0} ₺</div>
         <div class="card-actions">
-          ${o.durum === 'bekliyor'
-            ? `<button class="act-btn primary" onclick="setDurum('${o.key}', 'hazir')">Hazır</button>`
-            : `<button class="act-btn geri" onclick="setDurum('${o.key}', 'bekliyor')">Geri Al</button>`
-          }
+          ${o.durum === 'bekliyor' ? `<button class="act-btn primary" onclick="setDurum('${o.key}','hazir','Hazır işaretlendi','Masa ${o.masa} — ${o.urun}')">Hazır</button>` : ''}
+          ${o.durum === 'hazir' ? `<button class="act-btn blue" onclick="setDurum('${o.key}','odeme_alinacak','Öd. alınacak işaretlendi','Masa ${o.masa} — ${o.urun}')">Öd. Alınacak</button>` : ''}
+          ${o.durum === 'odeme_alinacak' ? `<button class="act-btn purple" onclick="setDurum('${o.key}','odeme_alindi','Ödeme alındı','Masa ${o.masa} — ${o.urun} · ${o.toplamFiyat||0}₺')">Ödeme Alındı</button>` : ''}
+          ${o.durum !== 'bekliyor' ? `<button class="act-btn geri" onclick="setDurum('${o.key}','bekliyor','Geri alındı','Masa ${o.masa} — ${o.urun}')">Geri Al</button>` : ''}
           <button class="act-btn" onclick="sil('${o.key}')">Sil</button>
         </div>
       </div>`;
@@ -440,12 +378,98 @@
     renderOrders();
   };
 
-  window.setDurum = async function(key, durum) {
+  window.setDurum = async function(key, durum, islemAdi, detay) {
     await update(ref(db, 'siparisler/' + key), { durum });
+    await push(ref(db, 'gecmis'), {
+      islem: islemAdi,
+      detay,
+      zaman: new Date().toISOString(),
+      zamanStr: simdi(),
+      ikon: {bekliyor:'↩', hazir:'✓', odeme_alinacak:'💳', odeme_alindi:'✅'}[durum] || '·',
+      renk: {bekliyor:'#f0b840', hazir:'#4caf7a', odeme_alinacak:'#5b9cf6', odeme_alindi:'#a78bfa'}[durum] || '#8a7060'
+    });
   };
 
   window.sil = async function(key) {
     await remove(ref(db, 'siparisler/' + key));
+  };
+
+  // RAPOR
+  window.raporFiltre = function(filtre, el) {
+    currentRaporFiltre = filtre;
+    document.querySelectorAll('.rapor-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    renderRapor();
+  };
+
+  window.renderRapor = function() {
+    const simdiDate = new Date();
+    const filtered = allOrders.filter(o => {
+      if (!o.zaman) return false;
+      const d = new Date(o.zaman);
+      if (currentRaporFiltre === 'gun') {
+        return d.toDateString() === simdiDate.toDateString();
+      } else if (currentRaporFiltre === 'hafta') {
+        const haftaOnce = new Date(simdiDate); haftaOnce.setDate(simdiDate.getDate() - 7);
+        return d >= haftaOnce;
+      } else {
+        const ayOnce = new Date(simdiDate); ayOnce.setMonth(simdiDate.getMonth() - 1);
+        return d >= ayOnce;
+      }
+    });
+
+    const toplamTutar = filtered.reduce((s, o) => s + (o.toplamFiyat || 0), 0);
+    const odenenTutar = filtered.filter(o => o.durum === 'odeme_alindi').reduce((s, o) => s + (o.toplamFiyat || 0), 0);
+    const siparisSayisi = filtered.length;
+
+    document.getElementById('rapor-ozet').innerHTML = `
+      <div class="ozet-kart"><div class="sayi">${siparisSayisi}</div><div class="etiket">Sipariş</div></div>
+      <div class="ozet-kart"><div class="sayi">${toplamTutar} ₺</div><div class="etiket">Toplam Tutar</div></div>
+      <div class="ozet-kart"><div class="sayi">${odenenTutar} ₺</div><div class="etiket">Tahsil Edilen</div></div>
+      <div class="ozet-kart"><div class="sayi">${toplamTutar - odenenTutar} ₺</div><div class="etiket">Bekleyen</div></div>
+    `;
+
+    document.getElementById('rapor-tbody').innerHTML = filtered.map(o => `
+      <tr>
+        <td>${o.zamanStr || '—'}</td>
+        <td>Masa ${o.masa}</td>
+        <td>${o.kategori || '—'}</td>
+        <td>${o.urun || '—'}</td>
+        <td>${o.miktar || 1}</td>
+        <td>${o.toplamFiyat || 0} ₺</td>
+        <td>${{bekliyor:'Bekliyor', hazir:'Hazır', odeme_alinacak:'Öd. Alınacak', odeme_alindi:'Öd. Alındı'}[o.durum] || o.durum}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="7" style="text-align:center;color:#8a7060;padding:2rem;">Bu dönemde sipariş yok</td></tr>';
+  };
+
+  window.excelIndir = function() {
+    const tablo = document.getElementById('rapor-tablo');
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.table_to_sheet(tablo);
+    XLSX.utils.book_append_sheet(wb, ws, 'Rapor');
+    const donem = {gun:'Gunluk', hafta:'Haftalik', ay:'Aylik'}[currentRaporFiltre];
+    XLSX.writeFile(wb, `Bellacone_${donem}_Rapor_${new Date().toLocaleDateString('tr-TR').replace(/\./g,'-')}.xlsx`);
+  };
+
+  // GEÇMİŞ
+  window.renderGecmis = function() {
+    const listEl = document.getElementById('gecmis-listesi');
+    if (!allGecmis.length) { listEl.innerHTML = '<p style="color:var(--muted);font-size:13px;">Henüz işlem yok</p>'; return; }
+    listEl.innerHTML = allGecmis.map(g => `
+      <div class="gecmis-item">
+        <div class="gecmis-icon" style="background:${g.renk || '#8a7060'}22;color:${g.renk || '#8a7060'}">${g.ikon || '·'}</div>
+        <div class="gecmis-info">
+          <div class="gecmis-baslik">${g.islem || '—'}</div>
+          <div class="gecmis-detay">${g.detay || ''}</div>
+        </div>
+        <div class="gecmis-zaman">${g.zamanStr || ''}</div>
+      </div>
+    `).join('');
+  };
+
+  window.gecmisSil = async function() {
+    await set(ref(db, 'gecmis'), null);
+    document.getElementById('gecmis-listesi').innerHTML = '<p style="color:var(--muted);font-size:13px;">Henüz işlem yok</p>';
   };
 
   function playSound() {
