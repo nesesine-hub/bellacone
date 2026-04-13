@@ -271,7 +271,14 @@
   <div class="stat-pills">
     <span class="pill pill-bekliyor" id="stat-bekliyor">0 bekliyor</span>
     <span class="pill pill-hazir" id="stat-hazir">0 hazır</span>
+    <span class="pill" id="stat-stok" style="display:none;background:rgba(224,100,60,0.15);color:#e0643c;">⚠ Stok</span>
   </div>
+</div>
+
+<!-- STOK UYARI BÖLÜMÜ -->
+<div id="stok-uyari" style="display:none;background:rgba(224,100,60,0.08);border-bottom:1px solid rgba(224,100,60,0.2);padding:0.6rem 1.5rem;">
+  <div style="font-size:12px;font-weight:500;color:#e0643c;margin-bottom:4px;">⚠ Azalan Stok</div>
+  <div id="stok-uyari-listesi" style="font-size:12px;color:#8a7060;"></div>
 </div>
 
 <div class="filter-bar" id="filter-bar" style="display:none;">
@@ -331,6 +338,32 @@
   let currentFilter = 'hepsi';
   let isFirstLoad = true;
 
+  // Stok takibi
+  onValue(ref(db, 'menu'), (snap) => {
+    const menu = snap.val() || {};
+    const azalanlar = [];
+    Object.entries(menu).forEach(([katId, kat]) => {
+      if (typeof kat !== 'object' || !kat.urunler) return;
+      Object.values(kat.urunler).forEach(u => {
+        if (u.stok !== undefined && u.stok <= 5) {
+          azalanlar.push(`${u.isim}: ${u.stok} adet kaldı`);
+        }
+      });
+    });
+    const stokDiv = document.getElementById('stok-uyari');
+    const stokPill = document.getElementById('stat-stok');
+    const stokListe = document.getElementById('stok-uyari-listesi');
+    if (azalanlar.length) {
+      stokDiv.style.display = 'block';
+      stokPill.style.display = 'inline-flex';
+      stokPill.textContent = `⚠ ${azalanlar.length} ürün`;
+      stokListe.textContent = azalanlar.join(' · ');
+    } else {
+      stokDiv.style.display = 'none';
+      stokPill.style.display = 'none';
+    }
+  });
+
   onValue(ref(db, 'siparisler'), (snapshot) => {
     const data = snapshot.val() || {};
     allOrders = Object.entries(data).map(([key, val]) => ({ key, ...val }))
@@ -384,6 +417,9 @@
           </span>
         </div>
         <div class="dondurma-row">${o.kategori ? o.kategori + ' — ' : ''}${o.urun} × ${o.miktar}</div>
+        ${o.toplar && o.toplar.length ? `<div class="detail-row" style="margin-top:4px;">
+          ${o.toplar.map((t, i) => `<span style="display:inline-block;background:rgba(224,120,64,0.15);color:#e07840;border-radius:6px;padding:2px 8px;font-size:11px;margin:2px 2px 2px 0;">${i+1}. top: ${t}</span>`).join('')}
+        </div>` : ''}
         ${o.secimMetni ? `<div class="detail-row">${o.secimMetni}</div>` : ''}
         ${o.not ? `<div class="detail-row" style="color:#e07840;">Not: ${o.not}</div>` : ''}
         <div class="zaman-row">${o.zamanStr || ''} &middot; ${o.toplamFiyat || 0} ₺</div>
