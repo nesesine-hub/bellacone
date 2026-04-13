@@ -428,7 +428,11 @@
       const topToggle = document.getElementById('top-destegi-toggle');
       if (topToggle) topToggle.checked = d.topDestegi || false;
       const bolumler = d.bolumler || {};
-      renderDinamikBolumler(bolumler);
+      // sira alanına göre sırala
+      const siralibolumler = Object.fromEntries(
+        Object.entries(bolumler).sort((a, b) => (a[1].sira ?? 999) - (b[1].sira ?? 999))
+      );
+      renderDinamikBolumler(siralibolumler);
     }, { onlyOnce: true });
   }
 
@@ -436,11 +440,15 @@
     const container = document.getElementById('dinamik-bolumler');
     const entries = Object.entries(bolumler);
     if (!entries.length) { container.innerHTML = ''; return; }
-    container.innerHTML = entries.map(([bolumKey, bolum]) => {
+    container.innerHTML = entries.map(([bolumKey, bolum], bolumIdx) => {
       const secenekler = bolum.secenekler || [];
       return `<div style="margin-bottom:1rem; background:var(--cream); border-radius:12px; padding:1rem; border:1px solid var(--soft);">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.6rem; padding-bottom:0.4rem; border-bottom:1px solid var(--soft);">
-          <span id="bolum-baslik-${bolumKey}" style="font-size:13px; font-weight:600; color:var(--brown);">${bolum.isim}</span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button onclick="bolumTasi('${bolumKey}',${bolumIdx},-1)" style="width:24px;height:24px;border-radius:6px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;" ${bolumIdx===0?'disabled':''}>↑</button>
+            <button onclick="bolumTasi('${bolumKey}',${bolumIdx},1)" style="width:24px;height:24px;border-radius:6px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;" ${bolumIdx===entries.length-1?'disabled':''}>↓</button>
+            <span id="bolum-baslik-${bolumKey}" style="font-size:13px; font-weight:600; color:var(--brown);">${bolum.isim}</span>
+          </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <button onclick="bolumAdiniDuzenle('${bolumKey}','${bolum.isim}')" style="width:28px;height:28px;border-radius:8px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;" title="Düzenle">✎</button>
             <span style="font-size:11px;color:var(--muted);">Top seçimi için kullan</span>
@@ -472,6 +480,25 @@
       </div>`;
     }).join('');
   }
+
+  window.bolumTasi = async function(bolumKey, idx, yon) {
+    const yeniIdx = idx + yon;
+    const container = document.getElementById('dinamik-bolumler');
+    const bolumBasliklar = Array.from(container.querySelectorAll('[id^="bolum-baslik-"]'));
+    const keys = bolumBasliklar.map(el => el.id.replace('bolum-baslik-', ''));
+    if (yeniIdx < 0 || yeniIdx >= keys.length) return;
+    [keys[idx], keys[yeniIdx]] = [keys[yeniIdx], keys[idx]];
+    
+    const { onValue: ov, ref: r } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+    const snap = await new Promise(res => ov(r(db, `menu/${aktifKatId}/bolumler`), s => res(s), { onlyOnce: true }));
+    const bolumler = snap.val() || {};
+    const yeniBolumler = {};
+    keys.forEach((key, i) => {
+      if (bolumler[key]) yeniBolumler[key] = { ...bolumler[key], sira: i };
+    });
+    await set(ref(db, `menu/${aktifKatId}/bolumler`), yeniBolumler);
+    loadKatIcerik(aktifKatId);
+  };
 
   window.secenekTasi = async function(bolumKey, idx, yon) {
     const yeniIdx = idx + yon;

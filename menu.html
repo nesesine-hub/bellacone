@@ -237,7 +237,7 @@
     const tumUrunler = data.urunler ? Object.values(data.urunler) : [];
     const aktifUrunler = tumUrunler.filter(u => !u.pasif && (u.stok === undefined || u.stok > 0));
     const pasifUrunler = tumUrunler.filter(u => u.pasif || (u.stok !== undefined && u.stok <= 0));
-    const bolumler = data.bolumler ? Object.entries(data.bolumler) : [];
+    const bolumler = data.bolumler ? Object.entries(data.bolumler).sort((a,b) => (a[1].sira ?? 999) - (b[1].sira ?? 999)) : [];
     const topDestegi = data.topDestegi || false;
 
     document.getElementById('detail-title').textContent = aktifKategori.isim;
