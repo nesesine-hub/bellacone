@@ -378,7 +378,11 @@
       return `<div style="margin-bottom:1rem; background:var(--cream); border-radius:12px; padding:1rem; border:1px solid var(--soft);">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.6rem; padding-bottom:0.4rem; border-bottom:1px solid var(--soft);">
           <span style="font-size:13px; font-weight:600; color:var(--brown);">${bolum.isim}</span>
-          <button class="del-btn" onclick="delBolum('${bolumKey}')" title="Bölümü sil">×</button>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:11px;color:var(--muted);">Top seçimi için kullan</span>
+            <label class="toggle"><input type="checkbox" ${bolum.topIcinKullan ? 'checked' : ''} onchange="toggleTopIcinKullan('${bolumKey}', this.checked)"><span class="toggle-slider"></span></label>
+            <button class="del-btn" onclick="delBolum('${bolumKey}')" title="Bölümü sil">×</button>
+          </div>
         </div>
         <div class="form-row" style="margin-bottom:0.5rem;">
           <div class="form-group"><input class="form-input" id="bolum-inp-${bolumKey}" type="text" placeholder="${bolum.isim} ekle..."></div>
@@ -398,6 +402,13 @@
       </div>`;
     }).join('');
   }
+
+  window.toggleTopIcinKullan = async function(bolumKey, aktif) {
+    if (!aktifKatId) return;
+    await set(ref(db, `menu/${aktifKatId}/bolumler/${bolumKey}/topIcinKullan`), aktif);
+    loadKatIcerik(aktifKatId);
+    showToast(aktif ? 'Top seçimi için işaretlendi' : 'İşaret kaldırıldı');
+  };
 
   window.addBolum = async function() {
     if (!aktifKatId) return;

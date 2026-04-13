@@ -271,9 +271,10 @@
       }
       // Top seçim alanı - ürün seçilince açılacak
       html += `<div id="top-secim-alani" style="display:none;"></div>`;
-      // Dinamik bölümler - top seçim alanından sonra
+      // Dinamik bölümler - sadece topIcinKullan=false olanlar gösterilsin
       html += `<div id="diger-bolumler" style="display:none;">`;
       bolumler.forEach(([bolumKey, bolum]) => {
+        if (bolum.topIcinKullan) return; // top seçiminde kullanılan bölümler burada gösterilmez
         const secenekler = bolum.secenekler || [];
         const aktifler = secenekler.filter(s => !(typeof s === 'object' ? s.pasif : false));
         const pasifler = secenekler.filter(s => (typeof s === 'object' ? s.pasif : false));
@@ -374,15 +375,26 @@
     if (!alan) return;
     const data = menuData[aktifKategori.id] || {};
     const bolumler = data.bolumler || {};
-    // Tüm bölüm seçeneklerini topla (aktif olanlar)
+    // Sadece topIcinKullan=true olan bölümlerin seçeneklerini topla
     let tumSecenekler = [];
     Object.values(bolumler).forEach(bolum => {
+      if (!bolum.topIcinKullan) return;
       (bolum.secenekler || []).forEach(s => {
         if (!(typeof s === 'object' ? s.pasif : false)) {
           tumSecenekler.push(typeof s === 'object' ? s.isim : s);
         }
       });
     });
+    // Hiç topIcinKullan bölümü yoksa tüm bölümleri al (geriye dönük uyumluluk)
+    if (!tumSecenekler.length) {
+      Object.values(bolumler).forEach(bolum => {
+        (bolum.secenekler || []).forEach(s => {
+          if (!(typeof s === 'object' ? s.pasif : false)) {
+            tumSecenekler.push(typeof s === 'object' ? s.isim : s);
+          }
+        });
+      });
+    }
     const topSayisi = state.toplar.length;
     const siradakiTop = topSayisi + 1;
 
