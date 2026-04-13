@@ -339,20 +339,48 @@
     const list = document.getElementById('kategoriler-list');
     if (!kategoriler.length) { list.innerHTML = '<span class="empty-list">Henüz kategori yok</span>'; return; }
     list.innerHTML = kategoriler.map((k, i) => `
-      <div class="item-row">
-        <div class="item-left">
+      <div class="item-row" id="kat-row-${k.id}">
+        <div class="item-left" style="flex:1;">
           ${k.foto ? `<img src="${k.foto}" class="foto-preview" onerror="this.style.display='none'">` : `<span class="item-emoji">${k.emoji || '🍦'}</span>`}
           <div class="item-info"><span class="item-name">${k.isim}</span></div>
         </div>
         <div style="display:flex;align-items:center;gap:4px;">
-          <button onclick="tasiKategori(${i}, -1)" style="width:28px;height:28px;border-radius:8px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;" ${i === 0 ? 'disabled style="opacity:0.3;cursor:default;"' : ''}>↑</button>
-          <button onclick="tasiKategori(${i}, 1)" style="width:28px;height:28px;border-radius:8px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;" ${i === kategoriler.length - 1 ? 'disabled style="opacity:0.3;cursor:default;"' : ''}>↓</button>
+          <button onclick="katDuzenle('${k.id}')" style="width:28px;height:28px;border-radius:8px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;" title="Düzenle">✎</button>
+          <button onclick="tasiKategori(${i}, -1)" style="width:28px;height:28px;border-radius:8px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;" ${i === 0 ? 'disabled' : ''}>↑</button>
+          <button onclick="tasiKategori(${i}, 1)" style="width:28px;height:28px;border-radius:8px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;" ${i === kategoriler.length - 1 ? 'disabled' : ''}>↓</button>
           <button class="del-btn" onclick="delKategori('${k.id}')">×</button>
         </div>
       </div>
     `).join('');
     renderFotoListesi();
   }
+
+  window.katDuzenle = function(id) {
+    const kat = kategoriler.find(k => k.id === id);
+    if (!kat) return;
+    const row = document.getElementById('kat-row-' + id);
+    row.innerHTML = `
+      <div style="display:flex;gap:8px;align-items:center;flex:1;flex-wrap:wrap;">
+        <input id="kat-edit-emoji-${id}" type="text" value="${kat.emoji || ''}" style="width:50px;border:1px solid var(--soft);border-radius:8px;padding:6px;font-size:18px;text-align:center;" maxlength="2">
+        <input id="kat-edit-isim-${id}" type="text" value="${kat.isim}" style="flex:1;border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:14px;font-family:'DM Sans',sans-serif;">
+        <button onclick="katKaydet('${id}')" style="padding:6px 14px;background:var(--brown);color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;">Kaydet</button>
+        <button onclick="renderKategorilerList()" style="padding:6px 14px;background:transparent;color:var(--muted);border:1px solid var(--soft);border-radius:8px;font-size:13px;cursor:pointer;">İptal</button>
+      </div>
+    `;
+  };
+
+  window.katKaydet = async function(id) {
+    const emoji = document.getElementById('kat-edit-emoji-' + id).value.trim();
+    const isim = document.getElementById('kat-edit-isim-' + id).value.trim();
+    if (!isim) { showToast('İsim boş olamaz'); return; }
+    const kat = kategoriler.find(k => k.id === id);
+    const guncellenmis = { ...kat, isim, emoji };
+    const yeniListe = kategoriler.map(k => k.id === id ? guncellenmis : k);
+    const obj = {};
+    yeniListe.forEach(k => { obj[k.id] = k; });
+    await set(ref(db, 'menu/kategoriler'), obj);
+    showToast('Kategori güncellendi');
+  };
 
   function renderFotoListesi() {
     const el = document.getElementById('foto-listesi');
@@ -412,8 +440,9 @@
       const secenekler = bolum.secenekler || [];
       return `<div style="margin-bottom:1rem; background:var(--cream); border-radius:12px; padding:1rem; border:1px solid var(--soft);">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.6rem; padding-bottom:0.4rem; border-bottom:1px solid var(--soft);">
-          <span style="font-size:13px; font-weight:600; color:var(--brown);">${bolum.isim}</span>
+          <span id="bolum-baslik-${bolumKey}" style="font-size:13px; font-weight:600; color:var(--brown);">${bolum.isim}</span>
           <div style="display:flex;align-items:center;gap:8px;">
+            <button onclick="bolumAdiniDuzenle('${bolumKey}','${bolum.isim}')" style="width:28px;height:28px;border-radius:8px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;" title="Düzenle">✎</button>
             <span style="font-size:11px;color:var(--muted);">Top seçimi için kullan</span>
             <label class="toggle"><input type="checkbox" ${bolum.topIcinKullan ? 'checked' : ''} onchange="toggleTopIcinKullan('${bolumKey}', this.checked)"><span class="toggle-slider"></span></label>
             <button class="del-btn" onclick="delBolum('${bolumKey}')" title="Bölümü sil">×</button>
@@ -428,8 +457,9 @@
             const isim = typeof s === 'object' ? s.isim : s;
             const pasif = typeof s === 'object' ? s.pasif : false;
             return `<div class="chip-item" style="${pasif ? 'opacity:0.5' : ''}">
-              ${isim}
-              <label class="toggle" style="margin-left:4px;"><input type="checkbox" ${pasif ? '' : 'checked'} onchange="toggleBolumSecenek('${bolumKey}', ${i}, this.checked)"><span class="toggle-slider"></span></label>
+              <span id="sec-isim-${bolumKey}-${i}">${isim}</span>
+              <button onclick="secenekDuzenle('${bolumKey}',${i},'${isim}')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:12px;padding:0 2px;" title="Düzenle">✎</button>
+              <label class="toggle" style="margin-left:2px;"><input type="checkbox" ${pasif ? '' : 'checked'} onchange="toggleBolumSecenek('${bolumKey}', ${i}, this.checked)"><span class="toggle-slider"></span></label>
               <button class="chip-del" onclick="delBolumSecenek('${bolumKey}', ${i})">×</button>
             </div>`;
           }).join('') : '<span class="empty-list">Henüz seçenek eklenmedi</span>'}
@@ -438,6 +468,59 @@
     }).join('');
   }
 
+  window.bolumAdiniDuzenle = function(bolumKey, mevcutIsim) {
+    const baslik = document.getElementById('bolum-baslik-' + bolumKey);
+    baslik.innerHTML = `
+      <input id="bolum-edit-${bolumKey}" type="text" value="${mevcutIsim}" style="border:1px solid var(--soft);border-radius:8px;padding:4px 8px;font-size:13px;font-family:'DM Sans',sans-serif;">
+      <button onclick="bolumAdiniKaydet('${bolumKey}')" style="padding:4px 10px;background:var(--brown);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;margin-left:4px;">Kaydet</button>
+      <button onclick="loadKatIcerik('${aktifKatId}')" style="padding:4px 8px;background:transparent;color:var(--muted);border:1px solid var(--soft);border-radius:8px;font-size:12px;cursor:pointer;margin-left:2px;">İptal</button>
+    `;
+  };
+
+  window.bolumAdiniKaydet = async function(bolumKey) {
+    const yeniIsim = document.getElementById('bolum-edit-' + bolumKey).value.trim();
+    if (!yeniIsim) { showToast('İsim boş olamaz'); return; }
+    await set(ref(db, `menu/${aktifKatId}/bolumler/${bolumKey}/isim`), yeniIsim);
+    loadKatIcerik(aktifKatId);
+    showToast('Bölüm adı güncellendi');
+  };
+
+  window.secenekDuzenle = function(bolumKey, idx, mevcutIsim) {
+    const span = document.getElementById(`sec-isim-${bolumKey}-${idx}`);
+    const parent = span.parentElement;
+    span.style.display = 'none';
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.value = mevcutIsim;
+    inp.style.cssText = 'border:1px solid var(--soft);border-radius:6px;padding:3px 8px;font-size:12px;width:120px;font-family:DM Sans,sans-serif;';
+    const kaydetBtn = document.createElement('button');
+    kaydetBtn.textContent = '✓';
+    kaydetBtn.style.cssText = 'background:var(--brown);color:#fff;border:none;border-radius:6px;padding:3px 7px;cursor:pointer;font-size:12px;margin-left:2px;';
+    kaydetBtn.onclick = () => secenekKaydet(bolumKey, idx, inp.value.trim());
+    const iptalBtn = document.createElement('button');
+    iptalBtn.textContent = '✕';
+    iptalBtn.style.cssText = 'background:transparent;color:var(--muted);border:1px solid var(--soft);border-radius:6px;padding:3px 7px;cursor:pointer;font-size:12px;margin-left:2px;';
+    iptalBtn.onclick = () => loadKatIcerik(aktifKatId);
+    parent.insertBefore(inp, span.nextSibling);
+    parent.insertBefore(kaydetBtn, inp.nextSibling);
+    parent.insertBefore(iptalBtn, kaydetBtn.nextSibling);
+  };
+
+  window.secenekKaydet = async function(bolumKey, idx, yeniIsim) {
+    if (!yeniIsim) { showToast('İsim boş olamaz'); return; }
+    const chipList = document.getElementById('bolum-chip-' + bolumKey);
+    const items = Array.from(chipList.querySelectorAll('.chip-item')).map((el, i) => {
+      const isimEl = el.querySelector('span[id^="sec-isim"]');
+      const isim = isimEl ? isimEl.textContent.trim() : '';
+      const cb = el.querySelector('input[type=checkbox]');
+      return { isim: i === idx ? yeniIsim : isim, pasif: cb ? !cb.checked : false };
+    });
+    await set(ref(db, `menu/${aktifKatId}/bolumler/${bolumKey}/secenekler`), items);
+    loadKatIcerik(aktifKatId);
+    showToast('Seçenek güncellendi');
+  };
+
+  window.bolumAdiniDuzenle = window.bolumAdiniDuzenle || function() {};
   window.toggleTopIcinKullan = async function(bolumKey, aktif) {
     if (!aktifKatId) return;
     await set(ref(db, `menu/${aktifKatId}/bolumler/${bolumKey}/topIcinKullan`), aktif);
@@ -531,7 +614,7 @@
     const items = Object.entries(obj);
     if (!items.length) { list.innerHTML = '<span class="empty-list">Henüz ürün eklenmedi</span>'; return; }
     list.innerHTML = items.map(([key, u]) => `
-      <div class="item-row" style="${u.pasif ? 'opacity:0.5' : ''}">
+      <div class="item-row" id="urun-row-${key}" style="${u.pasif ? 'opacity:0.5' : ''}">
         <div class="item-left">
           <span class="item-emoji">${u.emoji || '🍦'}</span>
           <div class="item-info">
@@ -540,11 +623,12 @@
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
+          <button onclick="urunDuzenle('${key}','${u.isim}',${u.fiyat},'${u.emoji||'🍦'}')" style="width:28px;height:28px;border-radius:8px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;" title="Düzenle">✎</button>
           ${u.stok !== undefined ? `
             <button onclick="stokDegistir('${key}', ${u.stok}, -1)" style="width:26px;height:26px;border-radius:6px;border:1px solid var(--soft);background:transparent;color:var(--red);font-size:16px;cursor:pointer;">−</button>
             <span style="font-size:13px;font-weight:600;min-width:24px;text-align:center;">${u.stok}</span>
             <button onclick="stokDegistir('${key}', ${u.stok}, 1)" style="width:26px;height:26px;border-radius:6px;border:1px solid var(--soft);background:transparent;color:var(--green);font-size:16px;cursor:pointer;">+</button>
-          ` : `<button onclick="stokAc('${key}', ${u.stok || 0})" style="padding:4px 8px;border-radius:6px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;">Stok Ekle</button>`}
+          ` : `<button onclick="stokAc('${key}', 0)" style="padding:4px 8px;border-radius:6px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;">Stok Ekle</button>`}
           <div class="toggle-wrap">
             <label class="toggle"><input type="checkbox" ${u.pasif ? '' : 'checked'} onchange="toggleUrun('${key}', this.checked)"><span class="toggle-slider"></span></label>
             ${u.pasif ? '<span class="pasif-label">Pasif</span>' : ''}
@@ -554,6 +638,30 @@
       </div>
     `).join('');
   }
+
+  window.urunDuzenle = function(key, isim, fiyat, emoji) {
+    const row = document.getElementById('urun-row-' + key);
+    row.innerHTML = `
+      <div style="display:flex;gap:6px;align-items:center;flex:1;flex-wrap:wrap;">
+        <input id="uedit-emoji-${key}" type="text" value="${emoji}" style="width:46px;border:1px solid var(--soft);border-radius:8px;padding:6px;font-size:18px;text-align:center;" maxlength="2">
+        <input id="uedit-isim-${key}" type="text" value="${isim}" style="flex:1;min-width:120px;border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:14px;font-family:'DM Sans',sans-serif;">
+        <input id="uedit-fiyat-${key}" type="number" value="${fiyat}" style="width:80px;border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:14px;">
+        <button onclick="urunKaydet('${key}')" style="padding:6px 14px;background:var(--brown);color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">Kaydet</button>
+        <button onclick="loadKatIcerik('${aktifKatId}')" style="padding:6px 14px;background:transparent;color:var(--muted);border:1px solid var(--soft);border-radius:8px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">İptal</button>
+      </div>`;
+  };
+
+  window.urunKaydet = async function(key) {
+    const emoji = document.getElementById('uedit-emoji-' + key).value.trim();
+    const isim = document.getElementById('uedit-isim-' + key).value.trim();
+    const fiyat = parseFloat(document.getElementById('uedit-fiyat-' + key).value);
+    if (!isim || isNaN(fiyat)) { showToast('İsim ve fiyat girin'); return; }
+    await set(ref(db, `menu/${aktifKatId}/urunler/${key}/isim`), isim);
+    await set(ref(db, `menu/${aktifKatId}/urunler/${key}/fiyat`), fiyat);
+    await set(ref(db, `menu/${aktifKatId}/urunler/${key}/emoji`), emoji);
+    loadKatIcerik(aktifKatId);
+    showToast('Ürün güncellendi');
+  };
 
   function renderChipListAdmin(type, arr) {
     const list = document.getElementById(type + '-list');
