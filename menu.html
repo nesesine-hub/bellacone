@@ -15,7 +15,7 @@
   body { background: var(--cream); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding-bottom: 100px; }
 
   .header { background: var(--brown); color: #fff; padding: 0.75rem 1.25rem; text-align: center; position: sticky; top: 0; z-index: 100; }
-  .header img { height: 65px; width: auto; object-fit: contain; }
+  .header img { height: 65px; width: auto; object-fit: contain; display: block; margin: 0 auto; }
 
   .masa-bar { background: var(--warm); border-bottom: 1.5px solid var(--soft); padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 10px; }
   .masa-bar label { font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; }
@@ -56,12 +56,12 @@
   .detail-header {
     background: var(--warm); border-bottom: 1.5px solid var(--soft);
     padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 12px;
-    position: sticky; top: 65px; z-index: 99;
+    position: sticky; top: 0; z-index: 99;
   }
   .back-btn {
-    background: transparent; border: 1.5px solid var(--soft); border-radius: 10px;
-    padding: 6px 14px; font-size: 13px; color: var(--brown); cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-weight: 500;
+    background: transparent; border: 2px solid var(--brown); border-radius: 10px;
+    padding: 7px 16px; font-size: 14px; color: var(--brown); cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: 0.02em;
   }
   .back-btn:hover { background: var(--soft); }
   .detail-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--brown); }
@@ -347,6 +347,10 @@
     html += `</div>`;
 
     document.getElementById('detail-content').innerHTML = html;
+    // Geri butonu header'ın hemen altında sabitlensin
+    const headerH = document.querySelector('.header')?.offsetHeight || 80;
+    const detailHeader = document.querySelector('.detail-header');
+    if (detailHeader) detailHeader.style.top = headerH + 'px';
     showScreen('detail');
   };
 
