@@ -235,36 +235,71 @@
     if (!aktifKategori) return;
     const data = menuData[id] || {};
     const tumUrunler = data.urunler ? Object.values(data.urunler) : [];
-    const aktifUrunler = tumUrunler.filter(u => !u.pasif);
-    const pasifUrunler = tumUrunler.filter(u => u.pasif);
+    const aktifUrunler = tumUrunler.filter(u => !u.pasif && (u.stok === undefined || u.stok > 0));
+    const pasifUrunler = tumUrunler.filter(u => u.pasif || (u.stok !== undefined && u.stok <= 0));
     const bolumler = data.bolumler ? Object.entries(data.bolumler) : [];
+    const topDestegi = data.topDestegi || false;
 
     document.getElementById('detail-title').textContent = aktifKategori.isim;
-    state = { urun: null, secimler: {}, miktar: 1 };
+    state = { urun: null, toplar: [], topSayisi: 1, aktifTop: 0, secimler: {}, miktar: 1 };
     document.getElementById('miktar-val').textContent = '1';
 
     let html = '<div class="section">';
-    html += `<div class="section-title">Ürünler</div>`;
 
-    if (!tumUrunler.length) {
-      html += '<p class="empty-msg">Henüz ürün eklenmedi</p>';
+    if (topDestegi) {
+      // TOP SIRALAMASI MODU
+      html += `<div class="section-title">Kaç Top?</div>
+        <div style="display:flex;gap:8px;margin-bottom:1rem;">
+          ${[1,2,3].map(n => `<button class="top-sayi-btn ${n===1?'active':''}" onclick="topSayisiSec(${n})" style="flex:1;padding:10px;border:1.5px solid var(--soft);border-radius:12px;background:${n===1?'var(--accent)':'var(--card)'};color:${n===1?'#fff':'var(--text)'};font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">${n} Top</button>`).join('')}
+        </div>
+        <div id="top-secim-alani"></div>`;
+      
+      html += `<div class="section-title" style="margin-top:0.5rem;">Ürün Seçin</div>`;
+      if (!tumUrunler.length) {
+        html += '<p class="empty-msg">Henüz ürün eklenmedi</p>';
+      } else {
+        html += `<div class="urun-grid">`;
+        aktifUrunler.forEach(u => {
+          const stokBilgi = u.stok !== undefined ? ` (${u.stok} adet)` : '';
+          html += `<div class="urun-card" id="uc-${u.id}" onclick="selectUrun('${u.id}')">
+            <div class="urun-icon">${u.emoji || '🍦'}</div>
+            <div class="urun-name">${u.isim}</div>
+            <div class="urun-price">${u.fiyat} ₺${stokBilgi}</div>
+          </div>`;
+        });
+        pasifUrunler.forEach(u => {
+          html += `<div class="urun-card" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);">
+            <div class="urun-icon">${u.emoji || '🍦'}</div>
+            <div class="urun-name">${u.isim}</div>
+            <div class="urun-price" style="color:#999;">Stokta yok</div>
+          </div>`;
+        });
+        html += `</div>`;
+      }
     } else {
-      html += `<div class="urun-grid">`;
-      aktifUrunler.forEach(u => {
-        html += `<div class="urun-card" id="uc-${u.id}" onclick="selectUrun('${u.id}')">
-          <div class="urun-icon">${u.emoji || '🍦'}</div>
-          <div class="urun-name">${u.isim}</div>
-          <div class="urun-price">${u.fiyat} ₺</div>
-        </div>`;
-      });
-      pasifUrunler.forEach(u => {
-        html += `<div class="urun-card" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);">
-          <div class="urun-icon">${u.emoji || '🍦'}</div>
-          <div class="urun-name">${u.isim}</div>
-          <div class="urun-price" style="color:#999;">Stokta yok</div>
-        </div>`;
-      });
-      html += `</div>`;
+      // NORMAL MOD
+      html += `<div class="section-title">Ürünler</div>`;
+      if (!tumUrunler.length) {
+        html += '<p class="empty-msg">Henüz ürün eklenmedi</p>';
+      } else {
+        html += `<div class="urun-grid">`;
+        aktifUrunler.forEach(u => {
+          const stokBilgi = u.stok !== undefined ? ` (${u.stok})` : '';
+          html += `<div class="urun-card" id="uc-${u.id}" onclick="selectUrun('${u.id}')">
+            <div class="urun-icon">${u.emoji || '🍦'}</div>
+            <div class="urun-name">${u.isim}</div>
+            <div class="urun-price">${u.fiyat} ₺${stokBilgi}</div>
+          </div>`;
+        });
+        pasifUrunler.forEach(u => {
+          html += `<div class="urun-card" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);">
+            <div class="urun-icon">${u.emoji || '🍦'}</div>
+            <div class="urun-name">${u.isim}</div>
+            <div class="urun-price" style="color:#999;">Stokta yok</div>
+          </div>`;
+        });
+        html += `</div>`;
+      }
     }
 
     // Dinamik bölümler
@@ -276,7 +311,8 @@
       html += `<div class="section-title">${bolum.isim}</div><div class="chips">`;
       aktifler.forEach(s => {
         const isim = typeof s === 'object' ? s.isim : s;
-        html += `<span class="chip" onclick="toggleBolumChip(this,'${bolumKey}','${isim}')">${isim}</span>`;
+        const ekFiyat = typeof s === 'object' && s.ekFiyat ? ` +${s.ekFiyat}₺` : '';
+        html += `<span class="chip" onclick="toggleBolumChip(this,'${bolumKey}','${isim}',${typeof s === 'object' && s.ekFiyat ? s.ekFiyat : 0})">${isim}${ekFiyat}</span>`;
       });
       pasifler.forEach(s => {
         const isim = typeof s === 'object' ? s.isim : s;
@@ -290,7 +326,68 @@
     </div>`;
 
     document.getElementById('detail-content').innerHTML = html;
+    if (topDestegi) { state.aktifTop = 0; renderTopAlani(); }
     showScreen('detail');
+  };
+
+  window.topSayisiSec = function(sayi) {
+    state.topSayisi = sayi;
+    state.toplar = Array(sayi).fill(null);
+    state.aktifTop = 0;
+    document.querySelectorAll('.top-sayi-btn').forEach((b, i) => {
+      const n = i + 1;
+      b.style.background = n === sayi ? 'var(--accent)' : 'var(--card)';
+      b.style.color = n === sayi ? '#fff' : 'var(--text)';
+      b.style.borderColor = n === sayi ? 'var(--accent)' : 'var(--soft)';
+    });
+    renderTopAlani();
+  };
+
+  function renderTopAlani() {
+    const alan = document.getElementById('top-secim-alani');
+    if (!alan) return;
+    const data = menuData[aktifKategori.id] || {};
+    const urunler = data.urunler ? Object.values(data.urunler).filter(u => !u.pasif && (u.stok === undefined || u.stok > 0)) : [];
+    const sayi = state.topSayisi;
+    const aktifIdx = state.aktifTop;
+
+    // Seçim özeti
+    let ozet = '';
+    for (let i = sayi - 1; i >= 0; i--) {
+      const secilen = state.toplar[i];
+      const urunIsim = secilen ? urunler.find(u => u.id === secilen)?.isim : null;
+      ozet += `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:${secilen ? 'var(--warm)' : 'transparent'};border:1px solid ${secilen ? 'var(--soft)' : 'transparent'};">
+        <span style="font-size:11px;color:var(--muted);min-width:40px;">${i+1}. top</span>
+        <span style="font-size:13px;font-weight:${secilen?'500':'400'};color:${secilen?'var(--brown)':'var(--muted)'};">${urunIsim || '—'}</span>
+        ${secilen ? `<button onclick="topIptal(${i})" style="margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;">✕</button>` : ''}
+      </div>`;
+    }
+
+    alan.innerHTML = `
+      <div style="margin-bottom:0.75rem;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-style:italic;">Seçim sırasına göre aşağıdan yukarıya dizilir. Önce alta koymak istediğinizi seçin.</div>
+        <div style="display:flex;flex-direction:column;gap:4px;">${ozet}</div>
+      </div>
+      <div style="font-size:13px;font-weight:500;color:var(--brown);margin-bottom:0.4rem;">${aktifIdx + 1}. topu seçin:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${urunler.map(u => `<span class="chip ${state.toplar[aktifIdx]===u.id?'active':''}" onclick="topSec(${aktifIdx},'${u.id}',this)">${u.isim}</span>`).join('')}
+      </div>
+    `;
+  }
+
+  window.topSec = function(topIdx, urunId) {
+    state.toplar[topIdx] = urunId;
+    // Otomatik sonraki topa geç
+    if (topIdx < state.topSayisi - 1) {
+      state.aktifTop = topIdx + 1;
+    }
+    renderTopAlani();
+  };
+
+  window.topIptal = function(topIdx) {
+    state.toplar[topIdx] = null;
+    state.aktifTop = topIdx;
+    renderTopAlani();
   };
 
   window.goHome = function() {
@@ -339,41 +436,69 @@
     const masa = document.getElementById('masa-input').value;
     if (!masa) { showToast('Lütfen masa numarası girin'); return; }
     if (!aktifKategori) { showToast('Lütfen bir kategori seçin'); return; }
-    if (!state.urun) { showToast('Lütfen bir ürün seçin'); return; }
 
     const data = menuData[aktifKategori.id] || {};
     const urunler = data.urunler ? Object.values(data.urunler) : [];
-    const urun = urunler.find(u => u.id === state.urun);
+    const topDestegi = data.topDestegi || false;
     const not = document.getElementById('siparis-not')?.value?.trim() || '';
-
     const bolumler = data.bolumler || {};
+
+    let urunIsim, fiyat, topBilgi = null;
+
+    if (topDestegi) {
+      // Top modu - her top için seçim kontrolü
+      if (state.toplar.some(t => !t)) { showToast('Tüm toplar için dondurma seçin'); return; }
+      const topIsimleri = state.toplar.map(id => urunler.find(u => u.id === id)?.isim || '');
+      const ilkUrun = urunler.find(u => u.id === state.toplar[0]);
+      fiyat = ilkUrun ? ilkUrun.fiyat * state.toplar.length : 0;
+      urunIsim = topIsimleri.join(' + ');
+      topBilgi = state.toplar;
+    } else {
+      if (!state.urun) { showToast('Lütfen bir ürün seçin'); return; }
+      const urun = urunler.find(u => u.id === state.urun);
+      urunIsim = urun.isim;
+      fiyat = urun.fiyat;
+    }
+
+    // Ek fiyatları hesapla
+    let ekFiyatToplam = 0;
     const secimMetni = Object.entries(state.secimler || {})
       .filter(([, arr]) => arr.length > 0)
       .map(([bolumKey, arr]) => {
         const bolumIsim = bolumler[bolumKey]?.isim || bolumKey;
+        const secenekler = bolumler[bolumKey]?.secenekler || [];
+        arr.forEach(secIsim => {
+          const sec = secenekler.find(s => (typeof s === 'object' ? s.isim : s) === secIsim);
+          if (sec && typeof sec === 'object' && sec.ekFiyat) ekFiyatToplam += Number(sec.ekFiyat);
+        });
         return bolumIsim + ': ' + arr.join(', ');
       }).join(' | ');
+
+    const toplamFiyat = (fiyat + ekFiyatToplam) * state.miktar;
 
     const btn = document.getElementById('siparis-btn');
     btn.disabled = true; btn.textContent = 'Gönderiliyor...';
 
     try {
-      await push(ref(db, 'siparisler'), {
+      const siparis = {
         masa: Number(masa),
         kategori: aktifKategori.isim,
-        urun: urun.isim,
-        fiyat: urun.fiyat,
+        urun: urunIsim,
+        fiyat: fiyat + ekFiyatToplam,
         miktar: state.miktar,
-        toplamFiyat: urun.fiyat * state.miktar,
+        toplamFiyat,
         secimler: state.secimler || {},
         secimMetni,
         not,
         durum: 'bekliyor',
         zaman: new Date().toISOString(),
         zamanStr: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-      });
+      };
+      if (topBilgi) siparis.toplar = topBilgi;
+      await push(ref(db, 'siparisler'), siparis);
+
       showToast('✓ Siparişiniz alındı!');
-      state = { urun: null, secimler: {}, miktar: 1 };
+      state = { urun: null, toplar: [], topSayisi: 1, secimler: {}, miktar: 1 };
       document.getElementById('miktar-val').textContent = '1';
       document.querySelectorAll('.urun-card').forEach(e => e.classList.remove('selected'));
       document.querySelectorAll('.chip').forEach(e => e.classList.remove('active'));

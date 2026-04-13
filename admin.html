@@ -187,8 +187,15 @@
   <div id="menu-icerik" style="display:none;">
     <div class="kat-detail-card">
       <div class="kat-detail-title" id="aktif-kat-baslik"></div>
-
-      <!-- Ürünler (sabit) -->
+      
+      <!-- Top Desteği Toggle -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding:0.75rem 1rem;background:var(--warm);border-radius:10px;border:1px solid var(--soft);">
+        <label class="toggle" id="top-toggle-wrap"><input type="checkbox" id="top-destegi-toggle" onchange="toggleTopDestegi(this.checked)"><span class="toggle-slider"></span></label>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--brown);">Top Sıralaması Modu</div>
+          <div style="font-size:11px;color:var(--muted);">Aktifken müşteri 1-2-3 top seçip her top için ayrı dondurma seçer</div>
+        </div>
+      </div>
       <div style="margin-bottom:1.25rem;">
         <div style="font-size:13px; font-weight:600; color:var(--brown); margin-bottom:0.5rem; padding-bottom:0.4rem; border-bottom:1px solid var(--soft);">Ürünler</div>
         <div class="form-row">
@@ -355,7 +362,8 @@
     onValue(ref(db, 'menu/' + id), (snap) => {
       const d = snap.val() || {};
       renderUrunList(d.urunler || {});
-      // Dinamik bölümleri render et
+      const topToggle = document.getElementById('top-destegi-toggle');
+      if (topToggle) topToggle.checked = d.topDestegi || false;
       const bolumler = d.bolumler || {};
       renderDinamikBolumler(bolumler);
     }, { onlyOnce: true });
@@ -482,10 +490,15 @@
           <span class="item-emoji">${u.emoji || '🍦'}</span>
           <div class="item-info">
             <span class="item-name">${u.isim}</span>
-            <span class="item-price">${u.fiyat} ₺</span>
+            <span class="item-price">${u.fiyat} ₺ ${u.stok !== undefined ? `· Stok: <b>${u.stok}</b>` : '· Stoksuz'}</span>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${u.stok !== undefined ? `
+            <button onclick="stokDegistir('${key}', ${u.stok}, -1)" style="width:26px;height:26px;border-radius:6px;border:1px solid var(--soft);background:transparent;color:var(--red);font-size:16px;cursor:pointer;">−</button>
+            <span style="font-size:13px;font-weight:600;min-width:24px;text-align:center;">${u.stok}</span>
+            <button onclick="stokDegistir('${key}', ${u.stok}, 1)" style="width:26px;height:26px;border-radius:6px;border:1px solid var(--soft);background:transparent;color:var(--green);font-size:16px;cursor:pointer;">+</button>
+          ` : `<button onclick="stokAc('${key}', ${u.stok || 0})" style="padding:4px 8px;border-radius:6px;border:1px solid var(--soft);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;">Stok Ekle</button>`}
           <div class="toggle-wrap">
             <label class="toggle"><input type="checkbox" ${u.pasif ? '' : 'checked'} onchange="toggleUrun('${key}', this.checked)"><span class="toggle-slider"></span></label>
             ${u.pasif ? '<span class="pasif-label">Pasif</span>' : ''}
@@ -598,6 +611,28 @@
     await remove(ref(db, 'menu/' + aktifKatId + '/urunler/' + key));
     loadKatIcerik(aktifKatId);
     showToast('Silindi');
+  };
+
+  window.stokDegistir = async function(key, mevcutStok, delta) {
+    if (!aktifKatId) return;
+    const yeni = Math.max(0, mevcutStok + delta);
+    await set(ref(db, `menu/${aktifKatId}/urunler/${key}/stok`), yeni);
+    loadKatIcerik(aktifKatId);
+  };
+
+  window.stokAc = async function(key, baslangic) {
+    if (!aktifKatId) return;
+    const miktar = prompt('Başlangıç stok miktarı:', baslangic || 10);
+    if (miktar === null) return;
+    await set(ref(db, `menu/${aktifKatId}/urunler/${key}/stok`), Number(miktar));
+    loadKatIcerik(aktifKatId);
+    showToast('Stok eklendi');
+  };
+
+  window.toggleTopDestegi = async function(aktif) {
+    if (!aktifKatId) return;
+    await set(ref(db, `menu/${aktifKatId}/topDestegi`), aktif);
+    showToast(aktif ? 'Top sıralaması aktif' : 'Top sıralaması pasif');
   };
 
   window.toggleUrun = async function(key, aktif) {
