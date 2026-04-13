@@ -158,6 +158,7 @@
 <div class="tabs">
   <button class="tab active" onclick="switchTab('kategoriler', this)">Kategoriler</button>
   <button class="tab" onclick="switchTab('menu', this)">Menü İçerikleri</button>
+  <button class="tab" onclick="switchTab('stok', this)">Stok</button>
   <button class="tab" onclick="switchTab('foto', this)">Fotoğraflar</button>
   <button class="tab" onclick="switchTab('qr', this)">QR Kodlar</button>
 </div>
@@ -231,6 +232,40 @@
       Her kategori için fotoğraf linki girin. Google Drive, imgur, ya da herhangi bir görsel linki olabilir.
     </p>
     <div id="foto-listesi"><div class="loading">Yükleniyor...</div></div>
+  </div>
+</div>
+
+<!-- STOK PANELİ -->
+<div class="panel" id="panel-stok">
+  <div class="section-card">
+    <div class="section-header"><h2>Stok Yönetimi</h2></div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:1rem;">Kategori seç, ürün adı gir ve stok miktarını ayarla.</p>
+
+    <!-- Kategori seçici -->
+    <div class="form-row" style="margin-bottom:1rem;">
+      <div class="form-group">
+        <label>Kategori</label>
+        <select class="form-input" id="stok-kat-sec" onchange="stokKatSec(this.value)">
+          <option value="">— Kategori Seçin —</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Yeni stok kalemi ekle -->
+    <div class="form-row" id="stok-ekle-form" style="display:none; margin-bottom:1rem;">
+      <div class="form-group">
+        <label>Ürün / Malzeme Adı</label>
+        <input class="form-input" id="stok-urun-adi" type="text" placeholder="Örn: Vanilyalı Dondurma, Çikolata Sosu...">
+      </div>
+      <div class="form-group" style="flex:0 0 110px;">
+        <label>Başlangıç Stok</label>
+        <input class="form-input" id="stok-miktar" type="number" value="10" min="0">
+      </div>
+      <button class="add-btn" onclick="stokEkle()">Ekle</button>
+    </div>
+
+    <!-- Stok listesi -->
+    <div id="stok-listesi"></div>
   </div>
 </div>
 
@@ -734,6 +769,77 @@
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById('panel-' + tab).classList.add('active');
     el.classList.add('active');
+    if (tab === 'stok') stokKategorileriDoldur();
+  };
+
+  function stokKategorileriDoldur() {
+    const sel = document.getElementById('stok-kat-sec');
+    sel.innerHTML = '<option value="">— Kategori Seçin —</option>' +
+      kategoriler.map(k => `<option value="${k.id}">${k.emoji || ''} ${k.isim}</option>`).join('');
+  }
+
+  let aktifStokKatId = null;
+
+  window.stokKatSec = function(id) {
+    aktifStokKatId = id;
+    document.getElementById('stok-ekle-form').style.display = id ? 'flex' : 'none';
+    if (id) stokListesiYukle(id);
+    else document.getElementById('stok-listesi').innerHTML = '';
+  };
+
+  function stokListesiYukle(katId) {
+    onValue(ref(db, `stok/${katId}`), (snap) => {
+      const data = snap.val() || {};
+      const items = Object.entries(data).sort((a, b) => a[1].isim?.localeCompare(b[1].isim));
+      const listEl = document.getElementById('stok-listesi');
+      if (!items.length) {
+        listEl.innerHTML = '<span class="empty-list">Henüz stok kalemi yok</span>';
+        return;
+      }
+      listEl.innerHTML = items.map(([key, s]) => `
+        <div class="item-row" style="margin-bottom:6px;">
+          <div class="item-left">
+            <div class="item-info">
+              <span class="item-name">${s.isim}</span>
+              <span class="item-price" style="color:${s.miktar <= 5 ? 'var(--red)' : 'var(--muted)'};">${s.miktar} adet ${s.miktar <= 5 ? '⚠ Az kaldı' : ''}</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button onclick="stokAdimDegistir('${katId}','${key}',${s.miktar},-5)" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--soft);background:transparent;color:var(--red);font-size:13px;font-weight:600;cursor:pointer;">-5</button>
+            <button onclick="stokAdimDegistir('${katId}','${key}',${s.miktar},-1)" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--soft);background:transparent;color:var(--red);font-size:18px;cursor:pointer;">−</button>
+            <span style="font-size:16px;font-weight:600;min-width:36px;text-align:center;color:${s.miktar <= 5 ? 'var(--red)' : 'var(--text)'};">${s.miktar}</span>
+            <button onclick="stokAdimDegistir('${katId}','${key}',${s.miktar},1)" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--soft);background:transparent;color:var(--green);font-size:18px;cursor:pointer;">+</button>
+            <button onclick="stokAdimDegistir('${katId}','${key}',${s.miktar},5)" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--soft);background:transparent;color:var(--green);font-size:13px;font-weight:600;cursor:pointer;">+5</button>
+            <button onclick="stokSil('${katId}','${key}')" class="del-btn">×</button>
+          </div>
+        </div>
+      `).join('');
+    }, { onlyOnce: true });
+  }
+
+  window.stokAdimDegistir = async function(katId, key, mevcutMiktar, delta) {
+    const yeni = Math.max(0, mevcutMiktar + delta);
+    await set(ref(db, `stok/${katId}/${key}/miktar`), yeni);
+    stokListesiYukle(katId);
+  };
+
+  window.stokEkle = async function() {
+    if (!aktifStokKatId) return;
+    const isim = document.getElementById('stok-urun-adi').value.trim();
+    const miktar = parseInt(document.getElementById('stok-miktar').value) || 0;
+    if (!isim) { showToast('Ürün adı girin'); return; }
+    const key = isim.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') + '_' + Date.now();
+    await set(ref(db, `stok/${aktifStokKatId}/${key}`), { isim, miktar });
+    document.getElementById('stok-urun-adi').value = '';
+    document.getElementById('stok-miktar').value = '10';
+    stokListesiYukle(aktifStokKatId);
+    showToast('Stok kalemi eklendi');
+  };
+
+  window.stokSil = async function(katId, key) {
+    await remove(ref(db, `stok/${katId}/${key}`));
+    stokListesiYukle(katId);
+    showToast('Silindi');
   };
 </script>
 </body>

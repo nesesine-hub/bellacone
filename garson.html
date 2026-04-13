@@ -338,27 +338,26 @@
   let currentFilter = 'hepsi';
   let isFirstLoad = true;
 
-  // Stok takibi
-  onValue(ref(db, 'menu'), (snap) => {
-    const menu = snap.val() || {};
+  // Stok takibi - yeni stok yapısı
+  onValue(ref(db, 'stok'), (snap) => {
+    const stokData = snap.val() || {};
     const azalanlar = [];
-    Object.entries(menu).forEach(([katId, kat]) => {
-      if (typeof kat !== 'object' || !kat.urunler) return;
-      Object.values(kat.urunler).forEach(u => {
-        if (u.stok !== undefined && u.stok <= 5) {
-          azalanlar.push(`${u.isim}: ${u.stok} adet kaldı`);
+    Object.entries(stokData).forEach(([katId, items]) => {
+      Object.values(items).forEach(s => {
+        if (s.miktar !== undefined && s.miktar <= 5) {
+          azalanlar.push(`${s.isim}: ${s.miktar} adet kaldı`);
         }
       });
     });
     const stokDiv = document.getElementById('stok-uyari');
     const stokPill = document.getElementById('stat-stok');
     const stokListe = document.getElementById('stok-uyari-listesi');
-    if (azalanlar.length) {
+    if (stokDiv && azalanlar.length) {
       stokDiv.style.display = 'block';
       stokPill.style.display = 'inline-flex';
       stokPill.textContent = `⚠ ${azalanlar.length} ürün`;
       stokListe.textContent = azalanlar.join(' · ');
-    } else {
+    } else if (stokDiv) {
       stokDiv.style.display = 'none';
       stokPill.style.display = 'none';
     }
