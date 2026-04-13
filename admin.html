@@ -458,6 +458,8 @@
             const pasif = typeof s === 'object' ? s.pasif : false;
             const ekFiyat = typeof s === 'object' && s.ekFiyat ? s.ekFiyat : 0;
             return `<div class="chip-item" style="${pasif ? 'opacity:0.5' : ''}">
+              <button onclick="secenekTasi('${bolumKey}',${i},-1)" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:11px;padding:0 1px;" ${i===0?'disabled style="opacity:0.3"':''}>↑</button>
+              <button onclick="secenekTasi('${bolumKey}',${i},1)" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:11px;padding:0 1px;" ${i===secenekler.length-1?'disabled style="opacity:0.3"':''}>↓</button>
               <span id="sec-isim-${bolumKey}-${i}">${isim}</span>
               ${ekFiyat ? `<span style="font-size:10px;color:var(--accent);font-weight:600;margin-left:2px;">+${ekFiyat}₺</span>` : ''}
               <button onclick="secenekDuzenle('${bolumKey}',${i},'${isim}')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:12px;padding:0 2px;" title="Düzenle">✎</button>
@@ -470,6 +472,23 @@
       </div>`;
     }).join('');
   }
+
+  window.secenekTasi = async function(bolumKey, idx, yon) {
+    const yeniIdx = idx + yon;
+    const chipList = document.getElementById('bolum-chip-' + bolumKey);
+    const items = Array.from(chipList.querySelectorAll('.chip-item')).map((el) => {
+      const isimEl = el.querySelector('span[id^="sec-isim"]');
+      const isim = isimEl ? isimEl.textContent.trim() : '';
+      const cb = el.querySelector('input[type=checkbox]');
+      const ekFiyatEl = el.querySelector('span[style*="accent"]');
+      const ekFiyat = ekFiyatEl ? parseFloat(ekFiyatEl.textContent.replace(/[^0-9.]/g,'')) || 0 : 0;
+      return { isim, pasif: cb ? !cb.checked : false, ...(ekFiyat > 0 ? { ekFiyat } : {}) };
+    });
+    if (yeniIdx < 0 || yeniIdx >= items.length) return;
+    [items[idx], items[yeniIdx]] = [items[yeniIdx], items[idx]];
+    await set(ref(db, `menu/${aktifKatId}/bolumler/${bolumKey}/secenekler`), items);
+    loadKatIcerik(aktifKatId);
+  };
 
   window.ekFiyatDuzenle = async function(bolumKey, idx, mevcutFiyat) {
     const yeni = prompt(`Ek ücret girin (₺) — 0 girerek kaldırabilirsiniz:`, mevcutFiyat || 0);
