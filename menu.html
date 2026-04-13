@@ -247,8 +247,53 @@
     let html = '<div class="section">';
 
     if (topDestegi) {
-      // TOP SIRALAMASI MODU - sınırsız, seç geç
-      html += `<div id="top-secim-alani"></div>`;
+      // ÖNCE ÜRÜN SEÇ (Külah/Cup vb.)
+      html += `<div class="section-title">Servis Şekli</div>`;
+      if (!tumUrunler.length) {
+        html += '<p class="empty-msg">Henüz ürün eklenmedi</p>';
+      } else {
+        html += `<div class="urun-grid">`;
+        aktifUrunler.forEach(u => {
+          html += `<div class="urun-card" id="uc-${u.id}" onclick="selectUrunTop('${u.id}')">
+            <div class="urun-icon">${u.emoji || '🍦'}</div>
+            <div class="urun-name">${u.isim}</div>
+            <div class="urun-price">${u.fiyat} ₺</div>
+          </div>`;
+        });
+        pasifUrunler.forEach(u => {
+          html += `<div class="urun-card" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);">
+            <div class="urun-icon">${u.emoji || '🍦'}</div>
+            <div class="urun-name">${u.isim}</div>
+            <div class="urun-price" style="color:#999;">Stokta yok</div>
+          </div>`;
+        });
+        html += `</div>`;
+      }
+      // Top seçim alanı - ürün seçilince açılacak
+      html += `<div id="top-secim-alani" style="display:none;"></div>`;
+      // Dinamik bölümler - top seçim alanından sonra
+      html += `<div id="diger-bolumler" style="display:none;">`;
+      bolumler.forEach(([bolumKey, bolum]) => {
+        const secenekler = bolum.secenekler || [];
+        const aktifler = secenekler.filter(s => !(typeof s === 'object' ? s.pasif : false));
+        const pasifler = secenekler.filter(s => (typeof s === 'object' ? s.pasif : false));
+        if (!secenekler.length) return;
+        html += `<div class="section-title">${bolum.isim}</div><div class="chips">`;
+        aktifler.forEach(s => {
+          const isim = typeof s === 'object' ? s.isim : s;
+          const ekFiyat = typeof s === 'object' && s.ekFiyat ? ` +${s.ekFiyat}₺` : '';
+          html += `<span class="chip" onclick="toggleBolumChip(this,'${bolumKey}','${isim}',${typeof s === 'object' && s.ekFiyat ? s.ekFiyat : 0})">${isim}${ekFiyat}</span>`;
+        });
+        pasifler.forEach(s => {
+          const isim = typeof s === 'object' ? s.isim : s;
+          html += `<span class="chip" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);" title="Stokta yok">${isim}</span>`;
+        });
+        html += `</div>`;
+      });
+      html += `<div class="section-title">Özel Not</div>
+        <textarea class="not-input" id="siparis-not" rows="2" placeholder="Örn: Az şekerli, alerji..."></textarea>
+      </div>`;
+
     } else {
       // NORMAL MOD
       html += `<div class="section-title">Ürünler</div>`;
@@ -273,66 +318,94 @@
         });
         html += `</div>`;
       }
+
+      // Normal mod dinamik bölümler
+      bolumler.forEach(([bolumKey, bolum]) => {
+        const secenekler = bolum.secenekler || [];
+        const aktifler = secenekler.filter(s => !(typeof s === 'object' ? s.pasif : false));
+        const pasifler = secenekler.filter(s => (typeof s === 'object' ? s.pasif : false));
+        if (!secenekler.length) return;
+        html += `<div class="section-title">${bolum.isim}</div><div class="chips">`;
+        aktifler.forEach(s => {
+          const isim = typeof s === 'object' ? s.isim : s;
+          const ekFiyat = typeof s === 'object' && s.ekFiyat ? ` +${s.ekFiyat}₺` : '';
+          html += `<span class="chip" onclick="toggleBolumChip(this,'${bolumKey}','${isim}',${typeof s === 'object' && s.ekFiyat ? s.ekFiyat : 0})">${isim}${ekFiyat}</span>`;
+        });
+        pasifler.forEach(s => {
+          const isim = typeof s === 'object' ? s.isim : s;
+          html += `<span class="chip" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);" title="Stokta yok">${isim}</span>`;
+        });
+        html += `</div>`;
+      });
+
+      html += `<div class="section-title">Özel Not</div>
+        <textarea class="not-input" id="siparis-not" rows="2" placeholder="Örn: Az şekerli, alerji..."></textarea>`;
     }
 
-    // Dinamik bölümler
-    bolumler.forEach(([bolumKey, bolum]) => {
-      const secenekler = bolum.secenekler || [];
-      const aktifler = secenekler.filter(s => !(typeof s === 'object' ? s.pasif : false));
-      const pasifler = secenekler.filter(s => (typeof s === 'object' ? s.pasif : false));
-      if (!secenekler.length) return;
-      html += `<div class="section-title">${bolum.isim}</div><div class="chips">`;
-      aktifler.forEach(s => {
-        const isim = typeof s === 'object' ? s.isim : s;
-        const ekFiyat = typeof s === 'object' && s.ekFiyat ? ` +${s.ekFiyat}₺` : '';
-        html += `<span class="chip" onclick="toggleBolumChip(this,'${bolumKey}','${isim}',${typeof s === 'object' && s.ekFiyat ? s.ekFiyat : 0})">${isim}${ekFiyat}</span>`;
-      });
-      pasifler.forEach(s => {
-        const isim = typeof s === 'object' ? s.isim : s;
-        html += `<span class="chip" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);" title="Stokta yok">${isim}</span>`;
-      });
-      html += `</div>`;
-    });
-
-    html += `<div class="section-title">Özel Not</div>
-      <textarea class="not-input" id="siparis-not" rows="2" placeholder="Örn: Az şekerli, alerji..."></textarea>
-    </div>`;
+    html += `</div>`;
 
     document.getElementById('detail-content').innerHTML = html;
-    if (topDestegi) renderTopAlani();
     showScreen('detail');
+  };
+
+  window.selectUrunTop = function(id) {
+    const data = menuData[aktifKategori.id] || {};
+    const urunler = data.urunler ? Object.values(data.urunler) : [];
+    state.urun = state.urun === id ? null : id;
+    state.toplar = [];
+    urunler.forEach(u => {
+      const el = document.getElementById('uc-' + u.id);
+      if (el) el.classList.toggle('selected', u.id === state.urun);
+    });
+    const topAlani = document.getElementById('top-secim-alani');
+    const digerBolumler = document.getElementById('diger-bolumler');
+    if (state.urun) {
+      topAlani.style.display = 'block';
+      digerBolumler.style.display = 'block';
+      renderTopAlani();
+    } else {
+      topAlani.style.display = 'none';
+      digerBolumler.style.display = 'none';
+    }
   };
 
   function renderTopAlani() {
     const alan = document.getElementById('top-secim-alani');
     if (!alan) return;
     const data = menuData[aktifKategori.id] || {};
-    const urunler = data.urunler ? Object.values(data.urunler).filter(u => !u.pasif && (u.stok === undefined || u.stok > 0)) : [];
+    const bolumler = data.bolumler || {};
+    // Tüm bölüm seçeneklerini topla (aktif olanlar)
+    let tumSecenekler = [];
+    Object.values(bolumler).forEach(bolum => {
+      (bolum.secenekler || []).forEach(s => {
+        if (!(typeof s === 'object' ? s.pasif : false)) {
+          tumSecenekler.push(typeof s === 'object' ? s.isim : s);
+        }
+      });
+    });
     const topSayisi = state.toplar.length;
     const siradakiTop = topSayisi + 1;
 
-    // Seçilen toplar özeti (aşağıdan yukarıya sıra)
+    // Seçilen toplar özeti (aşağıdan yukarıya)
     let ozet = '';
     if (topSayisi > 0) {
       ozet = `<div style="margin-bottom:1rem;">
         <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-style:italic;">Seçim sırasına göre aşağıdan yukarıya dizilir. Önce alta koymak istediğinizi seçin.</div>
         <div style="display:flex;flex-direction:column;gap:4px;">`;
       for (let i = topSayisi - 1; i >= 0; i--) {
-        const urun = urunler.find(u => u.id === state.toplar[i]);
         ozet += `<div style="display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:10px;background:var(--warm);border:1px solid var(--soft);">
           <span style="font-size:11px;color:var(--muted);min-width:40px;font-weight:500;">${i+1}. top</span>
-          <span style="font-size:13px;font-weight:500;color:var(--brown);flex:1;">${urun?.isim || '—'}</span>
+          <span style="font-size:13px;font-weight:500;color:var(--brown);flex:1;">${state.toplar[i]}</span>
           <button onclick="topSil(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0;">✕</button>
         </div>`;
       }
       ozet += `</div></div>`;
     }
 
-    // Şu anki top seçimi
     const secim = `<div>
       <div style="font-size:14px;font-weight:500;color:var(--brown);margin-bottom:0.6rem;">${siradakiTop}. topu seçin</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">
-        ${urunler.map(u => `<span class="chip" onclick="topEkle('${u.id}')">${u.isim}</span>`).join('')}
+        ${tumSecenekler.map(isim => `<span class="chip" onclick="topEkle('${isim}')">${isim}</span>`).join('')}
       </div>
     </div>`;
 
@@ -342,6 +415,7 @@
   window.topEkle = function(urunId) {
     state.toplar.push(urunId);
     renderTopAlani();
+    document.getElementById('diger-bolumler').style.display = 'block';
   };
 
   window.topSil = function(idx) {
@@ -405,11 +479,20 @@
     let urunIsim, fiyat, topBilgi = null;
 
     if (topDestegi) {
+      if (!state.urun) { showToast('Lütfen servis şekli seçin'); return; }
       if (state.toplar.length === 0) { showToast('En az 1 top seçin'); return; }
-      const topIsimleri = state.toplar.map(id => urunler.find(u => u.id === id)?.isim || '');
-      const ilkUrun = urunler.find(u => u.id === state.toplar[0]);
-      fiyat = ilkUrun ? ilkUrun.fiyat * state.toplar.length : 0;
-      urunIsim = topIsimleri.join(' + ');
+      const urun = urunler.find(u => u.id === state.urun);
+      const topIsimleri = state.toplar.map(id => {
+        const data = menuData[aktifKategori.id] || {};
+        const bolumler = data.bolumler || {};
+        for (const bolum of Object.values(bolumler)) {
+          const sec = (bolum.secenekler || []).find(s => (typeof s === 'object' ? s.isim : s) === id);
+          if (sec) return typeof sec === 'object' ? sec.isim : sec;
+        }
+        return urunler.find(u => u.id === id)?.isim || id;
+      });
+      fiyat = urun ? urun.fiyat : 0;
+      urunIsim = urun?.isim + ' — ' + topIsimleri.join(' + ');
       topBilgi = state.toplar;
     } else {
       if (!state.urun) { showToast('Lütfen bir ürün seçin'); return; }
