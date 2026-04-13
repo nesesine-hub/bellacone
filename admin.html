@@ -456,9 +456,12 @@
           ${secenekler.length ? secenekler.map((s, i) => {
             const isim = typeof s === 'object' ? s.isim : s;
             const pasif = typeof s === 'object' ? s.pasif : false;
+            const ekFiyat = typeof s === 'object' && s.ekFiyat ? s.ekFiyat : 0;
             return `<div class="chip-item" style="${pasif ? 'opacity:0.5' : ''}">
               <span id="sec-isim-${bolumKey}-${i}">${isim}</span>
+              ${ekFiyat ? `<span style="font-size:10px;color:var(--accent);font-weight:600;margin-left:2px;">+${ekFiyat}₺</span>` : ''}
               <button onclick="secenekDuzenle('${bolumKey}',${i},'${isim}')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:12px;padding:0 2px;" title="Düzenle">✎</button>
+              <button onclick="ekFiyatDuzenle('${bolumKey}',${i},${ekFiyat})" style="background:none;border:none;cursor:pointer;color:var(--accent);font-size:12px;padding:0 2px;" title="Ek Ücret">₺</button>
               <label class="toggle" style="margin-left:2px;"><input type="checkbox" ${pasif ? '' : 'checked'} onchange="toggleBolumSecenek('${bolumKey}', ${i}, this.checked)"><span class="toggle-slider"></span></label>
               <button class="chip-del" onclick="delBolumSecenek('${bolumKey}', ${i})">×</button>
             </div>`;
@@ -467,6 +470,24 @@
       </div>`;
     }).join('');
   }
+
+  window.ekFiyatDuzenle = async function(bolumKey, idx, mevcutFiyat) {
+    const yeni = prompt(`Ek ücret girin (₺) — 0 girerek kaldırabilirsiniz:`, mevcutFiyat || 0);
+    if (yeni === null) return;
+    const fiyat = parseFloat(yeni) || 0;
+    const chipList = document.getElementById('bolum-chip-' + bolumKey);
+    const items = Array.from(chipList.querySelectorAll('.chip-item')).map((el, i) => {
+      const isimEl = el.querySelector('span[id^="sec-isim"]');
+      const isim = isimEl ? isimEl.textContent.trim() : '';
+      const cb = el.querySelector('input[type=checkbox]');
+      const mevcutEkFiyatEl = el.querySelector('span[style*="accent"]');
+      const mevcutEkFiyat = i === idx ? fiyat : (parseFloat(mevcutEkFiyatEl?.textContent?.replace(/[^0-9.]/g, '')) || 0);
+      return { isim, pasif: cb ? !cb.checked : false, ...(mevcutEkFiyat > 0 ? { ekFiyat: mevcutEkFiyat } : {}) };
+    });
+    await set(ref(db, `menu/${aktifKatId}/bolumler/${bolumKey}/secenekler`), items);
+    loadKatIcerik(aktifKatId);
+    showToast(fiyat > 0 ? `+${fiyat}₺ ek ücret eklendi` : 'Ek ücret kaldırıldı');
+  };
 
   window.bolumAdiniDuzenle = function(bolumKey, mevcutIsim) {
     const baslik = document.getElementById('bolum-baslik-' + bolumKey);
