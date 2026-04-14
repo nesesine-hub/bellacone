@@ -326,49 +326,89 @@
     const grid = document.getElementById('orders-grid');
     let filtered = currentFilter === 'hepsi' ? allOrders : allOrders.filter(o => o.durum === currentFilter);
 
+    // Sorun bildirimlerini ayrı tut
+    const sorunlar = filtered.filter(o => o.sorunBildirimi);
+    const siparisler = filtered.filter(o => !o.sorunBildirimi);
+
     if (!filtered.length) {
       grid.innerHTML = `<div class="empty"><div class="empty-icon">🍦</div><p>Sipariş yok</p></div>`;
       return;
     }
 
-    grid.innerHTML = filtered.map(o => {
-      if (o.sorunBildirimi) {
-        return `<div class="order-card" style="border-color:#e07040;">
-          <div class="card-top">
-            <div class="masa-num" style="color:#e07040;">⚠ Sorun</div>
-            <span class="status-badge badge-bekliyor">Masa ${o.masa}</span>
-          </div>
-          <div class="dondurma-row">${o.urun}</div>
-          <div class="zaman-row">${o.zamanStr || ''}</div>
-          <div class="card-actions">
-            <button class="act-btn" onclick="sil('${o.key}')">Kapat</button>
-          </div>
-        </div>`;
-      }
+    // Masaya göre grupla
+    const masaGruplari = {};
+    siparisler.forEach(o => {
+      const masaKey = String(o.masa);
+      if (!masaGruplari[masaKey]) masaGruplari[masaKey] = [];
+      masaGruplari[masaKey].push(o);
+    });
 
-      const durumClass = {bekliyor:'yeni', hazir:'hazir-kart', odeme_alinacak:'odeme-kart', odeme_alindi:'odendi-kart'}[o.durum] || '';
-      const durumBadge = {bekliyor:'badge-bekliyor', hazir:'badge-hazir', odeme_alinacak:'badge-odeme', odeme_alindi:'badge-odendi'}[o.durum] || '';
-      const durumYazi = {bekliyor:'Bekliyor', hazir:'Hazır', odeme_alinacak:'Öd. Alınacak', odeme_alindi:'Öd. Alındı'}[o.durum] || o.durum;
+    // Masaları sırala (en erken siparişe göre)
+    const siraliMasalar = Object.entries(masaGruplari)
+      .sort((a, b) => new Date(a[1][0].zaman) - new Date(b[1][0].zaman));
 
-      return `<div class="order-card ${durumClass}">
+    let html = '';
+
+    // Sorun bildirimleri
+    sorunlar.forEach(o => {
+      html += `<div class="order-card" style="border-color:#e07040;">
         <div class="card-top">
-          <div class="masa-num">Masa ${o.masa}</div>
-          <span class="status-badge ${durumBadge}">${durumYazi}</span>
+          <div class="masa-num" style="color:#e07040;">⚠ Sorun</div>
+          <span class="status-badge badge-bekliyor">Masa ${o.masa}</span>
         </div>
-        <div class="dondurma-row">${o.kategori ? o.kategori + ' — ' : ''}${o.urun} × ${o.miktar}</div>
-        ${o.toplar && o.toplar.length ? `<div class="detail-row">${o.toplar.map((t,i) => `<span style="background:rgba(224,120,64,0.15);color:#e07840;border-radius:5px;padding:1px 6px;font-size:10px;margin:1px;">${i+1}. ${t}</span>`).join('')}</div>` : ''}
-        ${o.secimMetni ? `<div class="detail-row">${o.secimMetni}</div>` : ''}
-        ${o.not ? `<div class="detail-row" style="color:#e07840;">Not: ${o.not}</div>` : ''}
-        <div class="zaman-row">${o.zamanStr || ''} · ${o.toplamFiyat || 0} ₺</div>
+        <div class="dondurma-row">${o.urun}</div>
+        <div class="zaman-row">${o.zamanStr || ''}</div>
         <div class="card-actions">
-          ${o.durum === 'bekliyor' ? `<button class="act-btn primary" onclick="setDurum('${o.key}','hazir','Hazır işaretlendi','Masa ${o.masa} — ${o.urun}')">Hazır</button>` : ''}
-          ${o.durum === 'hazir' ? `<button class="act-btn blue" onclick="setDurum('${o.key}','odeme_alinacak','Öd. alınacak işaretlendi','Masa ${o.masa} — ${o.urun}')">Öd. Alınacak</button>` : ''}
-          ${o.durum === 'odeme_alinacak' ? `<button class="act-btn purple" onclick="setDurum('${o.key}','odeme_alindi','Ödeme alındı','Masa ${o.masa} — ${o.urun} · ${o.toplamFiyat||0}₺')">Ödeme Alındı</button>` : ''}
-          ${o.durum !== 'bekliyor' ? `<button class="act-btn geri" onclick="setDurum('${o.key}','bekliyor','Geri alındı','Masa ${o.masa} — ${o.urun}')">Geri Al</button>` : ''}
-          <button class="act-btn" onclick="sil('${o.key}')">Sil</button>
+          <button class="act-btn" onclick="sil('${o.key}')">Kapat</button>
         </div>
       </div>`;
-    }).join('');
+    });
+
+    // Masa grupları
+    siraliMasalar.forEach(([masa, kalemler]) => {
+      const masaToplam = kalemler.reduce((s, o) => s + (o.toplamFiyat || 0), 0);
+      const hepsiOdendi = kalemler.every(o => o.durum === 'odeme_alindi');
+      const kartBorderRenk = hepsiOdendi ? 'var(--purple)' : kalemler.some(o => o.durum === 'bekliyor') ? 'var(--accent)' : 'var(--green)';
+
+      html += `<div class="order-card" style="border-color:${kartBorderRenk}; padding:0; overflow:hidden;">
+        <!-- MASA BAŞLIĞI -->
+        <div style="background:var(--surface2); padding:10px 14px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border);">
+          <div class="masa-num">Masa ${masa}</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:13px;font-weight:600;color:var(--accent);">${masaToplam} ₺</span>
+            <span style="font-size:11px;color:var(--muted);">${kalemler.length} kalem</span>
+          </div>
+        </div>
+        <!-- KALEMLERİ -->
+        <div style="display:flex;flex-direction:column;gap:0;">
+          ${kalemler.map((o, idx) => {
+            const durumBadge = {bekliyor:'badge-bekliyor', hazir:'badge-hazir', odeme_alinacak:'badge-odeme', odeme_alindi:'badge-odendi'}[o.durum] || '';
+            const durumYazi = {bekliyor:'Bekliyor', hazir:'Hazır', odeme_alinacak:'Öd. Alınacak', odeme_alindi:'Öd. Alındı'}[o.durum] || o.durum;
+            return `<div style="padding:10px 14px;border-bottom:${idx < kalemler.length-1 ? '1px solid var(--border)' : 'none'};">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
+                <div style="flex:1;">
+                  <div class="dondurma-row">${o.kategori ? o.kategori + ' — ' : ''}${o.urun} × ${o.miktar}</div>
+                  ${o.toplar && o.toplar.length ? `<div class="detail-row">${o.toplar.map((t,i) => `<span style="background:rgba(224,120,64,0.15);color:#e07840;border-radius:5px;padding:1px 6px;font-size:10px;margin:1px;">${i+1}. ${t}</span>`).join('')}</div>` : ''}
+                  ${o.secimMetni ? `<div class="detail-row">${o.secimMetni}</div>` : ''}
+                  ${o.not ? `<div class="detail-row" style="color:#e07840;">Not: ${o.not}</div>` : ''}
+                  <div class="zaman-row">${o.zamanStr || ''} · ${o.toplamFiyat || 0} ₺</div>
+                </div>
+                <span class="status-badge ${durumBadge}" style="margin-left:8px;white-space:nowrap;">${durumYazi}</span>
+              </div>
+              <div class="card-actions" style="margin-top:6px;">
+                ${o.durum === 'bekliyor' ? `<button class="act-btn primary" onclick="setDurum('${o.key}','hazir','Hazır işaretlendi','Masa ${masa} — ${o.urun}')">Hazır</button>` : ''}
+                ${o.durum === 'hazir' ? `<button class="act-btn blue" onclick="setDurum('${o.key}','odeme_alinacak','Öd. alınacak','Masa ${masa} — ${o.urun}')">Öd. Alınacak</button>` : ''}
+                ${o.durum === 'odeme_alinacak' ? `<button class="act-btn purple" onclick="setDurum('${o.key}','odeme_alindi','Ödeme alındı','Masa ${masa} — ${o.urun} · ${o.toplamFiyat||0}₺')">Ödeme Alındı</button>` : ''}
+                ${o.durum !== 'bekliyor' ? `<button class="act-btn geri" onclick="setDurum('${o.key}','bekliyor','Geri alındı','Masa ${masa} — ${o.urun}')">Geri Al</button>` : ''}
+                <button class="act-btn" onclick="sil('${o.key}')">Sil</button>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    });
+
+    grid.innerHTML = html;
   }
 
   window.setFilter = function(filter, el) {
