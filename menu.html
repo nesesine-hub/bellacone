@@ -17,6 +17,7 @@
   .header { background: var(--brown); color: #fff; padding: 0.75rem 1.25rem; text-align: center; position: sticky; top: 0; z-index: 100; }
   .header img { height: 65px; width: auto; object-fit: contain; display: block; margin: 0 auto; }
 
+  /* MASA BAR */
   .masa-bar { background: var(--warm); border-bottom: 1.5px solid var(--soft); padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 10px; }
   .masa-bar label { font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; }
   .masa-bar input { flex: 1; border: 1.5px solid var(--soft); border-radius: 10px; padding: 8px 12px; font-size: 14px; background: #fff; color: var(--text); font-family: 'DM Sans', sans-serif; outline: none; }
@@ -27,49 +28,24 @@
   .screen { display: none; }
   .screen.active { display: block; }
 
-  /* KATEGORİ ANASAYFA */
+  /* KATEGORİ */
   .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 1.25rem; }
-  .cat-card {
-    border-radius: var(--radius); overflow: hidden; cursor: pointer;
-    border: 1.5px solid var(--soft); background: var(--card);
-    transition: transform 0.2s, border-color 0.2s;
-    aspect-ratio: 1;
-    position: relative;
-  }
+  .cat-card { border-radius: var(--radius); overflow: hidden; cursor: pointer; border: 1.5px solid var(--soft); background: var(--card); transition: transform 0.2s, border-color 0.2s; aspect-ratio: 1; position: relative; }
   .cat-card:hover { transform: translateY(-2px); border-color: var(--accent); }
   .cat-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .cat-card .cat-no-img {
-    width: 100%; height: 100%;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: var(--warm);
-    font-size: 36px;
-  }
-  .cat-label {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    background: linear-gradient(transparent, rgba(44,24,10,0.85));
-    color: #fff; font-size: 15px; font-weight: 500;
-    padding: 1.5rem 0.75rem 0.75rem;
-    font-family: 'Playfair Display', serif;
-  }
+  .cat-card .cat-no-img { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--warm); }
+  .cat-label { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(44,24,10,0.85)); color: #fff; font-size: 15px; font-weight: 500; padding: 1.5rem 0.75rem 0.75rem; font-family: 'Playfair Display', serif; }
 
-  /* KATEGORİ DETAY SAYFASI */
-  .detail-header {
-    background: var(--warm); border-bottom: 1.5px solid var(--soft);
-    padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 12px;
-    position: sticky; top: 0; z-index: 99;
-  }
-  .back-btn {
-    background: transparent; border: 2px solid var(--brown); border-radius: 10px;
-    padding: 7px 16px; font-size: 14px; color: var(--brown); cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: 0.02em;
-  }
-  .back-btn:hover { background: var(--soft); }
-  .detail-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--brown); }
+  /* DETAY HEADER */
+  .detail-header { background: var(--warm); border-bottom: 1.5px solid var(--soft); padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 99; }
+  .detail-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--brown); flex: 1; }
 
+  /* SECTION */
   .section { padding: 1.25rem 1.25rem 0; }
   .section-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--brown); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 8px; }
   .section-title::after { content: ''; flex: 1; height: 1px; background: var(--soft); }
 
+  /* ÜRÜN GRID */
   .urun-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 1rem; }
   .urun-card { background: var(--card); border: 1.5px solid var(--soft); border-radius: var(--radius); padding: 14px; cursor: pointer; transition: all 0.2s; }
   .urun-card:hover { border-color: var(--accent); transform: translateY(-1px); }
@@ -78,11 +54,13 @@
   .urun-name { font-size: 13px; font-weight: 500; color: var(--text); }
   .urun-price { font-size: 12px; color: var(--accent); font-weight: 500; margin-top: 2px; }
 
+  /* CHIPS */
   .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
   .chip { border: 1.5px solid var(--soft); border-radius: 999px; padding: 6px 14px; font-size: 13px; cursor: pointer; background: var(--card); color: var(--text); transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
   .chip:hover { border-color: var(--accent); }
   .chip.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 500; }
 
+  /* NOT */
   .not-input { width: 100%; border: 1.5px solid var(--soft); border-radius: 12px; padding: 10px 14px; font-size: 13px; background: var(--card); color: var(--text); font-family: 'DM Sans', sans-serif; resize: none; outline: none; margin-bottom: 1rem; }
   .not-input:focus { border-color: var(--accent); }
 
@@ -93,11 +71,29 @@
   .miktar-btn { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.3); background: transparent; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .miktar-btn:hover { background: rgba(255,255,255,0.1); }
   .miktar-val { color: #fff; font-size: 16px; font-weight: 500; min-width: 20px; text-align: center; }
-  .siparis-btn { flex: 1; background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 12px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s; }
-  .siparis-btn:hover { opacity: 0.9; }
-  .siparis-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .sepete-ekle-btn { flex: 1; background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 12px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s; }
+  .sepete-ekle-btn:hover { opacity: 0.9; }
+  .sepete-ekle-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* SORUN MODAL */
+  /* SEPET BALONCUĞU */
+  .sepet-fab { position: fixed; bottom: 90px; right: 20px; background: var(--brown); color: #fff; border: none; border-radius: 999px; padding: 12px 20px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; z-index: 300; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+  .sepet-fab.visible { display: flex; }
+  .sepet-badge { background: var(--accent); color: #fff; border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
+
+  /* SEPET EKRANI */
+  .sepet-item { background: var(--card); border: 1.5px solid var(--soft); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; }
+  .sepet-item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .sepet-item-isim { font-size: 14px; font-weight: 500; color: var(--text); }
+  .sepet-item-detay { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+  .sepet-item-fiyat { font-size: 14px; font-weight: 600; color: var(--accent); white-space: nowrap; }
+  .sepet-sil-btn { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0; line-height: 1; }
+  .sepet-toplam { background: var(--warm); border-radius: 12px; padding: 1rem; margin: 1rem 0; display: flex; justify-content: space-between; align-items: center; }
+  .siparis-ver-btn { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 0.5rem; }
+  .siparis-ver-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .bos-sepet { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+  .bos-sepet-icon { font-size: 48px; margin-bottom: 1rem; }
+
+  /* MODAL */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
   .modal-box { background: var(--card); border-radius: 16px; padding: 1.5rem; width: 90%; max-width: 340px; }
@@ -125,43 +121,64 @@
   <span class="masa-pill" id="masa-pill">—</span>
 </div>
 
-<!-- ANA KATEGORİ EKRANI -->
+<!-- ANA KATEGORİ -->
 <div class="screen active" id="screen-home">
   <div class="cat-grid" id="cat-grid">
     <div class="loading">Yükleniyor...</div>
   </div>
 </div>
 
-<!-- KATEGORİ DETAY EKRANI -->
+<!-- KATEGORİ DETAY -->
 <div class="screen" id="screen-detail">
   <div class="detail-header">
-    <button class="back-btn" onclick="goHome()">← Geri</button>
     <span class="detail-title" id="detail-title"></span>
   </div>
   <div id="detail-content"></div>
 </div>
 
-<!-- SORUN BİLDİR MODAL -->
-<div class="modal-overlay" id="sorun-modal">
-  <div class="modal-box">
-    <div class="modal-title">Sorun Bildir</div>
-    <div class="modal-sub">Yaşadığınız sorunu yazın, garson ekranına iletilecek.</div>
-    <textarea class="not-input" id="sorun-text" rows="4" placeholder="Örn: Menü yüklenmiyor, seçenek eksik..."></textarea>
-    <div class="modal-actions">
-      <button class="modal-cancel" onclick="sorunKapat()">İptal</button>
-      <button class="modal-send" onclick="sorunGonder()">Gönder</button>
+<!-- SEPET EKRANI -->
+<div class="screen" id="screen-sepet">
+  <div class="detail-header">
+    <span class="detail-title">🛒 Sepetim</span>
+  </div>
+  <div class="section" style="padding-top:1.25rem;">
+    <div id="sepet-icerik"></div>
+    <div class="sepet-toplam" id="sepet-toplam" style="display:none;">
+      <span style="font-size:14px;font-weight:500;color:var(--brown);">Toplam</span>
+      <span style="font-size:18px;font-weight:700;color:var(--accent);" id="sepet-toplam-tutar">0 ₺</span>
     </div>
+    <textarea class="not-input" id="genel-not" rows="2" placeholder="Genel not (opsiyonel)..."></textarea>
+    <button class="siparis-ver-btn" id="siparis-ver-btn" onclick="siparisVer()">Siparişi Tamamla</button>
   </div>
 </div>
 
-<div class="bottom-bar">
+<!-- SEPET FAB -->
+<button class="sepet-fab" id="sepet-fab" onclick="sepeteGit()">
+  🛒 Sepet <span class="sepet-badge" id="sepet-badge">0</span>
+</button>
+
+<!-- ALT BAR (detay sayfasında) -->
+<div class="bottom-bar" id="bottom-bar" style="display:none;">
   <button class="sorun-btn" onclick="sorunAc()" title="Sorun Bildir">!</button>
   <div class="miktar-ctrl">
     <button class="miktar-btn" onclick="changeMiktar(-1)">−</button>
     <span class="miktar-val" id="miktar-val">1</span>
     <button class="miktar-btn" onclick="changeMiktar(1)">+</button>
   </div>
-  <button class="siparis-btn" id="siparis-btn" onclick="siparisVer()">Sipariş Ver</button>
+  <button class="sepete-ekle-btn" id="sepete-ekle-btn" onclick="sepeteEkle()">Sepete Ekle</button>
+</div>
+
+<!-- SORUN MODAL -->
+<div class="modal-overlay" id="sorun-modal">
+  <div class="modal-box">
+    <div class="modal-title">Sorun Bildir</div>
+    <div class="modal-sub">Yaşadığınız sorunu yazın, garson ekranına iletilecek.</div>
+    <textarea class="not-input" id="sorun-text" rows="4" placeholder="Örn: Menü yüklenmiyor..."></textarea>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="sorunKapat()">İptal</button>
+      <button class="modal-send" onclick="sorunGonder()">Gönder</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -185,19 +202,21 @@
 
   const VARSAYILAN_KATEGORILER = [
     { id: 'dondurma', isim: 'Dondurma', emoji: '🍦' },
-    { id: 'waffle',   isim: 'Waffle',   emoji: '🧇' },
+    { id: 'waffle', isim: 'Waffle', emoji: '🧇' },
     { id: 'magnolya', isim: 'Magnolya', emoji: '🌸' },
     { id: 'sansebastian', isim: 'San Sebastian', emoji: '🎂' },
-    { id: 'donut',    isim: 'Donut',    emoji: '🍩' },
-    { id: 'sufle',    isim: 'Sufle',    emoji: '🍮' },
-    { id: 'brownie',  isim: 'Brownie',  emoji: '🍫' },
+    { id: 'donut', isim: 'Donut', emoji: '🍩' },
+    { id: 'sufle', isim: 'Sufle', emoji: '🍮' },
+    { id: 'brownie', isim: 'Brownie', emoji: '🍫' },
   ];
 
   let menuData = {};
   let kategoriler = [];
   let aktifKategori = null;
-  let state = { urun: null, sos: [], topping: [], malzeme: [], miktar: 1 };
+  let state = { urun: null, toplar: [], secimler: {}, miktar: 1 };
+  let sepet = []; // [{kategori, urun, fiyat, miktar, toplar, secimMetni, not, toplamFiyat}]
 
+  // URL params
   const urlParams = new URLSearchParams(window.location.search);
   const masaUrl = urlParams.get('masa');
   const masaAdiUrl = urlParams.get('masaadi');
@@ -210,10 +229,26 @@
     document.getElementById('masa-pill').textContent = this.value ? 'Masa ' + this.value : '—';
   });
 
+  // Tarayıcı geri butonu yönetimi
+  history.pushState({ screen: 'home' }, '', '');
+  window.addEventListener('popstate', (e) => {
+    const screen = e.state?.screen || 'home';
+    if (screen === 'home') {
+      showScreenDirect('home');
+    } else if (screen === 'detail') {
+      showScreenDirect('detail');
+    } else if (screen === 'sepet') {
+      showScreenDirect('sepet');
+    }
+  });
+
+  // Menü yükle
   onValue(ref(db, 'menu'), (snapshot) => {
     const data = snapshot.val() || {};
     menuData = data;
-    kategoriler = data.kategoriler ? Object.values(data.kategoriler).sort((a, b) => (a.sira ?? 999) - (b.sira ?? 999)) : VARSAYILAN_KATEGORILER;
+    kategoriler = data.kategoriler
+      ? Object.values(data.kategoriler).sort((a, b) => (a.sira ?? 999) - (b.sira ?? 999))
+      : VARSAYILAN_KATEGORILER;
     renderHome();
   });
 
@@ -223,8 +258,8 @@
       const foto = k.foto || '';
       return `<div class="cat-card" onclick="openKategori('${k.id}')">
         ${foto
-          ? `<img src="${foto}" alt="${k.isim}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="cat-no-img" style="display:none"><span>${k.emoji || '🍦'}</span></div>`
-          : `<div class="cat-no-img"><span style="font-size:40px">${k.emoji || '🍦'}</span></div>`
+          ? `<img src="${foto}" alt="${k.isim}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="cat-no-img" style="display:none"><span style="font-size:40px">${k.emoji||'🍦'}</span></div>`
+          : `<div class="cat-no-img"><span style="font-size:40px">${k.emoji||'🍦'}</span></div>`
         }
         <div class="cat-label">${k.isim}</div>
       </div>`;
@@ -238,7 +273,7 @@
     const tumUrunler = data.urunler ? Object.values(data.urunler) : [];
     const aktifUrunler = tumUrunler.filter(u => !u.pasif && (u.stok === undefined || u.stok > 0));
     const pasifUrunler = tumUrunler.filter(u => u.pasif || (u.stok !== undefined && u.stok <= 0));
-    const bolumler = data.bolumler ? Object.entries(data.bolumler).sort((a,b) => (a[1].sira ?? 999) - (b[1].sira ?? 999)) : [];
+    const bolumler = data.bolumler ? Object.entries(data.bolumler).sort((a,b) => (a[1].sira??999)-(b[1].sira??999)) : [];
     const topDestegi = data.topDestegi || false;
 
     document.getElementById('detail-title').textContent = aktifKategori.isim;
@@ -248,112 +283,96 @@
     let html = '<div class="section">';
 
     if (topDestegi) {
-      // ÖNCE ÜRÜN SEÇ (Külah/Cup vb.)
       html += `<div class="section-title">Servis Şekli</div>`;
-      if (!tumUrunler.length) {
-        html += '<p class="empty-msg">Henüz ürün eklenmedi</p>';
-      } else {
-        html += `<div class="urun-grid">`;
-        aktifUrunler.forEach(u => {
-          html += `<div class="urun-card" id="uc-${u.id}" onclick="selectUrunTop('${u.id}')">
-            <div class="urun-icon">${u.emoji || '🍦'}</div>
-            <div class="urun-name">${u.isim}</div>
-            <div class="urun-price">${u.fiyat} ₺</div>
-          </div>`;
-        });
-        pasifUrunler.forEach(u => {
-          html += `<div class="urun-card" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);">
-            <div class="urun-icon">${u.emoji || '🍦'}</div>
-            <div class="urun-name">${u.isim}</div>
-            <div class="urun-price" style="color:#999;">Stokta yok</div>
-          </div>`;
-        });
-        html += `</div>`;
-      }
-      // Top seçim alanı - ürün seçilince açılacak
+      html += `<div class="urun-grid">`;
+      aktifUrunler.forEach(u => {
+        html += `<div class="urun-card" id="uc-${u.id}" onclick="selectUrunTop('${u.id}')">
+          <div class="urun-icon">${u.emoji||'🍦'}</div>
+          <div class="urun-name">${u.isim}</div>
+          <div class="urun-price">${u.fiyat} ₺</div>
+        </div>`;
+      });
+      pasifUrunler.forEach(u => {
+        html += `<div class="urun-card" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);">
+          <div class="urun-icon">${u.emoji||'🍦'}</div>
+          <div class="urun-name">${u.isim}</div>
+          <div class="urun-price" style="color:#999;">Stokta yok</div>
+        </div>`;
+      });
+      html += `</div>`;
       html += `<div id="top-secim-alani" style="display:none;"></div>`;
-      // Dinamik bölümler - sadece topIcinKullan=false olanlar gösterilsin
       html += `<div id="diger-bolumler" style="display:none;">`;
       bolumler.forEach(([bolumKey, bolum]) => {
-        if (bolum.topIcinKullan) return; // top seçiminde kullanılan bölümler burada gösterilmez
+        if (bolum.topIcinKullan) return;
         const secenekler = bolum.secenekler || [];
-        const aktifler = secenekler.filter(s => !(typeof s === 'object' ? s.pasif : false));
-        const pasifler = secenekler.filter(s => (typeof s === 'object' ? s.pasif : false));
+        const aktifler = secenekler.filter(s => !(typeof s==='object' ? s.pasif : false));
+        const pasifler = secenekler.filter(s => (typeof s==='object' ? s.pasif : false));
         if (!secenekler.length) return;
         html += `<div class="section-title">${bolum.isim}</div><div class="chips">`;
         aktifler.forEach(s => {
-          const isim = typeof s === 'object' ? s.isim : s;
-          const ekFiyat = typeof s === 'object' && s.ekFiyat ? ` +${s.ekFiyat}₺` : '';
-          html += `<span class="chip" onclick="toggleBolumChip(this,'${bolumKey}','${isim}',${typeof s === 'object' && s.ekFiyat ? s.ekFiyat : 0})">${isim}${ekFiyat}</span>`;
+          const isim = typeof s==='object' ? s.isim : s;
+          const ekFiyat = typeof s==='object' && s.ekFiyat ? ` +${s.ekFiyat}₺` : '';
+          html += `<span class="chip" onclick="toggleBolumChip(this,'${bolumKey}','${isim}',${typeof s==='object'&&s.ekFiyat?s.ekFiyat:0})">${isim}${ekFiyat}</span>`;
         });
         pasifler.forEach(s => {
-          const isim = typeof s === 'object' ? s.isim : s;
-          html += `<span class="chip" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);" title="Stokta yok">${isim}</span>`;
+          const isim = typeof s==='object' ? s.isim : s;
+          html += `<span class="chip" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);">${isim}</span>`;
         });
         html += `</div>`;
       });
       html += `<div class="section-title">Özel Not</div>
         <textarea class="not-input" id="siparis-not" rows="2" placeholder="Örn: Az şekerli, alerji..."></textarea>
       </div>`;
-
     } else {
-      // NORMAL MOD
       html += `<div class="section-title">Ürünler</div>`;
       if (!tumUrunler.length) {
         html += '<p class="empty-msg">Henüz ürün eklenmedi</p>';
       } else {
         html += `<div class="urun-grid">`;
         aktifUrunler.forEach(u => {
-          const stokBilgi = u.stok !== undefined ? ` (${u.stok})` : '';
           html += `<div class="urun-card" id="uc-${u.id}" onclick="selectUrun('${u.id}')">
-            <div class="urun-icon">${u.emoji || '🍦'}</div>
+            <div class="urun-icon">${u.emoji||'🍦'}</div>
             <div class="urun-name">${u.isim}</div>
-            <div class="urun-price">${u.fiyat} ₺${stokBilgi}</div>
+            <div class="urun-price">${u.fiyat} ₺</div>
           </div>`;
         });
         pasifUrunler.forEach(u => {
           html += `<div class="urun-card" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);">
-            <div class="urun-icon">${u.emoji || '🍦'}</div>
+            <div class="urun-icon">${u.emoji||'🍦'}</div>
             <div class="urun-name">${u.isim}</div>
             <div class="urun-price" style="color:#999;">Stokta yok</div>
           </div>`;
         });
         html += `</div>`;
       }
-
-      // Normal mod dinamik bölümler
       bolumler.forEach(([bolumKey, bolum]) => {
         const secenekler = bolum.secenekler || [];
-        const aktifler = secenekler.filter(s => !(typeof s === 'object' ? s.pasif : false));
-        const pasifler = secenekler.filter(s => (typeof s === 'object' ? s.pasif : false));
+        const aktifler = secenekler.filter(s => !(typeof s==='object' ? s.pasif : false));
+        const pasifler = secenekler.filter(s => (typeof s==='object' ? s.pasif : false));
         if (!secenekler.length) return;
         html += `<div class="section-title">${bolum.isim}</div><div class="chips">`;
         aktifler.forEach(s => {
-          const isim = typeof s === 'object' ? s.isim : s;
-          const ekFiyat = typeof s === 'object' && s.ekFiyat ? ` +${s.ekFiyat}₺` : '';
-          html += `<span class="chip" onclick="toggleBolumChip(this,'${bolumKey}','${isim}',${typeof s === 'object' && s.ekFiyat ? s.ekFiyat : 0})">${isim}${ekFiyat}</span>`;
+          const isim = typeof s==='object' ? s.isim : s;
+          const ekFiyat = typeof s==='object' && s.ekFiyat ? ` +${s.ekFiyat}₺` : '';
+          html += `<span class="chip" onclick="toggleBolumChip(this,'${bolumKey}','${isim}',${typeof s==='object'&&s.ekFiyat?s.ekFiyat:0})">${isim}${ekFiyat}</span>`;
         });
         pasifler.forEach(s => {
-          const isim = typeof s === 'object' ? s.isim : s;
-          html += `<span class="chip" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);" title="Stokta yok">${isim}</span>`;
+          const isim = typeof s==='object' ? s.isim : s;
+          html += `<span class="chip" style="opacity:0.4;cursor:not-allowed;filter:grayscale(1);">${isim}</span>`;
         });
         html += `</div>`;
       });
-
       html += `<div class="section-title">Özel Not</div>
         <textarea class="not-input" id="siparis-not" rows="2" placeholder="Örn: Az şekerli, alerji..."></textarea>`;
     }
 
     html += `</div>`;
-
     document.getElementById('detail-content').innerHTML = html;
-    // Geri butonu header'ın hemen altında sabitlensin
-    const headerH = document.querySelector('.header')?.offsetHeight || 80;
-    const detailHeader = document.querySelector('.detail-header');
-    if (detailHeader) detailHeader.style.top = headerH + 'px';
+    if (topDestegi) renderTopAlani();
     showScreen('detail');
   };
 
+  // TOP SIRALAMASI
   window.selectUrunTop = function(id) {
     const data = menuData[aktifKategori.id] || {};
     const urunler = data.urunler ? Object.values(data.urunler) : [];
@@ -380,33 +399,27 @@
     if (!alan) return;
     const data = menuData[aktifKategori.id] || {};
     const bolumler = data.bolumler || {};
-    // Sadece topIcinKullan=true olan bölümlerin adını ve seçeneklerini topla
     let tumSecenekler = [];
     let topBolumIsim = '';
-    Object.values(bolumler).forEach(bolum => {
+    Object.values(bolumler).sort((a,b)=>(a.sira??999)-(b.sira??999)).forEach(bolum => {
       if (!bolum.topIcinKullan) return;
       if (!topBolumIsim) topBolumIsim = bolum.isim;
       (bolum.secenekler || []).forEach(s => {
-        if (!(typeof s === 'object' ? s.pasif : false)) {
-          tumSecenekler.push(typeof s === 'object' ? s.isim : s);
-        }
+        if (!(typeof s==='object' ? s.pasif : false))
+          tumSecenekler.push(typeof s==='object' ? s.isim : s);
       });
     });
     if (!tumSecenekler.length) {
       Object.values(bolumler).forEach(bolum => {
         if (!topBolumIsim) topBolumIsim = bolum.isim;
         (bolum.secenekler || []).forEach(s => {
-          if (!(typeof s === 'object' ? s.pasif : false)) {
-            tumSecenekler.push(typeof s === 'object' ? s.isim : s);
-          }
+          if (!(typeof s==='object' ? s.pasif : false))
+            tumSecenekler.push(typeof s==='object' ? s.isim : s);
         });
       });
     }
-    const topBaslik = topBolumIsim ? topBolumIsim.replace(/çeşitleri/i, 'Çeşidi').replace(/çeşiti/i, 'Çeşidi') : 'Top';
+    const topBaslik = topBolumIsim || 'Top';
     const topSayisi = state.toplar.length;
-    const siradakiTop = topSayisi + 1;
-
-    // Seçilen toplar özeti (aşağıdan yukarıya)
     let ozet = '';
     if (topSayisi > 0) {
       ozet = `<div style="margin-bottom:1rem;">
@@ -414,44 +427,24 @@
         <div style="display:flex;flex-direction:column;gap:4px;">`;
       for (let i = topSayisi - 1; i >= 0; i--) {
         ozet += `<div style="display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:10px;background:var(--warm);border:1px solid var(--soft);">
-          <span style="font-size:11px;color:var(--muted);min-width:40px;font-weight:500;">${i+1}. ${topBaslik}</span>
+          <span style="font-size:11px;color:var(--muted);min-width:60px;font-weight:500;">${i+1}. ${topBaslik}</span>
           <span style="font-size:13px;font-weight:500;color:var(--brown);flex:1;">${state.toplar[i]}</span>
-          <button onclick="topSil(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0;">✕</button>
+          <button onclick="topSil(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;">✕</button>
         </div>`;
       }
       ozet += `</div></div>`;
     }
-
-    const secim = `<div>
-      <div style="font-size:14px;font-weight:500;color:var(--brown);margin-bottom:0.6rem;">${siradakiTop}. ${topBaslik} Seçin</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+    alan.innerHTML = `<div class="section" style="padding-bottom:0.5rem;">
+      ${ozet}
+      <div style="font-size:14px;font-weight:500;color:var(--brown);margin-bottom:0.6rem;">${topSayisi+1}. ${topBaslik} Seçin</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem;">
         ${tumSecenekler.map(isim => `<span class="chip" onclick="topEkle('${isim}')">${isim}</span>`).join('')}
       </div>
     </div>`;
-
-    alan.innerHTML = ozet + secim;
   }
 
-  window.topEkle = function(urunId) {
-    state.toplar.push(urunId);
-    renderTopAlani();
-    document.getElementById('diger-bolumler').style.display = 'block';
-  };
-
-  window.topSil = function(idx) {
-    state.toplar.splice(idx, 1);
-    renderTopAlani();
-  };
-
-  window.goHome = function() {
-    showScreen('home');
-    aktifKategori = null;
-  };
-
-  function showScreen(name) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('screen-' + name).classList.add('active');
-  }
+  window.topEkle = function(isim) { state.toplar.push(isim); renderTopAlani(); document.getElementById('diger-bolumler').style.display='block'; };
+  window.topSil = function(idx) { state.toplar.splice(idx,1); renderTopAlani(); };
 
   window.selectUrun = function(id) {
     const data = menuData[aktifKategori.id] || {};
@@ -463,21 +456,13 @@
     });
   };
 
-  window.toggleBolumChip = function(el, bolumKey, val) {
+  window.toggleBolumChip = function(el, bolumKey, val, ekFiyat) {
     el.classList.toggle('active');
     if (!state.secimler[bolumKey]) state.secimler[bolumKey] = [];
     const arr = state.secimler[bolumKey];
-    const idx = arr.indexOf(val);
-    if (idx === -1) arr.push(val); else arr.splice(idx, 1);
-  };
-
-  window.toggleChip = function(el, key, val) {
-    el.classList.toggle('active');
-    if (!state.secimler) state.secimler = {};
-    if (!state.secimler[key]) state.secimler[key] = [];
-    const arr = state.secimler[key];
-    const idx = arr.indexOf(val);
-    if (idx === -1) arr.push(val); else arr.splice(idx, 1);
+    const idx = arr.findIndex(s => s.isim === val);
+    if (idx === -1) arr.push({ isim: val, ekFiyat: Number(ekFiyat)||0 });
+    else arr.splice(idx, 1);
   };
 
   window.changeMiktar = function(d) {
@@ -485,16 +470,13 @@
     document.getElementById('miktar-val').textContent = state.miktar;
   };
 
-  window.siparisVer = async function() {
-    const masa = document.getElementById('masa-input').value;
-    if (!masa) { showToast('Lütfen masa numarası girin'); return; }
-    if (!aktifKategori) { showToast('Lütfen bir kategori seçin'); return; }
-
+  // SEPETE EKLE
+  window.sepeteEkle = function() {
+    if (!aktifKategori) return;
     const data = menuData[aktifKategori.id] || {};
     const urunler = data.urunler ? Object.values(data.urunler) : [];
-    const topDestegi = data.topDestegi || false;
-    const not = document.getElementById('siparis-not')?.value?.trim() || '';
     const bolumler = data.bolumler || {};
+    const topDestegi = data.topDestegi || false;
 
     let urunIsim, fiyat, topBilgi = null;
 
@@ -502,18 +484,9 @@
       if (!state.urun) { showToast('Lütfen servis şekli seçin'); return; }
       if (state.toplar.length === 0) { showToast('En az 1 top seçin'); return; }
       const urun = urunler.find(u => u.id === state.urun);
-      const topIsimleri = state.toplar.map(id => {
-        const data = menuData[aktifKategori.id] || {};
-        const bolumler = data.bolumler || {};
-        for (const bolum of Object.values(bolumler)) {
-          const sec = (bolum.secenekler || []).find(s => (typeof s === 'object' ? s.isim : s) === id);
-          if (sec) return typeof sec === 'object' ? sec.isim : sec;
-        }
-        return urunler.find(u => u.id === id)?.isim || id;
-      });
       fiyat = urun ? urun.fiyat : 0;
-      urunIsim = urun?.isim + ' — ' + topIsimleri.join(' + ');
-      topBilgi = state.toplar;
+      urunIsim = urun?.isim + ' — ' + state.toplar.join(' + ');
+      topBilgi = [...state.toplar];
     } else {
       if (!state.urun) { showToast('Lütfen bir ürün seçin'); return; }
       const urun = urunler.find(u => u.id === state.urun);
@@ -521,63 +494,158 @@
       fiyat = urun.fiyat;
     }
 
-    // Ek fiyatları hesapla
     let ekFiyatToplam = 0;
-    const secimMetni = Object.entries(state.secimler || {})
-      .filter(([, arr]) => arr.length > 0)
+    const secimMetni = Object.entries(state.secimler)
+      .filter(([,arr]) => arr.length > 0)
       .map(([bolumKey, arr]) => {
         const bolumIsim = bolumler[bolumKey]?.isim || bolumKey;
-        const secenekler = bolumler[bolumKey]?.secenekler || [];
-        arr.forEach(secIsim => {
-          const sec = secenekler.find(s => (typeof s === 'object' ? s.isim : s) === secIsim);
-          if (sec && typeof sec === 'object' && sec.ekFiyat) ekFiyatToplam += Number(sec.ekFiyat);
-        });
-        return bolumIsim + ': ' + arr.join(', ');
+        arr.forEach(s => { ekFiyatToplam += s.ekFiyat || 0; });
+        return bolumIsim + ': ' + arr.map(s => s.isim + (s.ekFiyat ? ` +${s.ekFiyat}₺` : '')).join(', ');
       }).join(' | ');
 
+    const not = document.getElementById('siparis-not')?.value?.trim() || '';
     const toplamFiyat = (fiyat + ekFiyatToplam) * state.miktar;
 
-    const btn = document.getElementById('siparis-btn');
-    btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+    sepet.push({
+      kategori: aktifKategori.isim,
+      urun: urunIsim,
+      fiyat: fiyat + ekFiyatToplam,
+      miktar: state.miktar,
+      toplamFiyat,
+      toplar: topBilgi,
+      secimMetni,
+      not
+    });
+
+    guncelleSepetFab();
+    showToast(`✓ Sepete eklendi (${sepet.length} ürün)`);
+
+    // State sıfırla
+    state = { urun: null, toplar: [], secimler: {}, miktar: 1 };
+    document.getElementById('miktar-val').textContent = '1';
+    document.querySelectorAll('.urun-card').forEach(e => e.classList.remove('selected'));
+    document.querySelectorAll('.chip').forEach(e => e.classList.remove('active'));
+    if (document.getElementById('siparis-not')) document.getElementById('siparis-not').value = '';
+    if (document.getElementById('top-secim-alani')) document.getElementById('top-secim-alani').style.display = 'none';
+    if (document.getElementById('diger-bolumler')) document.getElementById('diger-bolumler').style.display = 'none';
+  };
+
+  function guncelleSepetFab() {
+    const fab = document.getElementById('sepet-fab');
+    const badge = document.getElementById('sepet-badge');
+    if (sepet.length > 0) {
+      fab.classList.add('visible');
+      badge.textContent = sepet.length;
+    } else {
+      fab.classList.remove('visible');
+    }
+  }
+
+  window.sepeteGit = function() { showScreen('sepet'); renderSepet(); };
+
+  function renderSepet() {
+    const icerik = document.getElementById('sepet-icerik');
+    const toplam = document.getElementById('sepet-toplam');
+    const toplamTutar = document.getElementById('sepet-toplam-tutar');
+
+    if (!sepet.length) {
+      icerik.innerHTML = `<div class="bos-sepet"><div class="bos-sepet-icon">🛒</div><p>Sepetiniz boş</p></div>`;
+      toplam.style.display = 'none';
+      return;
+    }
+
+    icerik.innerHTML = sepet.map((item, i) => `
+      <div class="sepet-item">
+        <div class="sepet-item-top">
+          <div>
+            <div class="sepet-item-isim">${item.kategori} — ${item.urun} × ${item.miktar}</div>
+            ${item.secimMetni ? `<div class="sepet-item-detay">${item.secimMetni}</div>` : ''}
+            ${item.not ? `<div class="sepet-item-detay" style="color:var(--accent);">Not: ${item.not}</div>` : ''}
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+            <span class="sepet-item-fiyat">${item.toplamFiyat} ₺</span>
+            <button class="sepet-sil-btn" onclick="sepettenSil(${i})">×</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    const genelToplam = sepet.reduce((s, item) => s + item.toplamFiyat, 0);
+    toplam.style.display = 'flex';
+    toplamTutar.textContent = genelToplam + ' ₺';
+  }
+
+  window.sepettenSil = function(idx) {
+    sepet.splice(idx, 1);
+    guncelleSepetFab();
+    renderSepet();
+  };
+
+  // SİPARİŞ VER
+  window.siparisVer = async function() {
+    const masa = document.getElementById('masa-input').value;
+    if (!masa) { showToast('Lütfen masa numarası girin'); return; }
+    if (!sepet.length) { showToast('Sepetiniz boş'); return; }
+
+    const btn = document.getElementById('siparis-ver-btn');
+    btn.disabled = true;
+    btn.textContent = 'Gönderiliyor...';
+
+    const genelNot = document.getElementById('genel-not')?.value?.trim() || '';
 
     try {
-      const siparis = {
-        masa: Number(masa),
-        kategori: aktifKategori.isim,
-        urun: urunIsim,
-        fiyat: fiyat + ekFiyatToplam,
-        miktar: state.miktar,
-        toplamFiyat,
-        secimler: state.secimler || {},
-        secimMetni,
-        not,
-        durum: 'bekliyor',
-        zaman: new Date().toISOString(),
-        zamanStr: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-      };
-      if (topBilgi) siparis.toplar = topBilgi;
-      await push(ref(db, 'siparisler'), siparis);
-
+      for (const item of sepet) {
+        await push(ref(db, 'siparisler'), {
+          masa: Number(masa),
+          kategori: item.kategori,
+          urun: item.urun,
+          fiyat: item.fiyat,
+          miktar: item.miktar,
+          toplamFiyat: item.toplamFiyat,
+          toplar: item.toplar || null,
+          secimler: {},
+          secimMetni: item.secimMetni || '',
+          not: item.not || genelNot,
+          durum: 'bekliyor',
+          zaman: new Date().toISOString(),
+          zamanStr: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+        });
+      }
+      sepet = [];
+      guncelleSepetFab();
       showToast('✓ Siparişiniz alındı!');
-    state = { urun: null, toplar: [], secimler: {}, miktar: 1 };
-      document.getElementById('miktar-val').textContent = '1';
-      document.querySelectorAll('.urun-card').forEach(e => e.classList.remove('selected'));
-      document.querySelectorAll('.chip').forEach(e => e.classList.remove('active'));
-      if (document.getElementById('siparis-not')) document.getElementById('siparis-not').value = '';
+      showScreen('home');
       if (masaUrl) {
         document.getElementById('masa-input').value = masaUrl;
         document.getElementById('masa-pill').textContent = masaGoster || 'Masa ' + masaUrl;
       }
     } catch(e) { showToast('Hata oluştu, tekrar deneyin'); }
 
-    btn.disabled = false; btn.textContent = 'Sipariş Ver';
+    btn.disabled = false;
+    btn.textContent = 'Siparişi Tamamla';
   };
 
+  // EKRAN YÖNETİMİ
+  function showScreen(name) {
+    showScreenDirect(name);
+    history.pushState({ screen: name }, '', '');
+    document.getElementById('bottom-bar').style.display = name === 'detail' ? 'flex' : 'none';
+  }
+
+  function showScreenDirect(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + name).classList.add('active');
+    document.getElementById('bottom-bar').style.display = name === 'detail' ? 'flex' : 'none';
+    if (name === 'home') aktifKategori = null;
+    if (name === 'sepet') renderSepet();
+    window.scrollTo(0, 0);
+  }
+
+  window.goHome = function() { showScreen('home'); };
+
+  // SORUN BİLDİR
   window.sorunAc = function() { document.getElementById('sorun-modal').classList.add('open'); };
-  window.sorunKapat = function() {
-    document.getElementById('sorun-modal').classList.remove('open');
-    document.getElementById('sorun-text').value = '';
-  };
+  window.sorunKapat = function() { document.getElementById('sorun-modal').classList.remove('open'); document.getElementById('sorun-text').value = ''; };
   window.sorunGonder = async function() {
     const masa = document.getElementById('masa-input').value;
     const mesaj = document.getElementById('sorun-text').value.trim();
