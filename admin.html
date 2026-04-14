@@ -500,39 +500,75 @@
     loadKatIcerik(aktifKatId);
   };
 
+  // Firebase'den seçenekleri okuyup güncelle - güvenli yöntem
+  async function secenekleriGuncelle(bolumKey, guncellemeFn) {
+    const { onValue: ov, ref: r } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+    const snap = await new Promise(res => ov(r(db, `menu/${aktifKatId}/bolumler/${bolumKey}/secenekler`), s => res(s), { onlyOnce: true }));
+    const secenekler = snap.val() || [];
+    const yeni = guncellemeFn(secenekler);
+    await set(ref(db, `menu/${aktifKatId}/bolumler/${bolumKey}/secenekler`), yeni);
+    loadKatIcerik(aktifKatId);
+  }
+
   window.secenekTasi = async function(bolumKey, idx, yon) {
     const yeniIdx = idx + yon;
-    const chipList = document.getElementById('bolum-chip-' + bolumKey);
-    const items = Array.from(chipList.querySelectorAll('.chip-item')).map((el) => {
-      const isimEl = el.querySelector('span[id^="sec-isim"]');
-      const isim = isimEl ? isimEl.textContent.trim() : '';
-      const cb = el.querySelector('input[type=checkbox]');
-      const ekFiyatEl = el.querySelector('span[style*="accent"]');
-      const ekFiyat = ekFiyatEl ? parseFloat(ekFiyatEl.textContent.replace(/[^0-9.]/g,'')) || 0 : 0;
-      return { isim, pasif: cb ? !cb.checked : false, ...(ekFiyat > 0 ? { ekFiyat } : {}) };
+    await secenekleriGuncelle(bolumKey, items => {
+      if (yeniIdx < 0 || yeniIdx >= items.length) return items;
+      const yeni = [...items];
+      [yeni[idx], yeni[yeniIdx]] = [yeni[yeniIdx], yeni[idx]];
+      return yeni;
     });
-    if (yeniIdx < 0 || yeniIdx >= items.length) return;
-    [items[idx], items[yeniIdx]] = [items[yeniIdx], items[idx]];
-    await set(ref(db, `menu/${aktifKatId}/bolumler/${bolumKey}/secenekler`), items);
-    loadKatIcerik(aktifKatId);
   };
 
   window.ekFiyatDuzenle = async function(bolumKey, idx, mevcutFiyat) {
     const yeni = prompt(`Ek ücret girin (₺) — 0 girerek kaldırabilirsiniz:`, mevcutFiyat || 0);
     if (yeni === null) return;
     const fiyat = parseFloat(yeni) || 0;
-    const chipList = document.getElementById('bolum-chip-' + bolumKey);
-    const items = Array.from(chipList.querySelectorAll('.chip-item')).map((el, i) => {
-      const isimEl = el.querySelector('span[id^="sec-isim"]');
-      const isim = isimEl ? isimEl.textContent.trim() : '';
-      const cb = el.querySelector('input[type=checkbox]');
-      const mevcutEkFiyatEl = el.querySelector('span[style*="accent"]');
-      const mevcutEkFiyat = i === idx ? fiyat : (parseFloat(mevcutEkFiyatEl?.textContent?.replace(/[^0-9.]/g, '')) || 0);
-      return { isim, pasif: cb ? !cb.checked : false, ...(mevcutEkFiyat > 0 ? { ekFiyat: mevcutEkFiyat } : {}) };
+    await secenekleriGuncelle(bolumKey, items => {
+      const yeniItems = [...items];
+      if (yeniItems[idx]) {
+        if (fiyat > 0) yeniItems[idx] = { ...yeniItems[idx], ekFiyat: fiyat };
+        else { const { ekFiyat, ...rest } = yeniItems[idx]; yeniItems[idx] = rest; }
+      }
+      return yeniItems;
     });
-    await set(ref(db, `menu/${aktifKatId}/bolumler/${bolumKey}/secenekler`), items);
-    loadKatIcerik(aktifKatId);
     showToast(fiyat > 0 ? `+${fiyat}₺ ek ücret eklendi` : 'Ek ücret kaldırıldı');
+  };
+
+  window.secenekKaydet = async function(bolumKey, idx, yeniIsim) {
+    if (!yeniIsim) { showToast('İsim boş olamaz'); return; }
+    await secenekleriGuncelle(bolumKey, items => {
+      const yeniItems = [...items];
+      if (yeniItems[idx]) yeniItems[idx] = { ...yeniItems[idx], isim: yeniIsim };
+      return yeniItems;
+    });
+    showToast('Seçenek güncellendi');
+  };
+
+  window.delBolumSecenek = async function(bolumKey, idx) {
+    await secenekleriGuncelle(bolumKey, items => items.filter((_, i) => i !== idx));
+    showToast('Silindi');
+  };
+
+  window.toggleBolumSecenek = async function(bolumKey, idx, aktif) {
+    await secenekleriGuncelle(bolumKey, items => {
+      const yeniItems = [...items];
+      if (yeniItems[idx]) yeniItems[idx] = { ...yeniItems[idx], pasif: !aktif };
+      return yeniItems;
+    });
+  };
+
+  window.addBolumSecenek = async function(bolumKey) {
+    if (!aktifKatId) return;
+    const inp = document.getElementById('bolum-inp-' + bolumKey);
+    const val = inp.value.trim();
+    if (!val) return;
+    await secenekleriGuncelle(bolumKey, items => {
+      if (items.find(s => (typeof s === 'object' ? s.isim : s) === val)) { showToast('Zaten mevcut'); return items; }
+      return [...items, { isim: val, pasif: false }];
+    });
+    inp.value = '';
+    showToast('Eklendi');
   };
 
   window.bolumAdiniDuzenle = function(bolumKey, mevcutIsim) {
@@ -587,7 +623,6 @@
     showToast('Seçenek güncellendi');
   };
 
-  window.bolumAdiniDuzenle = window.bolumAdiniDuzenle || function() {};
   window.toggleTopIcinKullan = async function(bolumKey, aktif) {
     if (!aktifKatId) return;
     await set(ref(db, `menu/${aktifKatId}/bolumler/${bolumKey}/topIcinKullan`), aktif);
@@ -611,50 +646,6 @@
     await remove(ref(db, 'menu/' + aktifKatId + '/bolumler/' + bolumKey));
     loadKatIcerik(aktifKatId);
     showToast('Bölüm silindi');
-  };
-
-  window.addBolumSecenek = function(bolumKey) {
-    if (!aktifKatId) return;
-    const inp = document.getElementById('bolum-inp-' + bolumKey);
-    const val = inp.value.trim();
-    if (!val) return;
-    const chipList = document.getElementById('bolum-chip-' + bolumKey);
-    const mevcutlar = Array.from(chipList.querySelectorAll('.chip-item')).map(el => el.childNodes[0].textContent.trim());
-    if (mevcutlar.includes(val)) { showToast('Zaten mevcut'); return; }
-    const yeni = [...mevcutlar.map(m => ({ isim: m, pasif: false })), { isim: val, pasif: false }];
-    set(ref(db, 'menu/' + aktifKatId + '/bolumler/' + bolumKey + '/secenekler'), yeni).then(() => {
-      inp.value = '';
-      loadKatIcerik(aktifKatId);
-      showToast('Eklendi');
-    });
-  };
-
-  window.delBolumSecenek = function(bolumKey, idx) {
-    if (!aktifKatId) return;
-    const chipList = document.getElementById('bolum-chip-' + bolumKey);
-    const items = Array.from(chipList.querySelectorAll('.chip-item')).map((el, i) => {
-      const isim = el.childNodes[0].textContent.trim();
-      const cb = el.querySelector('input[type=checkbox]');
-      return { isim, pasif: cb ? !cb.checked : false };
-    });
-    items.splice(idx, 1);
-    set(ref(db, 'menu/' + aktifKatId + '/bolumler/' + bolumKey + '/secenekler'), items).then(() => {
-      loadKatIcerik(aktifKatId);
-      showToast('Silindi');
-    });
-  };
-
-  window.toggleBolumSecenek = function(bolumKey, idx, aktif) {
-    if (!aktifKatId) return;
-    const chipList = document.getElementById('bolum-chip-' + bolumKey);
-    const items = Array.from(chipList.querySelectorAll('.chip-item')).map((el, i) => {
-      const isim = el.childNodes[0].textContent.trim();
-      const cb = el.querySelector('input[type=checkbox]');
-      return { isim, pasif: i === idx ? !aktif : (cb ? !cb.checked : false) };
-    });
-    set(ref(db, 'menu/' + aktifKatId + '/bolumler/' + bolumKey + '/secenekler'), items).then(() => {
-      loadKatIcerik(aktifKatId);
-    });
   };
 
   window.addChipItem = function(type, inputId) {
