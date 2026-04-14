@@ -291,7 +291,7 @@
         html += `<div class="urun-card" id="uc-${u.id}" onclick="selectUrunTop('${u.id}')">
           <div class="urun-icon">${u.emoji||'🍦'}</div>
           <div class="urun-name">${u.isim}</div>
-          <div class="urun-price">${u.fiyat} ₺</div>
+          ${u.fiyat > 0 ? `<div class="urun-price">${u.fiyat} ₺</div>` : ''}
         </div>`;
       });
       pasifUrunler.forEach(u => {
@@ -401,6 +401,11 @@
     if (!alan) return;
     const data = menuData[aktifKategori.id] || {};
     const bolumler = data.bolumler || {};
+    const urunler2 = data.urunler ? Object.values(data.urunler) : [];
+    const secilenUrun = urunler2.find(u => u.id === state.urun);
+    const kulahFiyat = secilenUrun?.fiyat || 0;
+    const TOP_FIYAT = 80;
+
     let tumSecenekler = [];
     let topBolumIsim = '';
     Object.values(bolumler).sort((a,b)=>(a.sira??999)-(b.sira??999)).forEach(bolum => {
@@ -408,7 +413,7 @@
       if (!topBolumIsim) topBolumIsim = bolum.isim;
       (bolum.secenekler || []).forEach(s => {
         if (!(typeof s==='object' ? s.pasif : false))
-          tumSecenekler.push(typeof s==='object' ? s.isim : s);
+          tumSecenekler.push(typeof s==='object' ? s : { isim: s, pasif: false });
       });
     });
     if (!tumSecenekler.length) {
@@ -416,31 +421,51 @@
         if (!topBolumIsim) topBolumIsim = bolum.isim;
         (bolum.secenekler || []).forEach(s => {
           if (!(typeof s==='object' ? s.pasif : false))
-            tumSecenekler.push(typeof s==='object' ? s.isim : s);
+            tumSecenekler.push(typeof s==='object' ? s : { isim: s, pasif: false });
         });
       });
     }
     const topBaslik = topBolumIsim || 'Top';
     const topSayisi = state.toplar.length;
+
+    // Canlı fiyat hesapla
+    let toplamFiyatGoster = kulahFiyat;
+    state.toplar.forEach(t => {
+      const sec = tumSecenekler.find(s => (typeof s==='object' ? s.isim : s) === t);
+      toplamFiyatGoster += TOP_FIYAT + (typeof sec==='object' && sec.ekFiyat ? sec.ekFiyat : 0);
+    });
+
     let ozet = '';
     if (topSayisi > 0) {
       ozet = `<div style="margin-bottom:1rem;">
         <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-style:italic;">Seçim sırasına göre aşağıdan yukarıya dizilir. Önce alta koymak istediğinizi seçin.</div>
         <div style="display:flex;flex-direction:column;gap:4px;">`;
       for (let i = topSayisi - 1; i >= 0; i--) {
+        const sec = tumSecenekler.find(s => (typeof s==='object' ? s.isim : s) === state.toplar[i]);
+        const ekF = typeof sec==='object' && sec.ekFiyat ? sec.ekFiyat : 0;
         ozet += `<div style="display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:10px;background:var(--warm);border:1px solid var(--soft);">
           <span style="font-size:11px;color:var(--muted);min-width:60px;font-weight:500;">${i+1}. ${topBaslik}</span>
           <span style="font-size:13px;font-weight:500;color:var(--brown);flex:1;">${state.toplar[i]}</span>
+          <span style="font-size:12px;color:var(--accent);font-weight:600;">${TOP_FIYAT}${ekF ? ' +'+ekF : ''} ₺</span>
           <button onclick="topSil(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;">✕</button>
         </div>`;
       }
-      ozet += `</div></div>`;
+      ozet += `</div>
+        <div style="text-align:right;margin-top:8px;font-size:14px;font-weight:600;color:var(--accent);">
+          Toplam: ${toplamFiyatGoster} ₺
+        </div>
+      </div>`;
     }
     alan.innerHTML = `<div class="section" style="padding-bottom:0.5rem;">
       ${ozet}
+      <div style="font-size:12px;color:var(--muted);margin-bottom:0.5rem;">Her top <b>80 ₺</b>, aromalı toplar için ek ücret eklenir.</div>
       <div style="font-size:14px;font-weight:500;color:var(--brown);margin-bottom:0.6rem;">${topSayisi+1}. ${topBaslik} Seçin</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem;">
-        ${tumSecenekler.map(isim => `<span class="chip" onclick="topEkle('${isim}')">${isim}</span>`).join('')}
+        ${tumSecenekler.map(s => {
+          const isim = typeof s==='object' ? s.isim : s;
+          const ekF = typeof s==='object' && s.ekFiyat ? s.ekFiyat : 0;
+          return `<span class="chip" onclick="topEkle('${isim}')">${isim}${ekF ? ` <span style="font-size:10px;color:var(--accent);">+${ekF}₺</span>` : ''}</span>`;
+        }).join('')}
       </div>
     </div>`;
   }
@@ -486,8 +511,20 @@
       if (!state.urun) { showToast('Lütfen servis şekli seçin'); return; }
       if (state.toplar.length === 0) { showToast('En az 1 top seçin'); return; }
       const urun = urunler.find(u => u.id === state.urun);
-      fiyat = urun ? urun.fiyat : 0;
-      urunIsim = urun?.isim + ' — ' + state.toplar.join(' + ');
+      const TOP_FIYAT = 80;
+      // Her top için 80₺ + varsa aroma ek ücreti
+      const bolumlerObj = data.bolumler || {};
+      let topToplamEkFiyat = 0;
+      state.toplar.forEach(topIsim => {
+        Object.values(bolumlerObj).forEach(bolum => {
+          if (!bolum.topIcinKullan) return;
+          const sec = (bolum.secenekler || []).find(s => (typeof s==='object' ? s.isim : s) === topIsim);
+          if (sec && typeof sec==='object' && sec.ekFiyat) topToplamEkFiyat += sec.ekFiyat;
+        });
+      });
+      const kulahFiyat = urun?.fiyat || 0;
+      fiyat = kulahFiyat + (TOP_FIYAT * state.toplar.length) + topToplamEkFiyat;
+      urunIsim = (urun?.isim || '') + ' — ' + state.toplar.join(' + ');
       topBilgi = [...state.toplar];
     } else {
       if (!state.urun) { showToast('Lütfen bir ürün seçin'); return; }

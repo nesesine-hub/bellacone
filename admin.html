@@ -677,7 +677,7 @@
           <span class="item-emoji">${u.emoji || '🍦'}</span>
           <div class="item-info">
             <span class="item-name">${u.isim}</span>
-            <span class="item-price">${u.fiyat} ₺ ${u.stok !== undefined ? `· Stok: <b>${u.stok}</b>` : '· Stoksuz'}</span>
+            <span class="item-price">${u.fiyat > 0 ? u.fiyat + ' ₺ · ' : ''}${u.stok !== undefined ? `Stok: <b>${u.stok}</b>` : 'Stoksuz'}</span>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
