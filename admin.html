@@ -161,6 +161,23 @@
   <button class="tab" onclick="switchTab('stok', this)">Stok</button>
   <button class="tab" onclick="switchTab('foto', this)">Fotoğraflar</button>
   <button class="tab" onclick="switchTab('qr', this)">QR Kodlar</button>
+  <button class="tab" onclick="switchTab('ayarlar', this)">Ayarlar</button>
+</div>
+
+<!-- AYARLAR PANELİ -->
+<div class="panel" id="panel-ayarlar">
+  <div class="section-card">
+    <div class="section-header"><h2>Fiyat Ayarları</h2></div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:1rem;">Top sıralaması modunda her top için uygulanacak temel fiyatı buradan değiştirebilirsiniz.</p>
+    <div class="form-row" style="align-items:flex-end;">
+      <div class="form-group">
+        <label>Top Başına Fiyat (₺)</label>
+        <input class="form-input" id="top-fiyat-input" type="number" min="0" placeholder="80">
+      </div>
+      <button class="add-btn" onclick="topFiyatKaydet()">Kaydet</button>
+    </div>
+    <p style="font-size:12px; color:var(--muted);" id="top-fiyat-mevcut"></p>
+  </div>
 </div>
 
 <!-- KATEGORİLER PANELİ -->
@@ -929,6 +946,22 @@
     t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2500);
   }
+
+  // Top fiyatını Firebase'den oku
+  onValue(ref(db, 'ayarlar/topFiyat'), (snap) => {
+    const fiyat = snap.val() ?? 80;
+    const input = document.getElementById('top-fiyat-input');
+    const mevcut = document.getElementById('top-fiyat-mevcut');
+    if (input) input.value = fiyat;
+    if (mevcut) mevcut.textContent = `Mevcut fiyat: ${fiyat} ₺`;
+  });
+
+  window.topFiyatKaydet = async function() {
+    const fiyat = parseFloat(document.getElementById('top-fiyat-input').value);
+    if (isNaN(fiyat) || fiyat < 0) { showToast('Geçerli bir fiyat girin'); return; }
+    await set(ref(db, 'ayarlar/topFiyat'), fiyat);
+    showToast(`Top fiyatı ${fiyat} ₺ olarak kaydedildi`);
+  };
 
   window.switchTab = function(tab, el) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));

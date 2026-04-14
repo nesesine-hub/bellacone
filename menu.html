@@ -216,7 +216,13 @@
   let kategoriler = [];
   let aktifKategori = null;
   let state = { urun: null, toplar: [], secimler: {}, miktar: 1 };
-  let sepet = []; // [{kategori, urun, fiyat, miktar, toplar, secimMetni, not, toplamFiyat}]
+  let sepet = [];
+  let TOP_FIYAT = 80; // varsayılan, Firebase'den güncellenir
+
+  // Top fiyatını Firebase'den oku
+  onValue(ref(db, 'ayarlar/topFiyat'), (snap) => {
+    TOP_FIYAT = snap.val() ?? 80;
+  });
 
   // URL params
   const urlParams = new URLSearchParams(window.location.search);
@@ -404,7 +410,7 @@
     const urunler2 = data.urunler ? Object.values(data.urunler) : [];
     const secilenUrun = urunler2.find(u => u.id === state.urun);
     const kulahFiyat = secilenUrun?.fiyat || 0;
-    const TOP_FIYAT = 80;
+
 
     let tumSecenekler = [];
     let topBolumIsim = '';
@@ -511,7 +517,7 @@
       if (!state.urun) { showToast('Lütfen servis şekli seçin'); return; }
       if (state.toplar.length === 0) { showToast('En az 1 top seçin'); return; }
       const urun = urunler.find(u => u.id === state.urun);
-      const TOP_FIYAT = 80;
+  
       // Her top için 80₺ + varsa aroma ek ücreti
       const bolumlerObj = data.bolumler || {};
       let topToplamEkFiyat = 0;
