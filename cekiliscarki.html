@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Çekiliş Çarkı 🎡</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0c1a;
+    --card: #1a1530;
+    --accent: #f0c040;
+    --accent2: #ff6b6b;
+    --accent3: #6bffd8;
+    --text: #f0eaff;
+    --muted: #8a7aaa;
+    --border: #2e2650;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px 60px;
+    background-image: radial-gradient(ellipse at 20% 20%, #2a1a4a 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 80%, #1a2a4a 0%, transparent 60%);
+  }
+
+  h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--accent);
+    text-shadow: 0 0 30px rgba(240,192,64,0.4), 0 4px 0 rgba(0,0,0,0.5);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+
+  .main-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .wheel-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .wheel-wrapper {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    filter: drop-shadow(0 0 40px rgba(240,192,64,0.25));
+  }
+
+  #wheelCanvas { border-radius: 50%; }
+
+  .wheel-pointer {
+    position: absolute;
+    top: -18px; left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 16px solid transparent;
+    border-right: 16px solid transparent;
+    border-top: 36px solid var(--accent2);
+    filter: drop-shadow(0 4px 8px rgba(255,107,107,0.6));
+    z-index: 10;
+  }
+
+  .wheel-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px; height: 44px;
+    background: radial-gradient(circle at 40% 40%, #fff 0%, var(--accent) 60%);
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(240,192,64,0.8), inset 0 2px 4px rgba(255,255,255,0.3);
+    z-index: 10;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  #spinBtn {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.4rem;
+    padding: 14px 46px;
+    background: linear-gradient(135deg, var(--accent), #e0a020);
+    color: #1a0f00;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #a06010, 0 10px 30px rgba(240,192,64,0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
+    letter-spacing: 1px;
+  }
+  #spinBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #a06010, 0 14px 35px rgba(240,192,64,0.4); }
+  #spinBtn:active { transform: translateY(4px); box-shadow: 0 2px 0 #a06010; }
+  #spinBtn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 6px 0 #a06010; }
+
+  #shuffleBtn {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    padding: 14px 22px;
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    color: #e9d5ff;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #3b0f8a, 0 10px 30px rgba(124,58,237,0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  #shuffleBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #3b0f8a, 0 14px 35px rgba(124,58,237,0.4); }
+  #shuffleBtn:active { transform: translateY(4px); box-shadow: 0 2px 0 #3b0f8a; }
+  #shuffleBtn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* SETTINGS */
+  .settings-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 20px;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .settings-box h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    color: var(--accent);
+  }
+
+  .settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .setting-item label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .val-display {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--accent3);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(240,192,64,0.5);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  /* PANEL */
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    width: 280px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .panel h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.25rem;
+    color: var(--accent3);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+  }
+
+  .input-row { display: flex; gap: 8px; }
+
+  #nameInput {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  #nameInput:focus { border-color: var(--accent3); }
+
+  .add-btn {
+    background: var(--accent3);
+    color: #001a12;
+    border: none;
+    border-radius: 10px;
+    width: 42px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    font-weight: 800;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .add-btn:hover { opacity: 0.85; transform: scale(1.05); }
+
+  .participants-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .participants-list::-webkit-scrollbar { width: 4px; }
+  .participants-list::-webkit-scrollbar-track { background: var(--bg); border-radius: 2px; }
+  .participants-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .participant-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    animation: slideIn 0.2s ease;
+    transition: border-color 0.2s;
+  }
+  .participant-item.rigged { border-color: rgba(255,107,107,0.4); }
+  @keyframes slideIn { from { opacity:0; transform: translateX(-10px); } to { opacity:1; transform: none; } }
+
+  .name-label { display: flex; align-items: center; gap: 8px; }
+  .rigged-badge {
+    font-size: 0.6rem;
+    background: var(--accent2);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 20px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+
+  .del-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 2px 4px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+  }
+  .del-btn:hover { color: var(--accent2); background: rgba(255,107,107,0.1); }
+
+  .empty-note {
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .clear-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 10px;
+    padding: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .clear-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--card);
+    border: 2px solid var(--accent);
+    border-radius: 24px;
+    padding: 40px 50px;
+    text-align: center;
+    box-shadow: 0 0 80px rgba(240,192,64,0.3);
+    transform: scale(0.8);
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    max-width: 90vw;
+  }
+  .modal-overlay.show .modal { transform: scale(1); }
+
+  .modal-emoji { font-size: 4rem; margin-bottom: 16px; }
+  .modal h2 { font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: var(--muted); margin-bottom: 8px; }
+  .modal .winner-name {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2rem, 6vw, 3rem);
+    color: var(--accent);
+    text-shadow: 0 0 30px rgba(240,192,64,0.5);
+    word-break: break-word;
+    margin-bottom: 24px;
+  }
+  .modal-close {
+    background: linear-gradient(135deg, var(--accent), #e0a020);
+    color: #1a0f00;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 36px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #a06010;
+    transition: transform 0.1s;
+  }
+  .modal-close:hover { transform: translateY(-2px); }
+
+  @keyframes shake {
+    0%,100% { transform: rotate(0deg); }
+    15% { transform: rotate(-6deg) scale(1.02); }
+    30% { transform: rotate(6deg) scale(1.02); }
+    45% { transform: rotate(-4deg); }
+    60% { transform: rotate(4deg); }
+    75% { transform: rotate(-2deg); }
+    90% { transform: rotate(2deg); }
+  }
+  .shuffling { animation: shake 0.5s ease; }
+
+  .confetti-piece {
+    position: fixed;
+    width: 10px; height: 10px;
+    top: -10px;
+    border-radius: 2px;
+    animation: confettiFall linear forwards;
+    pointer-events: none;
+    z-index: 200;
+  }
+  @keyframes confettiFall {
+    to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🎡 Çekiliş Çarkı</h1>
+<p class="subtitle">İsimleri ekle, çarkı çevir, kazananı bul!</p>
+
+<div class="main-layout">
+  <!-- WHEEL + SETTINGS -->
+  <div class="wheel-section">
+    <div class="wheel-wrapper">
+      <div class="wheel-pointer"></div>
+      <canvas id="wheelCanvas" width="400" height="400"></canvas>
+      <div class="wheel-center"></div>
+    </div>
+
+    <div class="btn-row">
+      <button id="spinBtn" onclick="spin()">ÇEVİR!</button>
+      <button id="shuffleBtn" onclick="shuffleParticipants()">🔀 Karıştır</button>
+    </div>
+
+    <div class="settings-box">
+      <h3>⚙️ Çark Ayarları</h3>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <label>Süre (saniye)</label>
+          <div class="slider-row">
+            <input type="range" id="durationSlider" min="2" max="20" step="1" value="6" oninput="updateSettings()">
+            <span class="val-display" id="durationVal">6s</span>
+          </div>
+        </div>
+        <div class="setting-item">
+          <label>Hız (tur sayısı)</label>
+          <div class="slider-row">
+            <input type="range" id="speedSlider" min="2" max="20" step="1" value="7" oninput="updateSettings()">
+            <span class="val-display" id="speedVal">7x</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL -->
+  <div class="panel">
+    <h2>👥 Katılımcılar</h2>
+    <div class="input-row">
+      <input id="nameInput" type="text" placeholder="İsim ekle..." maxlength="30"
+             onkeydown="if(event.key==='Enter')addName()">
+      <button class="add-btn" onclick="addName()">+</button>
+    </div>
+    <ul class="participants-list" id="participantsList">
+      <li class="empty-note">Henüz katılımcı yok.</li>
+    </ul>
+    <button class="clear-btn" onclick="clearAll()">🗑️ Tümünü Temizle</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-emoji">🏆</div>
+    <h2>Kazanan:</h2>
+    <div class="winner-name" id="winnerName"></div>
+    <button class="modal-close" onclick="closeModal()">Harika!</button>
+  </div>
+</div>
+
+<script>
+  // Hileli isimler — tam eşleşme (büyük/küçük harf duyarlı)
+  const RIGGED_NAMES = ['morphineamca', 'morphine', 'morphinexd', 'Teddy', 'teddy'];
+
+  const COLORS = [
+    '#ff6b6b','#ffa94d','#ffd43b','#69db7c',
+    '#4dabf7','#cc5de8','#f783ac','#63e6be',
+    '#a9e34b','#ff8787','#74c0fc','#da77f2'
+  ];
+
+  let participants = [];
+  let spinning = false;
+  let currentAngle = 0;
+  let spinDuration = 6000;
+  let spinRotations = 7;
+
+  const canvas = document.getElementById('wheelCanvas');
+  const ctx = canvas.getContext('2d');
+
+  /* ── SETTINGS ── */
+  function updateSettings() {
+    const dur = parseInt(document.getElementById('durationSlider').value);
+    const spd = parseInt(document.getElementById('speedSlider').value);
+    spinDuration = dur * 1000;
+    spinRotations = spd;
+    document.getElementById('durationVal').textContent = dur + 's';
+    document.getElementById('speedVal').textContent = spd + 'x';
+  }
+
+  /* ── ADD / REMOVE ── */
+  function addName() {
+    const input = document.getElementById('nameInput');
+    const name = input.value.trim();
+    if (!name) return;
+    participants.push(name);
+    input.value = '';
+    renderList();
+    drawWheel();
+  }
+
+  function removeName(i) {
+    participants.splice(i, 1);
+    renderList();
+    drawWheel();
+  }
+
+  function clearAll() {
+    participants = [];
+    renderList();
+    drawWheel();
+  }
+
+  /* ── SHUFFLE ── */
+  function shuffleParticipants() {
+    if (spinning || participants.length < 2) return;
+    for (let i = participants.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [participants[i], participants[j]] = [participants[j], participants[i]];
+    }
+    renderList();
+    const wrapper = document.querySelector('.wheel-wrapper');
+    wrapper.classList.remove('shuffling');
+    void wrapper.offsetWidth;
+    wrapper.classList.add('shuffling');
+    setTimeout(() => wrapper.classList.remove('shuffling'), 500);
+    drawWheel();
+  }
+
+  /* ── RENDER LIST ── */
+  function escapeHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function renderList() {
+    const list = document.getElementById('participantsList');
+    if (participants.length === 0) {
+      list.innerHTML = '<li class="empty-note">Henüz katılımcı yok.</li>';
+      return;
+    }
+    list.innerHTML = participants.map((name, i) => {
+      const rigged = RIGGED_NAMES.includes(name);
+      return `<li class="participant-item${rigged?' rigged':''}">
+        <span class="name-label">
+          ${escapeHtml(name)}
+
+        </span>
+        <button class="del-btn" onclick="removeName(${i})">✕</button>
+      </li>`;
+    }).join('');
+  }
+
+  /* ── DRAW WHEEL ── */
+  function drawWheel(angle = currentAngle) {
+    const cx = 200, cy = 200, r = 192;
+    ctx.clearRect(0, 0, 400, 400);
+
+    if (participants.length === 0) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = '#1a1530'; ctx.fill();
+      ctx.strokeStyle = '#2e2650'; ctx.lineWidth = 3; ctx.stroke();
+      ctx.fillStyle = '#8a7aaa';
+      ctx.font = 'bold 18px Nunito';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('İsim ekleyin', cx, cy);
+      return;
+    }
+
+    const n = participants.length;
+    const slice = (Math.PI * 2) / n;
+
+    for (let i = 0; i < n; i++) {
+      const start = angle + i * slice;
+      const end = start + slice;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, start, end);
+      ctx.closePath();
+      ctx.fillStyle = COLORS[i % COLORS.length];
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+      ctx.lineWidth = 2; ctx.stroke();
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(start + slice / 2);
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#fff';
+      ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 4;
+      const fontSize = Math.max(10, Math.min(18, 260 / n));
+      ctx.font = `bold ${fontSize}px Nunito`;
+      const label = participants[i].length > 14 ? participants[i].slice(0,13)+'…' : participants[i];
+      ctx.fillText(label, r - 16, 0);
+      ctx.restore();
+    }
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 4; ctx.stroke();
+  }
+
+  drawWheel();
+
+  /* ── SPIN ── */
+  function spin() {
+    if (spinning || participants.length < 2) return;
+    spinning = true;
+    document.getElementById('spinBtn').disabled = true;
+    document.getElementById('shuffleBtn').disabled = true;
+
+    // Find first rigged participant by priority
+    let riggedIndex = -1;
+    for (const rn of RIGGED_NAMES) {
+      const idx = participants.indexOf(rn);
+      if (idx !== -1) { riggedIndex = idx; break; }
+    }
+
+    const n = participants.length;
+    const slice = (Math.PI * 2) / n;
+    const targetIndex = riggedIndex !== -1 ? riggedIndex : Math.floor(Math.random() * n);
+
+    const targetMid = targetIndex * slice + slice / 2;
+    const pointerAngle = -Math.PI / 2;
+    const fullRotations = spinRotations * Math.PI * 2;
+
+    let finalAngle = pointerAngle - targetMid;
+    while (finalAngle <= currentAngle) finalAngle += Math.PI * 2;
+    finalAngle += fullRotations;
+
+    // Natural jitter within the slice
+    finalAngle += (Math.random() - 0.5) * slice * 0.6;
+
+    const startAngle = currentAngle;
+    const startTime = performance.now();
+
+    function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+
+    function animate(now) {
+      const t = Math.min((now - startTime) / spinDuration, 1);
+      currentAngle = startAngle + (finalAngle - startAngle) * easeOut(t);
+      drawWheel(currentAngle);
+      if (t < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        currentAngle = finalAngle;
+        spinning = false;
+        document.getElementById('spinBtn').disabled = false;
+        document.getElementById('shuffleBtn').disabled = false;
+        showResult(participants[targetIndex]);
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+
+  /* ── RESULT ── */
+  function showResult(name) {
+    document.getElementById('winnerName').textContent = name;
+    document.getElementById('modalOverlay').classList.add('show');
+    launchConfetti();
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('show');
+  }
+
+  /* ── CONFETTI ── */
+  function launchConfetti() {
+    const colors = ['#f0c040','#ff6b6b','#6bffd8','#cc5de8','#ffa94d','#69db7c'];
+    for (let i = 0; i < 90; i++) {
+      setTimeout(() => {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.width = (8 + Math.random() * 8) + 'px';
+        el.style.height = (8 + Math.random() * 8) + 'px';
+        el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        el.style.animationDuration = (2 + Math.random() * 2) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 4500);
+      }, i * 25);
+    }
+  }
+
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+</script>
+</body>
+</html>
