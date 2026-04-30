@@ -118,7 +118,7 @@
 
 <div class="masa-bar">
   <label>Masa No</label>
-  <input type="number" id="masa-input" placeholder="Örn: 5" min="1" max="99" />
+  <input type="text" id="masa-input" placeholder="Örn: 5" />
   <span class="masa-pill" id="masa-pill">—</span>
 </div>
 
@@ -228,10 +228,10 @@
   const urlParams = new URLSearchParams(window.location.search);
   const masaUrl = urlParams.get('masa');
   const masaAdiUrl = urlParams.get('masaadi');
-  const masaGoster = masaAdiUrl ? decodeURIComponent(masaAdiUrl) : (masaUrl ? 'Masa ' + masaUrl : null);
+  const masaGoster = masaAdiUrl ? decodeURIComponent(masaAdiUrl) : (masaUrl ? decodeURIComponent(masaUrl) : null);
   if (masaUrl) {
-    document.getElementById('masa-input').value = masaUrl;
-    document.getElementById('masa-pill').textContent = masaGoster || 'Masa ' + masaUrl;
+    document.getElementById('masa-input').value = decodeURIComponent(masaUrl);
+    document.getElementById('masa-pill').textContent = masaGoster || decodeURIComponent(masaUrl);
   }
   document.getElementById('masa-input').addEventListener('input', function() {
     document.getElementById('masa-pill').textContent = this.value ? 'Masa ' + this.value : '—';
@@ -641,7 +641,7 @@
     try {
       for (const item of sepet) {
         await push(ref(db, 'siparisler'), {
-          masa: Number(masa),
+          masa: masa,
           kategori: item.kategori,
           urun: item.urun,
           fiyat: item.fiyat,
@@ -661,8 +661,8 @@
       showToast('✓ Siparişiniz alındı!');
       showScreen('home');
       if (masaUrl) {
-        document.getElementById('masa-input').value = masaUrl;
-        document.getElementById('masa-pill').textContent = masaGoster || 'Masa ' + masaUrl;
+        document.getElementById('masa-input').value = decodeURIComponent(masaUrl);
+        document.getElementById('masa-pill').textContent = masaGoster || decodeURIComponent(masaUrl);
       }
     } catch(e) { showToast('Hata oluştu, tekrar deneyin'); }
 
