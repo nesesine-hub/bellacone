@@ -389,7 +389,7 @@
                 <div style="flex:1;">
                   <div class="dondurma-row">${o.kategori ? o.kategori + ' — ' : ''}${o.urun} × ${o.miktar}</div>
                   ${o.toplar && o.toplar.length ? `<div class="detail-row">${o.toplar.map((t,i) => `<span style="background:rgba(224,120,64,0.15);color:#e07840;border-radius:5px;padding:1px 6px;font-size:10px;margin:1px;">${i+1}. ${t}</span>`).join('')}</div>` : ''}
-                  ${o.secimMetni ? `<div class="detail-row">${o.secimMetni}</div>` : ''}
+                  ${o.secimMetni ? `<div class="detail-row" style="margin-top:4px;">${o.secimMetni.split(' | ').map(s => `<div style="padding:2px 0;">• ${s}</div>`).join('')}</div>` : ''}
                   ${o.not ? `<div class="detail-row" style="color:#e07840;">Not: ${o.not}</div>` : ''}
                   <div class="zaman-row">${o.zamanStr || ''} · ${o.toplamFiyat || 0} ₺</div>
                 </div>
