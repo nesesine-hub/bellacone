@@ -23,11 +23,11 @@
   /* BURGER & MOBİL MENU */
   .nav-logo a { display:flex; align-items:center; text-decoration:none; }
   .burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; z-index: 1100; }
-  .burger span { display: block; width: 24px; height: 2px; background: var(--brown); border-radius: 2px; transition: all 0.3s; }
+  .burger span { display: block; width: 24px; height: 2px; background: var(--brown2); border-radius: 2px; transition: all 0.3s; }
   .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   .burger.open span:nth-child(2) { opacity: 0; }
   .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-  .mobile-menu { display: none; position: fixed; inset: 0; background: rgba(250,245,238,0.98); backdrop-filter: blur(16px); z-index: 1050; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; }
+  .mobile-menu { display: none; position: fixed; inset: 0; background: rgba(250,245,238,0.98); backdrop-filter: blur(16px); z-index: 1050; flex-direction: column; align-items: center; justify-content: flex-start; gap: 1.5rem; padding: 6rem 2rem 3rem; overflow-y: auto; }
   .mobile-menu.open { display: flex; }
   .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; color: var(--brown); text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s; }
   .mobile-menu a:hover { color: var(--accent); }
