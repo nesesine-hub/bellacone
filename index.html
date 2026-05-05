@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bellacone — Gelato Italiano & Pasticceria | Çorlu, Tekirdağ</title>
+<meta name="description" content="Bellacone, Çorlu'nun kalbinde İtalyan gelato ve pastacılık sanatını buluşturuyor. Taze malzemeler, benzersiz tatlar.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf5ee;
+    --cream2: #f5ede0;
+    --brown: #3d2314;
+    --brown2: #5c3d2e;
+    --accent: #c9663c;
+    --accent2: #e8956a;
+    --gold: #c9a96e;
+    --text: #2a1a0e;
+    --muted: #8a6a56;
+    --white: #fffdf9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 1.25rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.4s, box-shadow 0.4s;
+  }
+  nav.scrolled {
+    background: rgba(250,245,238,0.95);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 1px 0 rgba(92,61,46,0.1);
+  }
+  .nav-logo img { height: 52px; width: auto; }
+  .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--brown2);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-cta {
+    background: var(--brown);
+    color: var(--cream) !important;
+    padding: 9px 22px;
+    border-radius: 999px;
+    font-size: 12px !important;
+    letter-spacing: 0.1em !important;
+  }
+  .nav-cta:hover { background: var(--accent) !important; color: #fff !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8rem 5rem 5rem 6rem;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+  }
+  .hero-tag::before { content: ''; width: 30px; height: 1px; background: var(--gold); }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(52px, 6vw, 82px);
+    font-weight: 300;
+    line-height: 1.08;
+    color: var(--brown);
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero-desc {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--muted);
+    max-width: 420px;
+    margin-bottom: 2.5rem;
+  }
+  .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--brown);
+    color: var(--cream);
+    padding: 14px 32px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
+  .btn-secondary {
+    border: 1.5px solid var(--brown2);
+    color: var(--brown2);
+    padding: 14px 32px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+  .btn-secondary:hover { background: var(--brown2); color: var(--cream); transform: translateY(-2px); }
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-right img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .hero-right::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, var(--cream) 0%, transparent 30%);
+  }
+  .hero-badge {
+    position: absolute;
+    bottom: 3rem;
+    left: -1.5rem;
+    z-index: 10;
+    background: var(--white);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 20px 60px rgba(61,35,20,0.15);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .hero-badge-icon { font-size: 32px; }
+  .hero-badge-text { font-size: 12px; color: var(--muted); }
+  .hero-badge-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--brown); }
+
+  /* MARQUEE */
+  .marquee-wrap {
+    background: var(--brown);
+    padding: 14px 0;
+    overflow: hidden;
+  }
+  .marquee {
+    display: flex;
+    gap: 0;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+  }
+  .marquee span {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-style: italic;
+    color: var(--gold);
+    padding: 0 2rem;
+    letter-spacing: 0.05em;
+  }
+  .marquee span.dot { color: var(--accent2); font-style: normal; }
+  @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  /* HAKKIMIZDA */
+  .about {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    min-height: 600px;
+  }
+  .about-visual {
+    position: relative;
+    overflow: hidden;
+    background: var(--cream2);
+  }
+  .about-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s;
+  }
+  .about-visual:hover img { transform: scale(1.04); }
+  .about-visual-accent {
+    position: absolute;
+    top: 2rem; right: 2rem;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: var(--brown);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    text-align: center;
+  }
+  .about-visual-accent strong {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    line-height: 1;
+  }
+  .about-visual-accent span { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .about-content {
+    padding: 6rem 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .section-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+  .section-tag::before { content: ''; width: 30px; height: 1px; background: var(--gold); }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 4vw, 54px);
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--brown);
+    margin-bottom: 1.5rem;
+  }
+  .section-title em { font-style: italic; color: var(--accent); }
+  .about-text {
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+  .about-stats {
+    display: flex;
+    gap: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--cream2);
+  }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 300;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* KATEGORİLER */
+  .categories { padding: 7rem 6rem; background: var(--white); }
+  .categories-header { text-align: center; margin-bottom: 4rem; }
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  .cat-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    aspect-ratio: 3/4;
+    cursor: pointer;
+    group: true;
+  }
+  .cat-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .cat-card:hover img { transform: scale(1.08); }
+  .cat-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(30,15,5,0.85) 0%, rgba(30,15,5,0.1) 50%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2rem;
+  }
+  .cat-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .cat-desc { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: 0.05em; }
+  .cat-card.large { grid-row: span 1; aspect-ratio: 4/3; }
+
+  /* MENÜ CTA */
+  .menu-cta {
+    background: var(--brown);
+    padding: 6rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 3rem;
+  }
+  .menu-cta-text .section-tag { color: var(--gold); }
+  .menu-cta-text .section-tag::before { background: var(--gold); }
+  .menu-cta-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 4vw, 56px);
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+  .menu-cta-title em { font-style: italic; color: var(--gold); }
+  .menu-cta-desc { font-size: 15px; color: rgba(250,245,238,0.6); line-height: 1.8; }
+  .btn-gold {
+    background: var(--gold);
+    color: var(--brown);
+    padding: 16px 40px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    transition: all 0.3s;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .btn-gold:hover { background: var(--accent2); color: #fff; transform: translateY(-2px); }
+
+  /* ÇALIŞMA SAATLERİ & İLETİŞİM */
+  .contact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 500px;
+  }
+  .contact-map { position: relative; overflow: hidden; }
+  .contact-map iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    filter: sepia(20%) saturate(80%);
+  }
+  .contact-info {
+    background: var(--cream2);
+    padding: 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .contact-items { display: flex; flex-direction: column; gap: 2rem; margin-top: 2.5rem; }
+  .contact-item { display: flex; gap: 1.25rem; align-items: flex-start; }
+  .contact-icon {
+    width: 44px; height: 44px;
+    background: var(--brown);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .contact-item-title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .contact-item-value { font-size: 15px; color: var(--brown); font-weight: 500; line-height: 1.6; }
+  .contact-item-value a { color: var(--brown); text-decoration: none; }
+  .contact-item-value a:hover { color: var(--accent); }
+
+  /* SAATLER */
+  .hours-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 1.5rem;
+    margin-top: 6px;
+  }
+  .hour-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 1px solid rgba(92,61,46,0.1); }
+  .hour-day { color: var(--muted); }
+  .hour-time { color: var(--brown); font-weight: 500; }
+
+  /* SOSYAL MEDYA */
+  .social-section {
+    background: var(--white);
+    padding: 5rem 6rem;
+    text-align: center;
+  }
+  .social-links { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
+  .social-link {
+    width: 52px; height: 52px;
+    background: var(--brown);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cream);
+    text-decoration: none;
+    font-size: 20px;
+    transition: all 0.3s;
+  }
+  .social-link:hover { background: var(--accent); transform: translateY(-4px); }
+
+  /* FOOTER */
+  footer {
+    background: var(--brown);
+    padding: 3rem 6rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  footer img { height: 40px; filter: brightness(0) invert(1) opacity(0.7); }
+  .footer-text { font-size: 12px; color: rgba(250,245,238,0.4); }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { font-size: 12px; color: rgba(250,245,238,0.5); text-decoration: none; }
+  .footer-links a:hover { color: var(--gold); }
+
+  /* ANİMASYONLAR */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* MOBİL */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-left { padding: 7rem 2rem 3rem; }
+    .hero-right { height: 50vh; }
+    .about { grid-template-columns: 1fr; }
+    .about-content { padding: 3rem 2rem; }
+    .categories { padding: 4rem 1.5rem; }
+    .cat-grid { grid-template-columns: 1fr 1fr; }
+    .menu-cta { grid-template-columns: 1fr; padding: 4rem 2rem; text-align: center; }
+    .contact { grid-template-columns: 1fr; }
+    .contact-map { height: 300px; }
+    .contact-info { padding: 3rem 2rem; }
+    .social-section { padding: 4rem 2rem; }
+    footer { padding: 2rem; flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-logo">
+    <img src="bellacone_logo.png" alt="Bellacone" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'font-family:Cormorant Garamond,serif;font-size:24px;font-weight:400;color:#3d2314;\'>BellaCone</span>'">
+  </div>
+  <div class="nav-links">
+    <a href="#hakkimizda">Hakkımızda</a>
+    <a href="#kategoriler">Lezzetler</a>
+    <a href="#iletisim">İletişim</a>
+    <a href="menu.html" class="nav-cta">Menüye Git →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">Çorlu, Tekirdağ</div>
+    <h1>İtalyan gelato<br>sanatı <em>Çorlu'da</em></h1>
+    <p class="hero-desc">
+      Bellacone, geleneksel İtalyan gelato ve pasticceria kültürünü Çorlu'ya taşıyor. 
+      Her top, her waffle, her lokma özenle hazırlanıyor.
+    </p>
+    <div class="hero-btns">
+      <a href="menu.html" class="btn-primary">Menüyü Gör →</a>
+      <a href="#iletisim" class="btn-secondary">Bizi Bul</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=900&q=80" alt="Bellacone Gelato">
+    <div class="hero-badge">
+      <div class="hero-badge-icon"></div>
+      <div>
+        <div class="hero-badge-title">Gelato Italiano</div>
+        <div class="hero-badge-text">Taze • Doğal • Lezzetli</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee">
+    <span>Gelato Italiano</span><span class="dot">✦</span>
+    <span>Waffle</span><span class="dot">✦</span>
+    <span>Bella Minipan</span><span class="dot">✦</span>
+    <span>San Sebastian</span><span class="dot">✦</span>
+    <span>Pasticceria</span><span class="dot">✦</span>
+    <span>Brownie</span><span class="dot">✦</span>
+    <span>Bella Magnolia</span><span class="dot">✦</span>
+    <span>Donut</span><span class="dot">✦</span>
+    <span>Gelato Italiano</span><span class="dot">✦</span>
+    <span>Waffle</span><span class="dot">✦</span>
+    <span>Bella Minipan</span><span class="dot">✦</span>
+    <span>San Sebastian</span><span class="dot">✦</span>
+    <span>Pasticceria</span><span class="dot">✦</span>
+    <span>Brownie</span><span class="dot">✦</span>
+    <span>Bella Magnolia</span><span class="dot">✦</span>
+    <span>Donut</span><span class="dot">✦</span>
+  </div>
+</div>
+
+<!-- HAKKIMIZDA -->
+<section class="about" id="hakkimizda">
+  <div class="about-visual">
+    <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAHq4wXXlnrv5CgkbIz16MrmzxO2cu1zCPRRU0PhSNKR3tYkUs30vt3-0WqirMPtUiO8raIEtrqusXgYnXk6u4Jr0vGKUG8FhbZIl_67otpyR0pe49cSmkj5J73jFxE2RvhEa3_UKdwhqcLD=s1360-w1360-h1020-rw" alt="Bellacone">
+  </div>
+  <div class="about-content reveal">
+    <div class="section-tag">Hikayemiz</div>
+    <h2 class="section-title">Lezzetin <em>kalbinde</em><br>bir adres</h2>
+    <p class="about-text">
+      Bellacone, İtalyan gelato geleneğini Çorlu'ya taşıyan bir lezzet durağıdır. 
+      Her gün taze hazırlanan gelatolarımız, el yapımı wafflelarımız ve özgün pasticceria 
+      çeşitlerimizle misafirlerimize unutulmaz anlar yaşatıyoruz.
+    </p>
+    <p class="about-text">
+      Kaliteden ödün vermeden, en taze malzemelerle hazırlanan her ürünümüz, 
+      İtalyan mutfağının ruhunu Çorlu'ya taşımaktadır.
+    </p>
+    <div class="about-stats">
+      <div>
+        <div class="stat-num">30+</div>
+        <div class="stat-label">Gelato Çeşidi</div>
+      </div>
+      <div>
+        <div class="stat-num">7</div>
+        <div class="stat-label">Gün Açık</div>
+      </div>
+      <div>
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Taze Malzeme</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KATEGORİLER -->
+<section class="categories" id="kategoriler">
+  <div class="categories-header reveal">
+    <div class="section-tag" style="justify-content:center;">Lezzetlerimiz</div>
+    <h2 class="section-title">Her damak <em>zevkine</em><br>bir lezzet</h2>
+  </div>
+  <div class="cat-grid">
+    <div class="cat-card reveal">
+      <img src="https://media.istockphoto.com/id/1922618743/tr/foto%C4%9Fraf/assorted-of-scoops-ice-cream-colorful-set-of-ice-cream-of-different-flavours-side-view-of.jpg?s=612x612&w=0&k=20&c=HAVYZvIcYhKa6PU6aih0o4CBJfw8NdxODnhg3ki831I=" alt="Dondurma">
+      <div class="cat-overlay">
+        <div class="cat-name">Gelato</div>
+        <div class="cat-desc">30+ İtalyan gelato çeşidi</div>
+      </div>
+    </div>
+    <div class="cat-card reveal" style="transition-delay:0.1s">
+      <img src="https://media.istockphoto.com/id/1006566622/tr/foto%C4%9Fraf/tatl%C4%B1-%C3%A7ilek-ve-ah%C5%9Fap-masa-dondurma-ile-g%C3%B6zleme.jpg?s=612x612&w=0&k=20&c=9LagspRJ_yGi-d1LWTrDagnAi7wuArRAlG7LkNZpj5g=" alt="Waffle">
+      <div class="cat-overlay">
+        <div class="cat-name">Waffle</div>
+        <div class="cat-desc">Tabak, kova & bardak seçenekleri</div>
+      </div>
+    </div>
+    <div class="cat-card reveal" style="transition-delay:0.2s">
+      <img src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRSlhpxvE5PU7iVPrr_5CoJoGAFN-IOYLutPkmKwSiKG2ecrsqp" alt="Pasticceria">
+      <div class="cat-overlay">
+        <div class="cat-name">Pasticceria</div>
+        <div class="cat-desc">San Sebastian, Brownie & daha fazlası</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENÜ CTA -->
+<section class="menu-cta">
+  <div class="menu-cta-text reveal">
+    <div class="section-tag">Dijital Menü</div>
+    <h2 class="menu-cta-title">QR kod ile<br><em>anında sipariş</em> ver</h2>
+    <p class="menu-cta-desc">Masanızdaki QR kodu okutun, menümüzü keşfedin ve kolayca sipariş verin.</p>
+  </div>
+  <a href="menu.html" class="btn-gold reveal">Menüye Git →</a>
+</section>
+
+<!-- İLETİŞİM -->
+<section class="contact" id="iletisim">
+  <div class="contact-map">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010!2d27.8!3d41.15!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14b4e7b995a35533%3A0x892f7ce44a98678d!2sBellacone!5e0!3m2!1str!2str!4v1"
+      allowfullscreen=""
+      loading="lazy">
+    </iframe>
+  </div>
+  <div class="contact-info reveal">
+    <div class="section-tag">İletişim</div>
+    <h2 class="section-title" style="font-size:clamp(28px,3vw,40px);">Bizi <em>ziyaret</em> edin</h2>
+    <div class="contact-items">
+      <div class="contact-item">
+        <div class="contact-icon">📍</div>
+        <div>
+          <div class="contact-item-title">Adres</div>
+          <div class="contact-item-value">
+            <a href="https://maps.google.com/?q=Bellacone+Corlu" target="_blank">
+              Kervancı Çorlu, Şeyh Sinan,<br>Ali Osman Çelebi Blv. D:10 b2 no 50,<br>59850 Çorlu / Tekirdağ
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">📞</div>
+        <div>
+          <div class="contact-item-title">Telefon</div>
+          <div class="contact-item-value">
+            <a href="tel:+905335109559">0533 510 95 59</a>
+          </div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">🕐</div>
+        <div>
+          <div class="contact-item-title">Çalışma Saatleri</div>
+          <div class="contact-item-value">
+            <div style="font-size:13px; padding:4px 0; display:flex; justify-content:space-between; gap:16px;">
+              <span class="hour-day">Haftanın Her Günü</span>
+              <span class="hour-time">11:00 – 00:00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOSYAL MEDYA -->
+<section class="social-section">
+  <div class="section-tag" style="justify-content:center;">Sosyal Medya</div>
+  <h2 class="section-title">Bizi <em>takip edin</em></h2>
+  <p style="color:var(--muted);font-size:15px;margin-top:0.5rem;">Yeni lezzetler ve kampanyalar için Instagram'da bizi takip edin.</p>
+  <div class="social-links">
+    <a href="https://www.instagram.com/bella.cone59/" target="_blank" class="social-link" title="Instagram">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+      </svg>
+    </a>
+  </div>
+  <p style="margin-top:1.5rem;font-size:14px;color:var(--muted);">
+    <a href="https://www.instagram.com/bella.cone59/" target="_blank" style="color:var(--accent);text-decoration:none;font-weight:500;">@bella.cone59</a>
+  </p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <img src="bellacone_logo.png" alt="Bellacone" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=\'font-family:Cormorant Garamond,serif;font-size:20px;color:rgba(250,245,238,0.6);\'>BellaCone</span>')">
+  <span class="footer-text">© 2025 Bellacone. Tüm hakları saklıdır.</span>
+  <div class="footer-links">
+    <a href="menu.html">Menü</a>
+    <a href="#iletisim">İletişim</a>
+    <a href="https://www.instagram.com/bella.cone59/" target="_blank">Instagram</a>
+  </div>
+</footer>
+
+<script>
+  // Navbar scroll efekti
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Reveal animasyonları
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
