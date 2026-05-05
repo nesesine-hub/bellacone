@@ -20,6 +20,23 @@
   .nav-links a:hover, .nav-links a.active { color: var(--accent); }
   .nav-cta { background: var(--brown) !important; color: var(--cream) !important; padding: 9px 22px; border-radius: 999px; font-size: 12px !important; }
   .nav-cta:hover { background: var(--accent) !important; }
+  /* BURGER & MOBİL MENU */
+  .nav-logo a { display:flex; align-items:center; text-decoration:none; }
+  .burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; z-index: 1100; }
+  .burger span { display: block; width: 24px; height: 2px; background: var(--brown); border-radius: 2px; transition: all 0.3s; }
+  .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .burger.open span:nth-child(2) { opacity: 0; }
+  .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .mobile-menu { display: none; position: fixed; inset: 0; background: rgba(250,245,238,0.98); backdrop-filter: blur(16px); z-index: 1050; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; color: var(--brown); text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s; }
+  .mobile-menu a:hover { color: var(--accent); }
+  .mobile-menu .mob-cta { font-family: 'DM Sans', sans-serif !important; font-size: 15px !important; background: var(--brown); color: var(--cream) !important; padding: 12px 32px; border-radius: 999px; font-weight: 500 !important; }
+  .mobile-menu .mob-cta:hover { background: var(--accent) !important; color: #fff !important; }
+  @media (max-width: 900px) {
+    .burger { display: flex; }
+    .nav-links { display: none !important; }
+  }
 
   .page-hero { padding: 10rem 6rem 5rem; background: var(--cream2); text-align: center; }
   .section-tag { font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 1.25rem; }
@@ -103,8 +120,16 @@
 </style>
 </head>
 <body>
+<div class="mobile-menu" id="mobile-menu">
+    <a href="index.html" onclick="closeMobile()">Ana Sayfa</a>
+    <a href="hakkimizda.html" onclick="closeMobile()">Hakkımızda</a>
+    <a href="lezzetler.html" onclick="closeMobile()">Lezzetler</a>
+    <a href="siparis.html" onclick="closeMobile()">Sipariş Ver</a>
+    <a href="index.html#iletisim" onclick="closeMobile()">İletişim</a>
+  <a href="menu.html" class="mob-cta" onclick="closeMobile()">QR Menü →</a>
+</div>
 <nav>
-  <div class="nav-logo"><img src="bellacone_logo.png" alt="Bellacone" onerror="this.style.display='none'"></div>
+  <div class="nav-logo"><a href="index.html"><img src="bellacone_logo.png" alt="Bellacone" onerror="this.style.display='none'"></a></div>
   <div class="nav-links">
     <a href="index.html">Ana Sayfa</a>
     <a href="hakkimizda.html" class="active">Hakkımızda</a>
@@ -112,6 +137,9 @@
     <a href="index.html#iletisim">İletişim</a>
     <a href="menu.html" class="nav-cta">Menüye Git →</a>
   </div>
+  <button class="burger" id="burger-btn" onclick="toggleMobile()" aria-label="Menü">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
 <div class="page-hero">
@@ -230,6 +258,21 @@
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.1 });
   reveals.forEach(el => observer.observe(el));
+</script>
+
+<script>
+  function toggleMobile() {
+    const menu = document.getElementById('mobile-menu');
+    const burger = document.getElementById('burger-btn');
+    menu.classList.toggle('open');
+    burger.classList.toggle('open');
+    document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+  }
+  function closeMobile() {
+    document.getElementById('mobile-menu').classList.remove('open');
+    document.getElementById('burger-btn').classList.remove('open');
+    document.body.style.overflow = '';
+  }
 </script>
 </body>
 </html>
