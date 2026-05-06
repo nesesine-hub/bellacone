@@ -38,8 +38,9 @@
     cursor: pointer;
   }
   #splash.hidden {
-    opacity: 0;
-    pointer-events: none;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    display: none !important;
   }
   #splash-logo {
     width: min(72vw, 380px);
@@ -830,46 +831,51 @@
   }
 </script>
 <script>
-  // ── SPLASH ──
-  const splash  = document.getElementById('splash');
-  const navbar  = document.getElementById('navbar');
-  const navLogo = document.querySelector('.nav-logo img');
-  let splashDone = false;
+  window.addEventListener('DOMContentLoaded', function() {
+    var splash  = document.getElementById('splash');
+    var navbar  = document.getElementById('navbar');
+    var navLogo = document.querySelector('.nav-logo img');
+    var gone    = false;
 
-  function dismissSplash() {
-    if (splashDone) return;
-    splashDone = true;
-    splash.classList.add('hidden');
-  }
-
-  // Tıklama ile kapat
-  splash.addEventListener('click', dismissSplash);
-
-  // Mouse wheel ile kapat
-  splash.addEventListener('wheel', () => dismissSplash(), { passive: true });
-
-  // Mobil: swipe yukarı ile kapat
-  let tyStart = 0;
-  splash.addEventListener('touchstart', e => { tyStart = e.touches[0].clientY; }, { passive: true });
-  splash.addEventListener('touchend',   e => {
-    if (tyStart - e.changedTouches[0].clientY > 40) dismissSplash();
-  }, { passive: true });
-
-  // Herhangi bir tuş
-  document.addEventListener('keydown', dismissSplash, { once: true });
-
-  // 10 sn sonra otomatik kapat
-  setTimeout(dismissSplash, 10000);
-
-  // ── NAV LOGO: scroll ile küçül ──
-  window.addEventListener('scroll', () => {
-    const y = window.scrollY;
-    if (y > 60) navbar.classList.add('scrolled');
-    else        navbar.classList.remove('scrolled');
-
-    if (navLogo) {
-      navLogo.style.height = Math.max(34, 52 - y * 0.12) + 'px';
+    function hideSplash() {
+      if (gone) return;
+      gone = true;
+      // Önce soldur, sonra tamamen kaldır
+      splash.style.transition = 'opacity 0.7s ease';
+      splash.style.opacity    = '0';
+      setTimeout(function() {
+        splash.style.display = 'none';
+      }, 750);
     }
+
+    // Tıklama
+    splash.onclick = hideSplash;
+
+    // Mouse wheel
+    splash.onwheel = hideSplash;
+
+    // Klavye
+    document.onkeydown = function() { hideSplash(); document.onkeydown = null; };
+
+    // Mobil swipe
+    var ty0 = 0;
+    splash.addEventListener('touchstart', function(e){ ty0 = e.touches[0].clientY; }, {passive:true});
+    splash.addEventListener('touchend',   function(e){
+      if (ty0 - e.changedTouches[0].clientY > 30) hideSplash();
+    }, {passive:true});
+
+    // 8 saniye sonra otomatik
+    setTimeout(hideSplash, 8000);
+
+    // ── NAV LOGO: scroll ile küçül ──
+    window.addEventListener('scroll', function() {
+      var y = window.scrollY;
+      if (y > 60) navbar.classList.add('scrolled');
+      else        navbar.classList.remove('scrolled');
+      if (navLogo) {
+        navLogo.style.height = Math.max(34, 52 - y * 0.12) + 'px';
+      }
+    });
   });
 </script>
 </body>
