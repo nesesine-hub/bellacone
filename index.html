@@ -69,13 +69,13 @@
     height: 28px;
     border-left: 2px solid var(--accent);
     border-bottom: 2px solid var(--accent);
-    transform: rotate(135deg);
+    transform: rotate(-45deg);
     animation: arrowBounce 1.4s ease-in-out infinite;
     border-radius: 2px;
   }
   @keyframes arrowBounce {
-    0%, 100% { transform: rotate(135deg) translateY(0); }
-    50% { transform: rotate(135deg) translateY(-8px); }
+    0%, 100% { transform: rotate(-45deg) translateY(0); }
+    50% { transform: rotate(-45deg) translateY(-8px); }
   }
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(16px); }
@@ -580,7 +580,7 @@
 
 <!-- SPLASH -->
 <div id="splash">
-  <img id="splash-logo" src="bellacone_icon.jpeg" alt="Bellacone">
+  <img id="splash-logo" src="bellacone_logo.png" alt="Bellacone">
   <div id="splash-hint">
     <span>keşfetmek için yukarı kaydırın</span>
     <div id="splash-arrow"></div>
@@ -838,7 +838,7 @@
   }
 </script>
 <script>
-  // ── SPLASH: scroll yukarı veya aşağı → kapat ──
+  // ── SPLASH ──
   const splash = document.getElementById('splash');
   let splashDone = false;
 
@@ -847,33 +847,42 @@
     splashDone = true;
     splash.classList.add('hidden');
     document.body.style.overflow = '';
-    window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
-  // Sayfa yüklenince body scroll'u kilitle
+  // Body scroll kilidi açık tut ama splash üzerinde scroll'u yakala
   document.body.style.overflow = 'hidden';
 
-  // Scroll veya touch ile kapat
-  window.addEventListener('wheel', dismissSplash, { passive: true });
-  window.addEventListener('touchmove', dismissSplash, { passive: true });
-  // Tıklayınca da kapat
+  // Mouse wheel — splash üzerinde
+  splash.addEventListener('wheel', dismissSplash, { passive: true });
+
+  // Touch swipe yukarı
+  let touchStartY = 0;
+  splash.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  splash.addEventListener('touchend', (e) => {
+    const diff = touchStartY - e.changedTouches[0].clientY;
+    if (diff > 30) dismissSplash(); // yukarı swipe
+  }, { passive: true });
+
+  // Tıklama
   splash.addEventListener('click', dismissSplash);
 
-  // ── NAV LOGO: scroll'a göre küçül/büyü ──
+  // Klavye (herhangi bir tuş)
+  document.addEventListener('keydown', dismissSplash);
+
+  // 8 saniye sonra otomatik kapat
+  setTimeout(dismissSplash, 8000);
+
+  // ── NAV LOGO: scroll'a göre küçül ──
   const navbar  = document.getElementById('navbar');
   const navLogo = document.querySelector('.nav-logo img');
 
   window.addEventListener('scroll', () => {
     const y = window.scrollY;
+    if (y > 60) navbar.classList.add('scrolled');
+    else navbar.classList.remove('scrolled');
 
-    // Nav scrolled state (mevcut)
-    if (y > 60) {
-      navbar.classList.add('scrolled');
-    } else {
-      navbar.classList.remove('scrolled');
-    }
-
-    // Logo boyutu: 52px → 34px scroll arttıkça
     if (navLogo) {
       const size = Math.max(34, 52 - y * 0.1);
       navLogo.style.height = size + 'px';
