@@ -8,9 +8,9 @@
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 <style>
   :root {
-    --cream: #fdf6ee; --warm: #f5e6d0; --brown: #5c3d2e;
-    --accent: #c9663c; --soft: #e8d5c0; --text: #2d1f14;
-    --muted: #8a6a56; --card: #fff9f3; --green: #3a9b65;
+    --cream: #fef2f7; --warm: #fac8df; --brown: #320d1e;
+    --accent: #d44f82; --soft: #f094bc; --text: #c0336a;
+    --muted: #8a3860; --card: #fffafc; --green: #3a9b65;
     --red: #c0392b; --radius: 14px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,11 +23,11 @@
   .login-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: block; }
   .login-input { width: 100%; border: 1px solid var(--soft); border-radius: 10px; padding: 10px 14px; font-size: 14px; color: var(--text); font-family: 'DM Sans', sans-serif; outline: none; margin-bottom: 1rem; background: var(--cream); }
   .login-input:focus { border-color: var(--accent); }
-  .login-btn { width: 100%; background: var(--brown); color: #fff; border: none; border-radius: 10px; padding: 11px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .login-btn { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 11px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
   .login-error { font-size: 12px; color: var(--red); margin-top: 8px; display: none; }
   .main-app { display: none; }
 
-  .header { background: var(--brown); color: #fff; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .header { background: var(--accent); color: #fff; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .header h1 { font-size: 17px; font-weight: 600; }
   .header-badge { font-size: 12px; background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 999px; }
 
@@ -49,7 +49,7 @@
   .form-input:focus { border-color: var(--accent); }
   .emoji-select { width: 60px; text-align: center; font-size: 20px; padding: 4px 6px; }
 
-  .add-btn { padding: 8px 16px; background: var(--brown); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  .add-btn { padding: 8px 16px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
   .add-btn:hover { opacity: 0.85; }
   .add-btn.green { background: var(--green); }
 
@@ -80,7 +80,7 @@
   /* KATEGORİ SEÇİCİ */
   .kat-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; }
   .kat-btn { padding: 7px 16px; border: 1.5px solid var(--soft); border-radius: 999px; font-size: 13px; cursor: pointer; background: var(--card); color: var(--text); font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
-  .kat-btn.active { background: var(--brown); color: #fff; border-color: var(--brown); font-weight: 500; }
+  .kat-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 500; }
 
   /* KATEGORİ YÖNETİM KARTI */
   .kat-detail-card { background: var(--card); border: 1px solid var(--soft); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; }
@@ -94,7 +94,7 @@
   .qr-download { margin-top: 6px; font-size: 12px; color: var(--accent); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; }
   .gen-btn { padding: 10px 20px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
 
-  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--brown); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: 13px; opacity: 0; transition: opacity 0.3s; z-index: 999; pointer-events: none; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: 13px; opacity: 0; transition: opacity 0.3s; z-index: 999; pointer-events: none; }
   .toast.show { opacity: 1; }
   .loading { text-align: center; padding: 1rem; color: var(--muted); font-size: 13px; }
   .empty-list { font-size: 13px; color: var(--muted); font-style: italic; }
@@ -178,6 +178,23 @@
     </div>
     <p style="font-size:12px; color:var(--muted);" id="top-fiyat-mevcut"></p>
   </div>
+
+  <div class="section-card">
+    <div class="section-header"><h2>Online Sipariş Ayarları</h2></div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:1rem;">Online siparişler için minimum tutar ve teslimat ücreti belirleyin.</p>
+    <div class="form-row" style="align-items:flex-end;">
+      <div class="form-group">
+        <label>Minimum Sipariş Tutarı (₺)</label>
+        <input class="form-input" id="min-siparis-input" type="number" min="0" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>Teslimat Ücreti (₺)</label>
+        <input class="form-input" id="teslimat-ucreti-input" type="number" min="0" placeholder="0">
+      </div>
+      <button class="add-btn" onclick="onlineAyarKaydet()">Kaydet</button>
+    </div>
+    <p style="font-size:12px; color:var(--muted);" id="online-ayar-mevcut"></p>
+  </div>
 </div>
 
 <!-- KATEGORİLER PANELİ -->
@@ -221,6 +238,10 @@
           <div class="form-group"><label>İsim</label><input class="form-input" id="u-isim" type="text" placeholder="Ürün adı"></div>
           <div class="form-group" style="flex:0 0 90px;"><label>Fiyat (₺)</label><input class="form-input" id="u-fiyat" type="number" placeholder="50"></div>
           <button class="add-btn" onclick="addUrun()">Ekle</button>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Fotoğraf URL (lezzetler sayfası için)</label><input class="form-input" id="u-foto" type="text" placeholder="https://... veya GitHub dosya adı"></div>
+          <div class="form-group"><label>Açıklama (opsiyonel)</label><input class="form-input" id="u-aciklama" type="text" placeholder="Kısa ürün açıklaması..."></div>
         </div>
         <div class="item-list" id="urun-list"></div>
       </div>
@@ -826,11 +847,18 @@
     const emoji = document.getElementById('u-emoji').value.trim() || '🍦';
     const isim = document.getElementById('u-isim').value.trim();
     const fiyat = parseFloat(document.getElementById('u-fiyat').value);
+    const foto = document.getElementById('u-foto')?.value?.trim() || '';
+    const aciklama = document.getElementById('u-aciklama')?.value?.trim() || '';
     if (!isim || isNaN(fiyat)) { showToast('İsim ve fiyat girin'); return; }
     const id = 'u' + Date.now();
-    await set(ref(db, 'menu/' + aktifKatId + '/urunler/' + id), { id, isim, fiyat, emoji });
+    const urunObj = { id, isim, fiyat, emoji };
+    if (foto) urunObj.foto = foto;
+    if (aciklama) urunObj.aciklama = aciklama;
+    await set(ref(db, 'menu/' + aktifKatId + '/urunler/' + id), urunObj);
     document.getElementById('u-isim').value = '';
     document.getElementById('u-fiyat').value = '';
+    if (document.getElementById('u-foto')) document.getElementById('u-foto').value = '';
+    if (document.getElementById('u-aciklama')) document.getElementById('u-aciklama').value = '';
     loadKatIcerik(aktifKatId);
     showToast('Ürün eklendi');
   };
@@ -947,13 +975,28 @@
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 
-  // Top fiyatını Firebase'den oku
-  onValue(ref(db, 'ayarlar/topFiyat'), (snap) => {
-    const fiyat = snap.val() ?? 80;
-    const input = document.getElementById('top-fiyat-input');
+  window.onlineAyarKaydet = async function() {
+    const min = parseFloat(document.getElementById('min-siparis-input').value) || 0;
+    const teslimat = parseFloat(document.getElementById('teslimat-ucreti-input').value) || 0;
+    await set(ref(db, 'ayarlar/minSiparis'), min);
+    await set(ref(db, 'ayarlar/teslimatUcreti'), teslimat);
+    document.getElementById('online-ayar-mevcut').textContent = `Min sipariş: ${min} ₺ · Teslimat: ${teslimat} ₺`;
+    showToast('Online sipariş ayarları kaydedildi');
+  };
+
+  // Ayarları Firebase'den oku
+  onValue(ref(db, 'ayarlar'), (snap) => {
+    const a = snap.val() || {};
+    const topInput = document.getElementById('top-fiyat-input');
+    const minInput = document.getElementById('min-siparis-input');
+    const teslimatInput = document.getElementById('teslimat-ucreti-input');
+    if (topInput) topInput.value = a.topFiyat ?? 80;
+    if (minInput) minInput.value = a.minSiparis ?? 0;
+    if (teslimatInput) teslimatInput.value = a.teslimatUcreti ?? 0;
     const mevcut = document.getElementById('top-fiyat-mevcut');
-    if (input) input.value = fiyat;
-    if (mevcut) mevcut.textContent = `Mevcut fiyat: ${fiyat} ₺`;
+    const onlineMevcut = document.getElementById('online-ayar-mevcut');
+    if (mevcut) mevcut.textContent = `Mevcut: ${a.topFiyat ?? 80} ₺`;
+    if (onlineMevcut) onlineMevcut.textContent = `Min sipariş: ${a.minSiparis ?? 0} ₺ · Teslimat: ${a.teslimatUcreti ?? 0} ₺`;
   });
 
   window.topFiyatKaydet = async function() {
