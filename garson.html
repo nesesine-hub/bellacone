@@ -8,10 +8,10 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <style>
   :root {
-    --bg: #1a1108; --surface: #251a0e; --surface2: #2e2010;
-    --border: rgba(255,255,255,0.08); --accent: #e07840;
+    --bg: #1a0510; --surface: #2a0a18; --surface2: #3a0e22;
+    --border: rgba(255,255,255,0.08); --accent: #d44f82;
     --green: #4caf7a; --yellow: #f0b840; --blue: #5b9cf6;
-    --purple: #a78bfa; --text: #f5ede4; --muted: #8a7060; --radius: 14px;
+    --purple: #a78bfa; --text: #fce8f3; --muted: #9a5878; --radius: 14px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
@@ -153,8 +153,25 @@
   <!-- SEKMELER -->
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('siparisler', this)">Siparişler</button>
+    <button class="tab-btn" onclick="switchTab('online', this)">
+      Online Siparişler <span id="online-badge" style="display:none;background:var(--accent);color:#fff;border-radius:999px;padding:1px 7px;font-size:11px;margin-left:4px;">0</span>
+    </button>
     <button class="tab-btn" onclick="switchTab('rapor', this)">Rapor</button>
     <button class="tab-btn" onclick="switchTab('gecmis', this)">İşlem Geçmişi</button>
+  </div>
+
+  <!-- ONLINE SİPARİŞLER PANELİ -->
+  <div class="panel" id="panel-online">
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="setOnlineFilter('hepsi',this)">Hepsi</button>
+      <button class="filter-btn" onclick="setOnlineFilter('bekliyor',this)">Bekliyor</button>
+      <button class="filter-btn" onclick="setOnlineFilter('hazirlaniyor',this)">Hazırlanıyor</button>
+      <button class="filter-btn" onclick="setOnlineFilter('yolda',this)">Yolda</button>
+      <button class="filter-btn" onclick="setOnlineFilter('teslim_edildi',this)">Teslim Edildi</button>
+    </div>
+    <div class="orders-grid" id="online-grid">
+      <div class="empty"><div class="empty-icon">🛵</div><p>Online sipariş yok</p></div>
+    </div>
   </div>
 
   <!-- SİPARİŞLER PANELİ -->
@@ -241,6 +258,7 @@
     el.classList.add('active');
     if (tab === 'rapor') renderRapor();
     if (tab === 'gecmis') renderGecmis();
+    if (tab === 'online') { alarmDurdur(); renderOnlineOrders(); }
   }
 </script>
 
@@ -262,26 +280,85 @@
   const db = getDatabase(app);
 
   let allOrders = [];
+  let allOnlineOrders = [];
   let allGecmis = [];
   let currentFilter = 'hepsi';
+  let currentOnlineFilter = 'hepsi';
   let currentRaporFiltre = 'gun';
   let isFirstLoad = true;
+  let isFirstOnlineLoad = true;
+  let alarmInterval = null;
+  let alarmCtx = null;
 
   function simdi() {
     return new Date().toLocaleString('tr-TR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
   }
+
+  function alarmBaslat() {
+    if (alarmInterval) return;
+    try {
+      alarmCtx = new (window.AudioContext || window.webkitAudioContext)();
+      alarmInterval = setInterval(() => {
+        try {
+          const osc = alarmCtx.createOscillator();
+          const gain = alarmCtx.createGain();
+          osc.connect(gain); gain.connect(alarmCtx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, alarmCtx.currentTime);
+          osc.frequency.setValueAtTime(660, alarmCtx.currentTime + 0.2);
+          gain.gain.setValueAtTime(0.5, alarmCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, alarmCtx.currentTime + 0.5);
+          osc.start(); osc.stop(alarmCtx.currentTime + 0.5);
+        } catch(e) {}
+      }, 900);
+    } catch(e) {}
+  }
+
+  window.alarmDurdur = function() {
+    if (alarmInterval) { clearInterval(alarmInterval); alarmInterval = null; }
+    if (alarmCtx) { try { alarmCtx.close(); } catch(e) {} alarmCtx = null; }
+    document.getElementById('alarm-bar')?.remove();
+  };
 
   // Siparişler
   onValue(ref(db, 'siparisler'), (snapshot) => {
     const data = snapshot.val() || {};
     const yeni = Object.entries(data).map(([key, val]) => ({ key, ...val }))
       .sort((a, b) => new Date(a.zaman) - new Date(b.zaman));
-    
     if (!isFirstLoad && yeni.length > allOrders.length) playSound();
     allOrders = yeni;
     isFirstLoad = false;
     renderOrders();
     renderStats();
+  });
+
+  // Online siparişler
+  onValue(ref(db, 'online_siparisler'), (snapshot) => {
+    const data = snapshot.val() || {};
+    const yeni = Object.entries(data).map(([key, val]) => ({ key, ...val }))
+      .sort((a, b) => new Date(b.zaman) - new Date(a.zaman));
+    const bekleyenSayisi = yeni.filter(o => o.durum === 'bekliyor').length;
+
+    if (!isFirstOnlineLoad && yeni.length > allOnlineOrders.length) {
+      alarmBaslat();
+      // Alarm banner göster
+      if (!document.getElementById('alarm-bar')) {
+        const bar = document.createElement('div');
+        bar.id = 'alarm-bar';
+        bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#e07040;color:#fff;padding:14px 1.5rem;display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:14px;animation:pulse 1s infinite;';
+        bar.innerHTML = `<span>🛵 Yeni online sipariş geldi!</span><button onclick="alarmDurdur()" style="background:rgba(255,255,255,0.25);border:none;color:#fff;padding:7px 18px;border-radius:999px;cursor:pointer;font-weight:600;font-size:13px;">Tamam, Gördüm</button>`;
+        document.body.prepend(bar);
+      }
+    }
+
+    allOnlineOrders = yeni;
+    isFirstOnlineLoad = false;
+
+    const badge = document.getElementById('online-badge');
+    if (bekleyenSayisi > 0) { badge.style.display = 'inline'; badge.textContent = bekleyenSayisi; }
+    else badge.style.display = 'none';
+
+    renderOnlineOrders();
   });
 
   // Stok takibi
@@ -312,6 +389,70 @@
     allGecmis = Object.entries(data).map(([key, val]) => ({ key, ...val }))
       .sort((a, b) => new Date(b.zaman) - new Date(a.zaman));
   });
+
+  window.setOnlineFilter = function(filter, el) {
+    currentOnlineFilter = filter;
+    document.querySelectorAll('#panel-online .filter-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    renderOnlineOrders();
+  };
+
+  function renderOnlineOrders() {
+    const grid = document.getElementById('online-grid');
+    const filtered = currentOnlineFilter === 'hepsi'
+      ? allOnlineOrders
+      : allOnlineOrders.filter(o => o.durum === currentOnlineFilter);
+
+    if (!filtered.length) {
+      grid.innerHTML = `<div class="empty"><div class="empty-icon">🛵</div><p>Online sipariş yok</p></div>`;
+      return;
+    }
+
+    const durumRenk = { bekliyor: 'var(--accent)', hazirlaniyor: 'var(--yellow)', yolda: 'var(--blue)', teslim_edildi: 'var(--purple)' };
+    const durumYazi = { bekliyor: 'Bekliyor', hazirlaniyor: 'Hazırlanıyor', yolda: 'Yolda', teslim_edildi: 'Teslim Edildi' };
+    const durumBadge = { bekliyor: 'badge-bekliyor', hazirlaniyor: 'badge-bekliyor', yolda: 'badge-odeme', teslim_edildi: 'badge-odendi' };
+
+    grid.innerHTML = filtered.map(o => {
+      const urunListesi = (o.urunler || []).map(u => `<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted);">${u.katIsim} — ${u.isim} × ${u.adet} &nbsp; <span style="color:var(--accent);font-weight:600;">${u.fiyat * u.adet} ₺</span></div>`).join('');
+      return `<div class="order-card" style="border-color:${durumRenk[o.durum] || 'var(--border)'};">
+        <div class="card-top">
+          <div class="masa-num" style="font-size:15px;">🛵 Online</div>
+          <span class="status-badge ${durumBadge[o.durum] || ''}">${durumYazi[o.durum] || o.durum}</span>
+        </div>
+        <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;">${o.musteri?.ad || '—'} · ${o.musteri?.tel || ''}</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">📍 ${o.adres?.adres || ''}, ${o.adres?.semt || ''} ${o.adres?.daire ? '· ' + o.adres.daire : ''}</div>
+        ${o.adres?.tarif ? `<div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Tarif: ${o.adres.tarif}</div>` : ''}
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">💳 ${o.odeme || ''}</div>
+        <div style="border-top:1px solid var(--border);padding-top:8px;margin-bottom:8px;">${urunListesi}</div>
+        ${o.not ? `<div style="font-size:12px;color:var(--accent);margin-bottom:6px;">Not: ${o.not}</div>` : ''}
+        <div class="zaman-row" style="margin-bottom:8px;">${o.zamanStr || ''} · <strong style="color:var(--accent);">${o.toplamFiyat} ₺</strong></div>
+        <div class="card-actions">
+          ${o.durum === 'bekliyor' ? `<button class="act-btn primary" onclick="onlineDurumGuncelle('${o.key}','hazirlaniyor')">Hazırlanıyor</button>` : ''}
+          ${o.durum === 'hazirlaniyor' ? `<button class="act-btn blue" onclick="onlineDurumGuncelle('${o.key}','yolda')">Yola Çıktı</button>` : ''}
+          ${o.durum === 'yolda' ? `<button class="act-btn purple" onclick="onlineDurumGuncelle('${o.key}','teslim_edildi')">Teslim Edildi</button>` : ''}
+          ${o.durum !== 'bekliyor' ? `<button class="act-btn geri" onclick="onlineDurumGuncelle('${o.key}','bekliyor')">Geri Al</button>` : ''}
+          <button class="act-btn" onclick="onlineSil('${o.key}')">Sil</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window.onlineDurumGuncelle = async function(key, durum) {
+    await update(ref(db, 'online_siparisler/' + key), { durum });
+    if (durum !== 'bekliyor') alarmDurdur();
+    await push(ref(db, 'gecmis'), {
+      islem: 'Online sipariş: ' + { bekliyor:'Geri alındı', hazirlaniyor:'Hazırlanıyor', yolda:'Yola Çıktı', teslim_edildi:'Teslim Edildi' }[durum],
+      detay: '',
+      zaman: new Date().toISOString(),
+      zamanStr: simdi(),
+      ikon: { bekliyor:'↩', hazirlaniyor:'🍦', yolda:'🛵', teslim_edildi:'✅' }[durum],
+      renk: { bekliyor:'#f0b840', hazirlaniyor:'#4caf7a', yolda:'#5b9cf6', teslim_edildi:'#a78bfa' }[durum]
+    });
+  };
+
+  window.onlineSil = async function(key) {
+    await remove(ref(db, 'online_siparisler/' + key));
+  };
 
   function renderStats() {
     const bekliyor = allOrders.filter(o => o.durum === 'bekliyor').length;
@@ -388,9 +529,9 @@
               <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
                 <div style="flex:1;">
                   <div class="dondurma-row">${o.kategori ? o.kategori + ' — ' : ''}${o.urun} × ${o.miktar}</div>
-                  ${o.toplar && o.toplar.length ? `<div class="detail-row">${o.toplar.map((t,i) => `<span style="background:rgba(224,120,64,0.15);color:#e07840;border-radius:5px;padding:1px 6px;font-size:10px;margin:1px;">${i+1}. ${t}</span>`).join('')}</div>` : ''}
+                  ${o.toplar && o.toplar.length ? `<div class="detail-row">${o.toplar.map((t,i) => `<span style="background:rgba(212,79,130,0.15);color:#d44f82;border-radius:5px;padding:1px 6px;font-size:10px;margin:1px;">${i+1}. ${t}</span>`).join('')}</div>` : ''}
                   ${o.secimMetni ? `<div class="detail-row" style="margin-top:4px;">${o.secimMetni.split(' | ').map(s => `<div style="padding:2px 0;">• ${s}</div>`).join('')}</div>` : ''}
-                  ${o.not ? `<div class="detail-row" style="color:#e07840;">Not: ${o.not}</div>` : ''}
+                  ${o.not ? `<div class="detail-row" style="color:#d44f82;">Not: ${o.not}</div>` : ''}
                   <div class="zaman-row">${o.zamanStr || ''} · ${o.toplamFiyat || 0} ₺</div>
                 </div>
                 <span class="status-badge ${durumBadge}" style="margin-left:8px;white-space:nowrap;">${durumYazi}</span>
