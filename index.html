@@ -34,8 +34,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: opacity 0.8s ease;
     cursor: pointer;
+    transition: opacity 0.5s ease 0.6s;
   }
   #splash.hidden {
     opacity: 0 !important;
@@ -44,8 +44,18 @@
   }
   #splash-logo {
     width: min(72vw, 380px);
+    transform-origin: center center;
     animation: splashPulse 2.5s ease-in-out infinite;
     filter: drop-shadow(0 8px 32px rgba(212,96,122,0.18));
+    transition: width 0.7s cubic-bezier(.4,0,.2,1),
+                transform 0.7s cubic-bezier(.4,0,.2,1),
+                opacity 0.3s ease 0.5s;
+  }
+  #splash-logo.shrinking {
+    animation: none;
+    width: 52px !important;
+    transform: translate(calc(-50vw + 80px), calc(-50vh + 32px));
+    opacity: 0;
   }
   @keyframes splashPulse {
     0%, 100% { transform: scale(1); }
@@ -832,48 +842,53 @@
 </script>
 <script>
   window.addEventListener('DOMContentLoaded', function() {
-    var splash  = document.getElementById('splash');
-    var navbar  = document.getElementById('navbar');
-    var navLogo = document.querySelector('.nav-logo img');
-    var gone    = false;
+    var splash    = document.getElementById('splash');
+    var splashImg = document.getElementById('splash-logo');
+    var navbar    = document.getElementById('navbar');
+    var navLogo   = document.querySelector('.nav-logo img');
+    var gone      = false;
 
     function hideSplash() {
       if (gone) return;
       gone = true;
-      // Önce soldur, sonra tamamen kaldır
-      splash.style.transition = 'opacity 0.7s ease';
-      splash.style.opacity    = '0';
+
+      // 1) Logo küçülüp sol üste uçar
+      splashImg.classList.add('shrinking');
+
+      // 2) Arka plan solar (logo animasyonu bittikten sonra)
+      setTimeout(function() {
+        splash.style.transition = 'opacity 0.4s ease';
+        splash.style.opacity    = '0';
+      }, 650);
+
+      // 3) Tamamen kaldır
       setTimeout(function() {
         splash.style.display = 'none';
-      }, 750);
+      }, 1100);
     }
 
-    // Tıklama
-    splash.onclick = hideSplash;
-
-    // Mouse wheel
-    splash.onwheel = hideSplash;
-
-    // Klavye
+    splash.onclick  = hideSplash;
+    splash.onwheel  = hideSplash;
     document.onkeydown = function() { hideSplash(); document.onkeydown = null; };
 
-    // Mobil swipe
     var ty0 = 0;
     splash.addEventListener('touchstart', function(e){ ty0 = e.touches[0].clientY; }, {passive:true});
     splash.addEventListener('touchend',   function(e){
       if (ty0 - e.changedTouches[0].clientY > 30) hideSplash();
     }, {passive:true});
 
-    // 8 saniye sonra otomatik
     setTimeout(hideSplash, 8000);
 
-    // ── NAV LOGO: scroll ile küçül ──
+    // ── NAV LOGO: scroll ile küçül — uzun scroll mesafesi ──
     window.addEventListener('scroll', function() {
       var y = window.scrollY;
       if (y > 60) navbar.classList.add('scrolled');
       else        navbar.classList.remove('scrolled');
+
       if (navLogo) {
-        navLogo.style.height = Math.max(34, 52 - y * 0.12) + 'px';
+        // 0→400px scroll aralığında 52px→34px küçülür (daha uzun mesafe)
+        var size = Math.max(34, 52 - (y / 400) * 18);
+        navLogo.style.height = size + 'px';
       }
     });
   });
