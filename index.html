@@ -266,7 +266,7 @@
 
   /* MARQUEE */
   .marquee-wrap {
-    background: var(--brown);
+    background: var(--accent);
     padding: 14px 0;
     overflow: hidden;
   }
@@ -280,11 +280,11 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 15px;
     font-style: italic;
-    color: var(--gold);
+    color: rgba(255,255,255,0.9);
     padding: 0 2rem;
     letter-spacing: 0.05em;
   }
-  .marquee span.dot { color: var(--accent2); font-style: normal; }
+  .marquee span.dot { color: rgba(255,255,255,0.5); font-style: normal; }
   @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
   /* HAKKIMIZDA */
@@ -527,7 +527,7 @@
 
   /* FOOTER */
   footer {
-    background: var(--brown);
+    background: var(--accent);
     padding: 3rem 6rem;
     display: flex;
     align-items: center;
@@ -535,11 +535,11 @@
     flex-wrap: wrap;
     gap: 1rem;
   }
-  footer img { height: 40px; filter: brightness(0) invert(1) opacity(0.7); }
-  .footer-text { font-size: 12px; color: rgba(250,245,238,0.4); }
+  footer img { height: 40px; filter: brightness(0) invert(1) opacity(0.85); }
+  .footer-text { font-size: 12px; color: rgba(255,255,255,0.7); }
   .footer-links { display: flex; gap: 1.5rem; }
-  .footer-links a { font-size: 12px; color: rgba(250,245,238,0.5); text-decoration: none; }
-  .footer-links a:hover { color: var(--gold); }
+  .footer-links a { font-size: 12px; color: rgba(255,255,255,0.7); text-decoration: none; }
+  .footer-links a:hover { color: #fff; }
 
   /* ANİMASYONLAR */
   .reveal {
@@ -799,7 +799,7 @@
 <!-- FOOTER -->
 <footer>
   <img src="bellacone_logo.png" alt="Bellacone" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=\'font-family:Cormorant Garamond,serif;font-size:20px;color:rgba(250,245,238,0.6);\'>BellaCone</span>')">
-  <span class="footer-text">© 2025 Bellacone. Tüm hakları saklıdır. &nbsp;|&nbsp; Web Tasarım: <a href="https://www.instagram.com/kerem.cdr/" target="_blank" style="color:var(--gold);text-decoration:none;">@nesesine</a></span>
+  <span class="footer-text">© 2025 Bellacone. Tüm hakları saklıdır. &nbsp;|&nbsp; Web Tasarım: <a href="https://www.instagram.com/kerem.cdr/" target="_blank" style="color:#fff;text-decoration:none;">@nesesine</a></span>
   <div class="footer-links">
     <a href="menu.html">Menü</a>
     <a href="#iletisim">İletişim</a>
