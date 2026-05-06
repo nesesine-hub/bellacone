@@ -8,21 +8,87 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --cream: #fef0f3;
-    --cream2: #f8c8d4;
-    --brown: #3a1520;
-    --brown2: #7a3050;
-    --accent: #d4607a;
-    --accent2: #f2c5b0;
-    --gold: #eaa84a;
-    --text: #3a1520;
-    --muted: #9a5870;
-    --white: #fffafc;
+    --cream: #faf5ee;
+    --cream2: #f5ede0;
+    --brown: #3d2314;
+    --brown2: #5c3d2e;
+    --accent: #c9663c;
+    --accent2: #e8956a;
+    --gold: #c9a96e;
+    --text: #2a1a0e;
+    --muted: #8a6a56;
+    --white: #fffdf9;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   html { scroll-behavior: smooth; }
+
+  /* ── SPLASH SCREEN ── */
+  #splash {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--cream);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.7s ease, visibility 0.7s ease;
+  }
+  #splash.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  #splash-logo {
+    width: min(72vw, 380px);
+    animation: splashPulse 2.5s ease-in-out infinite;
+    filter: drop-shadow(0 8px 32px rgba(212,96,122,0.18));
+  }
+  @keyframes splashPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+  }
+  #splash-hint {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    animation: fadeInUp 1s ease 0.6s both;
+  }
+  #splash-hint span {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+  #splash-arrow {
+    width: 28px;
+    height: 28px;
+    border-left: 2px solid var(--accent);
+    border-bottom: 2px solid var(--accent);
+    transform: rotate(135deg);
+    animation: arrowBounce 1.4s ease-in-out infinite;
+    border-radius: 2px;
+  }
+  @keyframes arrowBounce {
+    0%, 100% { transform: rotate(135deg) translateY(0); }
+    50% { transform: rotate(135deg) translateY(-8px); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SHRINKING NAV LOGO ── */
+  .nav-logo img {
+    height: 52px;
+    width: auto;
+    transition: height 0.4s ease;
+  }
+  /* override the generic rule below */
 
   body {
     background: var(--cream);
@@ -47,7 +113,7 @@
     backdrop-filter: blur(12px);
     box-shadow: 0 1px 0 rgba(92,61,46,0.1);
   }
-  .nav-logo img { height: 52px; width: auto; }
+  .nav-logo img { height: 52px; width: auto; transition: height 0.4s ease, opacity 0.4s ease; }
   .nav-links { display: flex; gap: 2.5rem; align-items: center; }
   .nav-links a {
     font-size: 13px;
@@ -512,6 +578,15 @@
   <a href="menu.html" class="mob-cta" onclick="closeMobile()">QR Menü →</a>
 </div>
 
+<!-- SPLASH -->
+<div id="splash">
+  <img id="splash-logo" src="bellacone_icon.jpeg" alt="Bellacone">
+  <div id="splash-hint">
+    <span>keşfetmek için yukarı kaydırın</span>
+    <div id="splash-arrow"></div>
+  </div>
+</div>
+
 <!-- NAV -->
 <nav id="navbar">
   <div class="nav-logo">
@@ -761,6 +836,49 @@
     document.getElementById('burger-btn').classList.remove('open');
     document.body.style.overflow = '';
   }
+</script>
+<script>
+  // ── SPLASH: scroll yukarı veya aşağı → kapat ──
+  const splash = document.getElementById('splash');
+  let splashDone = false;
+
+  function dismissSplash() {
+    if (splashDone) return;
+    splashDone = true;
+    splash.classList.add('hidden');
+    document.body.style.overflow = '';
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  // Sayfa yüklenince body scroll'u kilitle
+  document.body.style.overflow = 'hidden';
+
+  // Scroll veya touch ile kapat
+  window.addEventListener('wheel', dismissSplash, { passive: true });
+  window.addEventListener('touchmove', dismissSplash, { passive: true });
+  // Tıklayınca da kapat
+  splash.addEventListener('click', dismissSplash);
+
+  // ── NAV LOGO: scroll'a göre küçül/büyü ──
+  const navbar  = document.getElementById('navbar');
+  const navLogo = document.querySelector('.nav-logo img');
+
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+
+    // Nav scrolled state (mevcut)
+    if (y > 60) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
+
+    // Logo boyutu: 52px → 34px scroll arttıkça
+    if (navLogo) {
+      const size = Math.max(34, 52 - y * 0.1);
+      navLogo.style.height = size + 'px';
+    }
+  });
 </script>
 </body>
 </html>
