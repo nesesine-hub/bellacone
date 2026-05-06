@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sipariş Ver — Bellacone</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fef2f7; --cream2: #fac8df; --brown: #320d1e; --brown2: #f094bc;
+    --accent: #d44f82; --gold: #eaaa40; --text: #c0336a; --muted: #8a3860;
+    --white: #fffafc; --green: #3a9b65; --red: #c0392b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--cream); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 1.25rem 4rem; display: flex; align-items: center; justify-content: space-between; background: rgba(250,245,238,0.95); backdrop-filter: blur(12px); box-shadow: 0 1px 0 rgba(92,61,46,0.1); }
+  .nav-logo img { height: 48px; width: auto; }
+  .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+  .nav-links a { font-size: 13px; font-weight: 500; color: var(--brown2); text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-cta { background: var(--accent) !important; color: var(--cream) !important; padding: 9px 22px; border-radius: 999px; font-size: 12px !important; }
+
+  .siparis-layout { display: grid; grid-template-columns: 1fr 420px; gap: 2rem; padding: 8rem 4rem 4rem; max-width: 1200px; margin: 0 auto; }
+
+  /* SOL — FORM */
+  .form-section h1 { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 300; color: var(--brown); margin-bottom: 0.5rem; }
+  .form-section h1 em { font-style: italic; color: var(--accent); }
+  .form-desc { font-size: 14px; color: var(--muted); margin-bottom: 2rem; }
+
+  .form-card { background: var(--white); border-radius: 20px; padding: 2rem; margin-bottom: 1.5rem; border: 1px solid var(--cream2); }
+  .form-card-title { font-size: 14px; font-weight: 600; color: var(--brown); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+  .form-card-title .num { width: 24px; height: 24px; background: var(--accent); color: var(--cream); border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+
+  .form-row { display: flex; gap: 12px; margin-bottom: 1rem; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .form-group label { font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.05em; }
+  .form-input { border: 1.5px solid var(--cream2); border-radius: 12px; padding: 11px 14px; font-size: 14px; color: var(--text); font-family: 'DM Sans', sans-serif; background: var(--cream); outline: none; transition: border-color 0.2s; }
+  .form-input:focus { border-color: var(--accent); background: var(--white); }
+  .form-input.error { border-color: var(--red); }
+  textarea.form-input { resize: none; }
+
+  .odeme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .odeme-opt { border: 2px solid var(--cream2); border-radius: 14px; padding: 1rem 1.25rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
+  .odeme-opt:hover { border-color: var(--brown2); }
+  .odeme-opt.selected { border-color: var(--accent); background: var(--cream2); }
+  .odeme-icon { font-size: 24px; }
+  .odeme-label { font-size: 14px; font-weight: 500; color: var(--brown); }
+  .odeme-desc { font-size: 12px; color: var(--muted); }
+
+  .bos-sepet { text-align: center; padding: 4rem 2rem; background: var(--white); border-radius: 20px; border: 1px solid var(--cream2); }
+  .bos-sepet-icon { font-size: 56px; margin-bottom: 1rem; }
+  .bos-sepet h3 { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--brown); margin-bottom: 0.5rem; }
+  .bos-sepet p { font-size: 14px; color: var(--muted); margin-bottom: 1.5rem; }
+  .btn-go { background: var(--accent); color: var(--cream); padding: 12px 28px; border-radius: 999px; text-decoration: none; font-size: 13px; font-weight: 500; display: inline-block; transition: all 0.2s; }
+  .btn-go:hover { background: var(--accent); }
+
+  /* SAĞ — SEPET ÖZET */
+  .cart-summary { position: sticky; top: 90px; align-self: start; }
+  .summary-card { background: var(--white); border-radius: 20px; padding: 1.75rem; border: 1px solid var(--cream2); margin-bottom: 1rem; }
+  .summary-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 400; color: var(--brown); margin-bottom: 1.25rem; }
+  .summary-items { display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.25rem; }
+  .summary-item { display: flex; align-items: center; gap: 12px; }
+  .summary-item-img { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; background: var(--cream2); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; overflow: hidden; }
+  .summary-item-img img { width: 100%; height: 100%; object-fit: cover; }
+  .summary-item-info { flex: 1; }
+  .summary-item-name { font-size: 13px; font-weight: 500; color: var(--brown); }
+  .summary-item-cat { font-size: 11px; color: var(--muted); }
+  .summary-item-price { font-size: 13px; font-weight: 600; color: var(--accent); white-space: nowrap; }
+  .summary-item-qty { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .sq-btn { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--cream2); background: transparent; color: var(--brown); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .sq-btn:hover { background: var(--cream2); }
+  .sq-val { font-size: 13px; font-weight: 600; color: var(--brown); min-width: 20px; text-align: center; }
+  .sq-del { background: none; border: none; color: var(--red); font-size: 14px; cursor: pointer; margin-left: 4px; }
+
+  .summary-divider { height: 1px; background: var(--cream2); margin: 1rem 0; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .summary-total { display: flex; justify-content: space-between; font-size: 18px; font-weight: 600; color: var(--brown); margin-top: 8px; }
+  .summary-total span:last-child { color: var(--accent); }
+  .min-warning { font-size: 12px; color: var(--red); margin-top: 8px; display: none; }
+  .min-warning.show { display: block; }
+
+  .siparis-btn { width: 100%; background: var(--accent); color: var(--cream); border: none; border-radius: 14px; padding: 16px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; margin-top: 1rem; }
+  .siparis-btn:hover { background: var(--accent); }
+  .siparis-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* BAŞARILI MODAL */
+  .success-overlay { display: none; position: fixed; inset: 0; background: rgba(42,26,14,0.7); z-index: 999; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .success-overlay.open { display: flex; }
+  .success-modal { background: var(--white); border-radius: 24px; padding: 3rem; text-align: center; max-width: 420px; width: 90%; }
+  .success-icon { font-size: 56px; margin-bottom: 1rem; }
+  .success-modal h2 { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 300; color: var(--brown); margin-bottom: 0.5rem; }
+  .success-modal p { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; }
+  .success-modal .btn-go { display: inline-block; }
+
+  footer { background: var(--accent); padding: 3rem 6rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  footer img { height: 40px; filter: brightness(0) invert(1) opacity(0.7); }
+  .footer-text { font-size: 12px; color: rgba(255,255,255,0.7); }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { font-size: 12px; color: rgba(255,255,255,0.7); text-decoration: none; }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .siparis-layout { grid-template-columns: 1fr; padding: 7rem 1.5rem 3rem; }
+    .cart-summary { position: static; }
+    .odeme-grid { grid-template-columns: 1fr; }
+    footer { padding: 2rem; flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="mobile-menu" id="mobile-menu">
+  <button onclick="closeMobile()" style="position:absolute;top:2rem;right:2rem;background:none;border:none;font-size:28px;color:var(--brown);cursor:pointer;line-height:1;">✕</button>
+
+    <a href="index.html" onclick="closeMobile()">Ana Sayfa</a>
+    <a href="hakkimizda.html" onclick="closeMobile()">Hakkımızda</a>
+    <a href="lezzetler.html" onclick="closeMobile()">Lezzetler</a>
+    <a href="siparis.html" onclick="closeMobile()">Sipariş Ver</a>
+    <a href="index.html#iletisim" onclick="closeMobile()">İletişim</a>
+  <a href="menu.html" class="mob-cta" onclick="closeMobile()">QR Menü →</a>
+</div>
+
+<nav>
+  <div class="nav-logo"><a href="index.html"><img src="bellacone_logo.png" alt="Bellacone" onerror="this.style.display='none'"></a></div>
+  <div class="nav-links">
+    <a href="index.html">Ana Sayfa</a>
+    <a href="lezzetler.html">Lezzetler</a>
+    <a href="index.html#iletisim">İletişim</a>
+    <a href="menu.html" class="nav-cta">QR Menü</a>
+  </div>
+  <button class="burger" id="burger-btn" onclick="toggleMobile()" aria-label="Menü">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="siparis-layout">
+  <!-- SOL FORM -->
+  <div class="form-section">
+    <h1>Sipariş <em>Ver</em></h1>
+    <p class="form-desc">Çorlu içi teslimat · Haftanın her günü 11:00 – 00:00</p>
+
+    <div id="bos-sepet-uyari" style="display:none;" class="bos-sepet">
+      <div class="bos-sepet-icon">🛒</div>
+      <h3>Sepetiniz boş</h3>
+      <p>Sipariş vermek için önce ürün seçin.</p>
+      <a href="lezzetler.html" class="btn-go">Lezzetleri Keşfet →</a>
+    </div>
+
+    <div id="siparis-form">
+      <!-- 1. İletişim -->
+      <div class="form-card">
+        <div class="form-card-title"><span class="num">1</span> İletişim Bilgileri</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ad Soyad *</label>
+            <input class="form-input" id="ad-soyad" type="text" placeholder="Adınız Soyadınız">
+          </div>
+          <div class="form-group">
+            <label>Telefon *</label>
+            <input class="form-input" id="telefon" type="tel" placeholder="05XX XXX XX XX">
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Teslimat -->
+      <div class="form-card">
+        <div class="form-card-title"><span class="num">2</span> Teslimat Adresi</div>
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label>Adres *</label>
+          <input class="form-input" id="adres" type="text" placeholder="Mahalle, Sokak, Bina No...">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Semt / İlçe *</label>
+            <input class="form-input" id="semt" type="text" placeholder="Çorlu">
+          </div>
+          <div class="form-group">
+            <label>Daire / Kat (opsiyonel)</label>
+            <input class="form-input" id="daire" type="text" placeholder="Kat 2, Daire 4">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:1rem;">
+          <label>Adres Tarifi (opsiyonel)</label>
+          <textarea class="form-input" id="tarif" rows="2" placeholder="Kapıya gelince sağa dönün..."></textarea>
+        </div>
+      </div>
+
+      <!-- 3. Ödeme -->
+      <div class="form-card">
+        <div class="form-card-title"><span class="num">3</span> Ödeme Yöntemi</div>
+        <div class="odeme-grid">
+          <div class="odeme-opt selected" id="odeme-nakit" onclick="odemeSeç('nakit')">
+            <div class="odeme-icon">💵</div>
+            <div>
+              <div class="odeme-label">Nakit</div>
+              <div class="odeme-desc">Kapıda ödeme</div>
+            </div>
+          </div>
+          <div class="odeme-opt" id="odeme-kart" onclick="odemeSeç('kart')">
+            <div class="odeme-icon">💳</div>
+            <div>
+              <div class="odeme-label">Kredi/Banka Kartı</div>
+              <div class="odeme-desc">Kapıda POS ile</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Not -->
+      <div class="form-card">
+        <div class="form-card-title"><span class="num">4</span> Sipariş Notu</div>
+        <textarea class="form-input" id="siparis-not" rows="3" placeholder="Ürünler hakkında özel notunuz varsa buraya yazın..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAĞ SEPET ÖZET -->
+  <div class="cart-summary">
+    <div class="summary-card">
+      <div class="summary-title">Sepetim</div>
+      <div class="summary-items" id="summary-items"></div>
+      <div class="summary-divider"></div>
+      <div class="summary-row"><span>Ara Toplam</span><span id="ara-toplam">0 ₺</span></div>
+      <div class="summary-row"><span>Teslimat</span><span id="teslimat-ucreti">—</span></div>
+      <div class="summary-total"><span>Toplam</span><span id="genel-toplam">0 ₺</span></div>
+      <div class="min-warning" id="min-warning"></div>
+      <button class="siparis-btn" id="siparis-btn" onclick="siparisVer()">Siparişi Tamamla →</button>
+    </div>
+  </div>
+</div>
+
+<!-- BAŞARILI MODAL -->
+<div class="success-overlay" id="success-overlay">
+  <div class="success-modal">
+    <div class="success-icon">🎉</div>
+    <h2>Siparişiniz <em>Alındı!</em></h2>
+    <p>Siparişiniz alındı ve en kısa sürede hazırlanarak adresinize teslim edilecektir. Sizi arayabiliriz, telefonunuzu açık tutun.</p>
+    <a href="lezzetler.html" class="btn-go">Alışverişe Devam Et</a>
+  </div>
+</div>
+
+<footer>
+  <img src="bellacone_logo.png" alt="Bellacone" onerror="this.style.display='none'">
+  <span class="footer-text">© 2025 Bellacone. &nbsp;|&nbsp; Web: <a href="https://www.instagram.com/kerem.cdr/" target="_blank" style="color:#fff;text-decoration:none;">@nesesine</a></span>
+  <div class="footer-links">
+    <a href="index.html">Ana Sayfa</a>
+    <a href="lezzetler.html">Lezzetler</a>
+  </div>
+</footer>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getDatabase, ref, push, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC18gKyPhFWEWH_244nDLOW0nQE2QgS6kA",
+    authDomain: "bellacone-7ee34.firebaseapp.com",
+    databaseURL: "https://bellacone-7ee34-default-rtdb.firebaseio.com",
+    projectId: "bellacone-7ee34",
+    storageBucket: "bellacone-7ee34.firebasestorage.app",
+    messagingSenderId: "41187589256",
+    appId: "1:41187589256:web:75e6f2f3c3360c9a3bf33d"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  let sepet = JSON.parse(localStorage.getItem('bellacone_sepet') || '[]');
+  let odemeYontemi = 'nakit';
+  let minSiparis = 0;
+  let teslimatUcreti = 0;
+
+  // Ayarları Firebase'den oku
+  onValue(ref(db, 'ayarlar'), snap => {
+    const a = snap.val() || {};
+    minSiparis = a.minSiparis || 0;
+    teslimatUcreti = a.teslimatUcreti || 0;
+    renderSepet();
+  });
+
+  if (!sepet.length) {
+    document.getElementById('bos-sepet-uyari').style.display = 'block';
+    document.getElementById('siparis-form').style.display = 'none';
+  }
+
+  renderSepet();
+
+  function renderSepet() {
+    const itemsEl = document.getElementById('summary-items');
+    const araToplam = sepet.reduce((s, i) => s + i.fiyat * i.adet, 0);
+    const genel = araToplam + teslimatUcreti;
+
+    document.getElementById('ara-toplam').textContent = araToplam + ' ₺';
+    document.getElementById('teslimat-ucreti').textContent = teslimatUcreti > 0 ? teslimatUcreti + ' ₺' : 'Ücretsiz';
+    document.getElementById('genel-toplam').textContent = genel + ' ₺';
+
+    const minWarning = document.getElementById('min-warning');
+    if (minSiparis > 0 && araToplam < minSiparis) {
+      minWarning.textContent = `Minimum sipariş tutarı ${minSiparis} ₺. ${minSiparis - araToplam} ₺ daha ekleyin.`;
+      minWarning.classList.add('show');
+      document.getElementById('siparis-btn').disabled = true;
+    } else {
+      minWarning.classList.remove('show');
+      document.getElementById('siparis-btn').disabled = sepet.length === 0;
+    }
+
+    if (!sepet.length) {
+      itemsEl.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:1rem;">Sepet boş</p>';
+      return;
+    }
+
+    itemsEl.innerHTML = sepet.map((item, i) => `
+      <div class="summary-item">
+        <div class="summary-item-img">
+          ${item.foto ? `<img src="${item.foto}" alt="${item.isim}" onerror="this.style.display='none'">` : item.emoji}
+        </div>
+        <div class="summary-item-info">
+          <div class="summary-item-name">${item.isim}</div>
+          <div class="summary-item-cat">${item.katIsim}</div>
+          <div class="summary-item-qty">
+            <button class="sq-btn" onclick="qtyDegistir(${i},-1)">−</button>
+            <span class="sq-val">${item.adet}</span>
+            <button class="sq-btn" onclick="qtyDegistir(${i},1)">+</button>
+            <button class="sq-del" onclick="sil(${i})">✕</button>
+          </div>
+        </div>
+        <div class="summary-item-price">${item.fiyat * item.adet} ₺</div>
+      </div>
+    `).join('');
+  }
+
+  window.qtyDegistir = function(idx, d) {
+    sepet[idx].adet = Math.max(1, sepet[idx].adet + d);
+    localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
+    renderSepet();
+  };
+
+  window.sil = function(idx) {
+    sepet.splice(idx, 1);
+    localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
+    if (!sepet.length) {
+      document.getElementById('bos-sepet-uyari').style.display = 'block';
+      document.getElementById('siparis-form').style.display = 'none';
+    }
+    renderSepet();
+  };
+
+  window.odemeSeç = function(tip) {
+    odemeYontemi = tip;
+    document.getElementById('odeme-nakit').classList.toggle('selected', tip === 'nakit');
+    document.getElementById('odeme-kart').classList.toggle('selected', tip === 'kart');
+  };
+
+  window.siparisVer = async function() {
+    const ad = document.getElementById('ad-soyad').value.trim();
+    const tel = document.getElementById('telefon').value.trim();
+    const adres = document.getElementById('adres').value.trim();
+    const semt = document.getElementById('semt').value.trim();
+
+    if (!ad) { document.getElementById('ad-soyad').classList.add('error'); document.getElementById('ad-soyad').focus(); return; }
+    if (!tel) { document.getElementById('telefon').classList.add('error'); document.getElementById('telefon').focus(); return; }
+    if (!adres) { document.getElementById('adres').classList.add('error'); document.getElementById('adres').focus(); return; }
+    if (!semt) { document.getElementById('semt').classList.add('error'); document.getElementById('semt').focus(); return; }
+
+    const btn = document.getElementById('siparis-btn');
+    btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+
+    const araToplam = sepet.reduce((s, i) => s + i.fiyat * i.adet, 0);
+    const siparisVerisi = {
+      tip: 'online',
+      musteri: { ad, tel },
+      adres: {
+        adres,
+        semt,
+        daire: document.getElementById('daire').value.trim(),
+        tarif: document.getElementById('tarif').value.trim()
+      },
+      odeme: odemeYontemi === 'nakit' ? 'Nakit' : 'Kredi/Banka Kartı',
+      urunler: sepet.map(i => ({ isim: i.isim, katIsim: i.katIsim, fiyat: i.fiyat, adet: i.adet })),
+      not: document.getElementById('siparis-not').value.trim(),
+      araToplam,
+      teslimatUcreti,
+      toplamFiyat: araToplam + teslimatUcreti,
+      durum: 'bekliyor',
+      zaman: new Date().toISOString(),
+      zamanStr: new Date().toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    };
+
+    try {
+      await push(ref(db, 'online_siparisler'), siparisVerisi);
+      localStorage.removeItem('bellacone_sepet');
+      document.getElementById('success-overlay').classList.add('open');
+    } catch(e) {
+      btn.disabled = false;
+      btn.textContent = 'Siparişi Tamamla →';
+      alert('Hata oluştu, tekrar deneyin.');
+    }
+  };
+
+  ['ad-soyad','telefon','adres','semt'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', function() {
+      this.classList.remove('error');
+    });
+  });
+</script>
+
+<script>
+  function toggleMobile() {
+    const menu = document.getElementById('mobile-menu');
+    const burger = document.getElementById('burger-btn');
+    menu.classList.toggle('open');
+    burger.classList.toggle('open');
+    document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+  }
+  function closeMobile() {
+    document.getElementById('mobile-menu').classList.remove('open');
+    document.getElementById('burger-btn').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+</script>
+</body>
+</html>
