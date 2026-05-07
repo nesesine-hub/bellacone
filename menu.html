@@ -313,7 +313,7 @@
       html += `<div id="diger-bolumler" style="display:none;">`;
       bolumler.forEach(([bolumKey, bolum]) => {
         if (bolum.topIcinKullan) return;
-        const secenekler = bolum.secenekler || [];
+        const secenekler = bolum.secenekler ? Object.values(bolum.secenekler) : [];
         const aktifler = secenekler.filter(s => !(typeof s==='object' ? s.pasif : false));
         const pasifler = secenekler.filter(s => (typeof s==='object' ? s.pasif : false));
         if (!secenekler.length) return;
@@ -355,7 +355,7 @@
         html += `</div>`;
       }
       bolumler.forEach(([bolumKey, bolum]) => {
-        const secenekler = bolum.secenekler || [];
+        const secenekler = bolum.secenekler ? Object.values(bolum.secenekler) : [];
         const aktifler = secenekler.filter(s => !(typeof s==='object' ? s.pasif : false));
         const pasifler = secenekler.filter(s => (typeof s==='object' ? s.pasif : false));
         if (!secenekler.length) return;
@@ -418,7 +418,7 @@
     Object.values(bolumler).sort((a,b)=>(a.sira??999)-(b.sira??999)).forEach(bolum => {
       if (!bolum.topIcinKullan) return;
       if (!topBolumIsim) topBolumIsim = bolum.isim;
-      (bolum.secenekler || []).forEach(s => {
+      (bolum.secenekler ? Object.values(bolum.secenekler) : []).forEach(s => {
         if (!(typeof s==='object' ? s.pasif : false))
           tumSecenekler.push(typeof s==='object' ? s : { isim: s, pasif: false });
       });
@@ -426,7 +426,7 @@
     if (!tumSecenekler.length) {
       Object.values(bolumler).forEach(bolum => {
         if (!topBolumIsim) topBolumIsim = bolum.isim;
-        (bolum.secenekler || []).forEach(s => {
+        (bolum.secenekler ? Object.values(bolum.secenekler) : []).forEach(s => {
           if (!(typeof s==='object' ? s.pasif : false))
             tumSecenekler.push(typeof s==='object' ? s : { isim: s, pasif: false });
         });
@@ -525,7 +525,7 @@
       state.toplar.forEach(topIsim => {
         Object.values(bolumlerObj).forEach(bolum => {
           if (!bolum.topIcinKullan) return;
-          const sec = (bolum.secenekler || []).find(s => (typeof s==='object' ? s.isim : s) === topIsim);
+          const sec = (bolum.secenekler ? Object.values(bolum.secenekler) : []).find(s => (typeof s==='object' ? s.isim : s) === topIsim);
           if (sec && typeof sec==='object' && sec.ekFiyat) topToplamEkFiyat += sec.ekFiyat;
         });
       });
