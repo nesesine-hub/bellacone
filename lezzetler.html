@@ -195,19 +195,24 @@
 
   let menuData = {};
   let kategoriler = [];
+  let urunlerData = {}; // menu/urunler/[katId]/[urunId]
   let sepet = JSON.parse(localStorage.getItem('bellacone_sepet') || '[]');
   let aktifKat = 'hepsi';
-  let modalUrun = null;
-  let modalQty = 1;
 
   guncelleSepetFab();
 
   onValue(ref(db, 'menu'), snap => {
     const data = snap.val() || {};
     menuData = data;
+
+    // Kategoriler
     kategoriler = data.kategoriler
       ? Object.values(data.kategoriler).sort((a, b) => (a.sira ?? 999) - (b.sira ?? 999))
       : [];
+
+    // Yeni path: menu/urunler/[katId]
+    urunlerData = data.urunler || {};
+
     renderFilter();
     renderProducts('hepsi');
   });
@@ -236,12 +241,11 @@
 
     let html = '';
     katlar.forEach(k => {
-      const katData = menuData[k.id] || {};
-      const urunler = katData.urunler
-        ? Object.entries(katData.urunler)
-            .map(([key, u]) => ({ key, ...u }))
-            .filter(u => !u.pasif)
-        : [];
+      // Yeni path: menu/urunler/[katId]
+      const katUrunler = urunlerData[k.id] || {};
+      const urunler = Object.entries(katUrunler)
+        .map(([key, u]) => ({ key, ...u }))
+        .filter(u => u.aktif !== false); // pasif olanları gizle
 
       if (!urunler.length) return;
 
@@ -317,11 +321,11 @@
 
   window.sepeteEkle = function(katId, urunKey, qty) {
     const kat = kategoriler.find(k => k.id === katId);
-    const katData = menuData[katId] || {};
-    const urun = katData.urunler?.[urunKey];
+    // Yeni path: urunlerData[katId][urunKey]
+    const urun = urunlerData[katId]?.[urunKey];
     if (!urun) return;
 
-    const adet = qty !== null ? qty : modalQty;
+    const adet = qty !== null ? qty : 1;
     const mevcutIdx = sepet.findIndex(s => s.katId === katId && s.urunKey === urunKey);
 
     if (mevcutIdx > -1) {
@@ -331,7 +335,7 @@
         katId, urunKey,
         isim: urun.isim,
         katIsim: kat?.isim || '',
-        emoji: kat?.emoji || '🍦',
+        emoji: urun.emoji || kat?.emoji || '🍦',
         fiyat: urun.fiyat,
         adet,
         foto: urun.foto || ''
@@ -340,7 +344,6 @@
 
     localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
     guncelleSepetFab();
-    document.getElementById('modal-overlay').classList.remove('open');
     showToast(`✓ ${urun.isim} sepete eklendi`);
   };
 
