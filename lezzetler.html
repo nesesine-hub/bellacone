@@ -29,7 +29,8 @@
   .page-desc { font-size: 16px; color: var(--muted); margin-top: 1rem; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.7; }
 
   /* KATEGORİ FİLTRE */
-  .cat-filter { padding: 2rem 6rem; background: var(--white); border-bottom: 1px solid var(--cream2); display: flex; gap: 10px; flex-wrap: wrap; position: sticky; top: 74px; z-index: 90; }
+  .cat-filter { padding: 0.75rem 6rem; background: var(--white); border-bottom: 1px solid var(--cream2); display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; position: sticky; top: 74px; z-index: 90; scrollbar-width: none; -ms-overflow-style: none; }
+  .cat-filter::-webkit-scrollbar { display: none; }
   .cat-btn { padding: 8px 20px; border-radius: 999px; border: 1.5px solid var(--cream2); background: transparent; color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; white-space: nowrap; }
   .cat-btn:hover { border-color: var(--accent); color: var(--accent); }
   .cat-btn.active { background: var(--accent); color: var(--cream); border-color: var(--accent); }
