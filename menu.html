@@ -424,13 +424,7 @@
       });
     });
     if (!tumSecenekler.length) {
-      Object.values(bolumler).forEach(bolum => {
-        if (!topBolumIsim) topBolumIsim = bolum.isim;
-        (bolum.secenekler ? Object.values(bolum.secenekler) : []).forEach(s => {
-          if (!(typeof s==='object' ? s.pasif : false))
-            tumSecenekler.push(typeof s==='object' ? s : { isim: s, pasif: false });
-        });
-      });
+      // topIcinKullan bölümü yoksa boş bırak, diger-bolumler zaten gösterir
     }
     const topBaslik = topBolumIsim || 'Top';
     const topSayisi = state.toplar.length;
