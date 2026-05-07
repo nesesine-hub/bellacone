@@ -29,8 +29,9 @@
   .page-desc { font-size: 16px; color: var(--muted); margin-top: 1rem; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.7; }
 
   /* KATEGORİ FİLTRE */
-  .cat-filter { padding: 0.75rem 6rem; background: var(--white); border-bottom: 1px solid var(--cream2); display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; position: sticky; top: 74px; z-index: 90; scrollbar-width: none; -ms-overflow-style: none; }
+  .cat-filter { padding: 0.75rem 2rem; background: var(--white); border-bottom: 1px solid var(--cream2); display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; position: sticky; top: 80px; z-index: 90; scrollbar-width: none; -ms-overflow-style: none; cursor: grab; }
   .cat-filter::-webkit-scrollbar { display: none; }
+  .cat-filter.dragging { cursor: grabbing; user-select: none; }
   .cat-btn { padding: 8px 20px; border-radius: 999px; border: 1.5px solid var(--cream2); background: transparent; color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; white-space: nowrap; }
   .cat-btn:hover { border-color: var(--accent); color: var(--accent); }
   .cat-btn.active { background: var(--accent); color: var(--cream); border-color: var(--accent); }
@@ -116,7 +117,7 @@
     nav { padding: 1rem 1.5rem; }
     .nav-links { display: none; }
     .page-hero { padding: 7rem 2rem 3rem; }
-    .cat-filter { padding: 1rem 1.5rem; top: 60px; }
+    .cat-filter { padding: 0.75rem 1rem; top: 68px; }
     .products-section { padding: 2rem 1.5rem; }
     .products-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
     footer { padding: 2rem; flex-direction: column; text-align: center; }
@@ -425,7 +426,25 @@
     else fab.classList.remove('visible');
   }
 
-  function showToast(msg) {
+  // Cat filter mouse drag scroll (masaüstü)
+  const catFilter = document.getElementById('cat-filter') || document.querySelector('.cat-filter');
+  if (catFilter) {
+    let isDragging = false, startX, scrollLeft;
+    catFilter.addEventListener('mousedown', e => {
+      isDragging = true;
+      startX = e.pageX - catFilter.offsetLeft;
+      scrollLeft = catFilter.scrollLeft;
+      catFilter.classList.add('dragging');
+    });
+    catFilter.addEventListener('mouseleave', () => { isDragging = false; catFilter.classList.remove('dragging'); });
+    catFilter.addEventListener('mouseup', () => { isDragging = false; catFilter.classList.remove('dragging'); });
+    catFilter.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX - catFilter.offsetLeft;
+      catFilter.scrollLeft = scrollLeft - (x - startX);
+    });
+  }
     const t = document.getElementById('toast');
     t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2500);
