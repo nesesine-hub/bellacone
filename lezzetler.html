@@ -195,7 +195,7 @@
 
   let menuData = {};
   let kategoriler = [];
-  let urunlerData = {}; // menu/urunler/[katId]/[urunId]
+  let urunlerData = {}; // menu/[katId]/urunler — menüden okur
   let sepet = JSON.parse(localStorage.getItem('bellacone_sepet') || '[]');
   let aktifKat = 'hepsi';
 
@@ -205,13 +205,17 @@
     const data = snap.val() || {};
     menuData = data;
 
-    // Kategoriler
+    // Kategoriler — menüdeki kategoriler
     kategoriler = data.kategoriler
       ? Object.values(data.kategoriler).sort((a, b) => (a.sira ?? 999) - (b.sira ?? 999))
       : [];
 
-    // Yeni path: menu/urunler/[katId]
-    urunlerData = data.urunler || {};
+    // Ürünler — menüdeki path: menu/[katId]/urunler
+    // Her kategorinin kendi node'undan urunleri topla
+    urunlerData = {};
+    kategoriler.forEach(k => {
+      urunlerData[k.id] = data[k.id]?.urunler || {};
+    });
 
     renderFilter();
     renderProducts('hepsi');
@@ -245,7 +249,7 @@
       const katUrunler = urunlerData[k.id] || {};
       const urunler = Object.entries(katUrunler)
         .map(([key, u]) => ({ key, ...u }))
-        .filter(u => u.aktif !== false); // pasif olanları gizle
+        .filter(u => !u.pasif && (u.stok === undefined || u.stok > 0));
 
       if (!urunler.length) return;
 
@@ -277,36 +281,8 @@
   }
 
   window.urunDetay = function(katId, urunKey) {
-    const kat = kategoriler.find(k => k.id === katId);
-    const katData = menuData[katId] || {};
-    const urun = katData.urunler?.[urunKey];
-    if (!urun) return;
-
-    modalUrun = { katId, urunKey, ...urun, katIsim: kat?.isim, katEmoji: kat?.emoji };
-    modalQty = 1;
-
-    document.getElementById('modal-inner').innerHTML = `
-      ${urun.foto
-        ? `<img class="modal-img" src="${urun.foto}" alt="${urun.isim}">`
-        : `<div class="modal-no-img">${kat?.emoji || '🍦'}</div>`
-      }
-      <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
-      <div class="modal-body">
-        <div class="modal-cat">${kat?.isim || ''}</div>
-        <div class="modal-name">${urun.isim}</div>
-        ${urun.aciklama ? `<p class="modal-desc">${urun.aciklama}</p>` : ''}
-        <div class="modal-price">${urun.fiyat > 0 ? urun.fiyat + ' ₺' : 'Fiyat için iletişime geçin'}</div>
-        <div class="modal-actions">
-          <div class="qty-ctrl">
-            <button class="qty-btn" onclick="modalQtyDegistir(-1)">−</button>
-            <span class="qty-val" id="modal-qty">1</span>
-            <button class="qty-btn" onclick="modalQtyDegistir(1)">+</button>
-          </div>
-          <button class="modal-add-btn" onclick="sepeteEkle('${katId}','${urunKey}',null)">Sepete Ekle</button>
-        </div>
-      </div>
-    `;
-    document.getElementById('modal-overlay').classList.add('open');
+    // Artık kullanılmıyor — urun.html'e yönlendiriliyor
+    window.location.href = `urun.html?id=${urunKey}&kat=${katId}`;
   };
 
   window.modalQtyDegistir = function(d) {
