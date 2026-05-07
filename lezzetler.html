@@ -81,6 +81,21 @@
   .modal-close { position: absolute; top: 1rem; right: 1rem; width: 36px; height: 36px; background: var(--cream); border: none; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .modal-inner { position: relative; }
 
+  /* DONDURMA ÇEŞİT KARTLARI */
+  .dondurma-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+  .cesit-card { background: var(--white); border: 1.5px solid var(--cream2); border-radius: 16px; padding: 1rem; text-align: center; transition: all 0.2s; }
+  .cesit-card:hover { border-color: var(--accent); box-shadow: 0 4px 16px rgba(212,79,130,0.1); }
+  .cesit-emoji { font-size: 28px; margin-bottom: 6px; }
+  .cesit-isim { font-size: 13px; font-weight: 500; color: var(--brown); margin-bottom: 8px; line-height: 1.3; }
+  .cesit-fiyat { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .cesit-ctrl { display: flex; align-items: center; justify-content: center; gap: 0; background: var(--cream); border: 1.5px solid var(--cream2); border-radius: 999px; overflow: hidden; }
+  .cesit-btn { width: 32px; height: 32px; border: none; background: transparent; font-size: 18px; cursor: pointer; color: var(--accent); transition: background 0.15s; }
+  .cesit-btn:hover { background: var(--cream2); }
+  .cesit-sayi { min-width: 28px; text-align: center; font-size: 14px; font-weight: 600; color: var(--brown); }
+  .cesit-ekle-btn { margin-top: 8px; width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 999px; padding: 7px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; display: none; transition: all 0.2s; }
+  .cesit-ekle-btn.visible { display: block; }
+  .cesit-ekle-btn:hover { opacity: 0.85; }
+
   .loading-state { text-align: center; padding: 5rem; color: var(--muted); }
   .loading-icon { font-size: 48px; margin-bottom: 1rem; }
   .empty-state { text-align: center; padding: 4rem; color: var(--muted); }
@@ -195,11 +210,15 @@
 
   let menuData = {};
   let kategoriler = [];
-  let urunlerData = {}; // menu/[katId]/urunler — menüden okur
+  let urunlerData = {};
+  let topFiyat = 80;
   let sepet = JSON.parse(localStorage.getItem('bellacone_sepet') || '[]');
   let aktifKat = 'hepsi';
 
   guncelleSepetFab();
+
+  // Top fiyatını yükle
+  onValue(ref(db, 'ayarlar/topFiyat'), snap => { if (snap.exists()) topFiyat = snap.val(); });
 
   onValue(ref(db, 'menu'), snap => {
     const data = snap.val() || {};
@@ -211,7 +230,6 @@
       : [];
 
     // Ürünler — menüdeki path: menu/[katId]/urunler
-    // Her kategorinin kendi node'undan urunleri topla
     urunlerData = {};
     kategoriler.forEach(k => {
       urunlerData[k.id] = data[k.id]?.urunler || {};
@@ -245,40 +263,115 @@
 
     let html = '';
     katlar.forEach(k => {
-      // Yeni path: menu/urunler/[katId]
-      const katUrunler = urunlerData[k.id] || {};
-      const urunler = Object.entries(katUrunler)
-        .map(([key, u]) => ({ key, ...u }))
-        .filter(u => !u.pasif && (u.stok === undefined || u.stok > 0));
+      const katMenuData = menuData[k.id] || {};
+      const isDondurma = katMenuData.topDestegi === true;
 
-      if (!urunler.length) return;
+      if (isDondurma) {
+        // Dondurma: çeşitleri göster
+        const bolumler = katMenuData.bolumler || {};
+        const cesitBolum = Object.values(bolumler).find(b => b.topIcinKullan) || Object.values(bolumler)[0];
+        const cesitler = cesitBolum ? Object.values(cesitBolum.secenekler || {}).filter(s => !s.pasif) : [];
+        if (!cesitler.length) return;
 
-      html += `<div class="cat-section" id="cat-${k.id}">
-        <div class="cat-title">${k.emoji || ''} <em>${k.isim}</em></div>
-        <div class="cat-divider"></div>
-        <div class="products-grid">
-          ${urunler.map(u => `
-            <div class="product-card" onclick="window.location.href='urun.html?id=${u.key}&kat=${k.id}'">
-              ${u.foto
-                ? `<img class="product-img" src="${u.foto}" alt="${u.isim}" onerror="this.style.display='none'">`
-                : `<div class="product-no-img">${k.emoji || '🍦'}</div>`
-              }
-              <div class="product-body">
-                <div class="product-name">${u.isim}</div>
-                ${u.aciklama ? `<div class="product-desc">${u.aciklama}</div>` : ''}
-                <div class="product-footer">
-                  <div class="product-price">${u.fiyat > 0 ? u.fiyat + ' ₺' : ''}</div>
-                  <button class="add-to-cart" onclick="event.stopPropagation();sepeteEkle('${k.id}','${u.key}',1)">+ Sepet</button>
+        html += `<div class="cat-section" id="cat-${k.id}">
+          <div class="cat-title">${k.emoji || ''} <em>${k.isim}</em></div>
+          <div class="cat-divider"></div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:1.25rem;">Her top <strong style="color:var(--accent);">${topFiyat} ₺</strong> · Adet seçip sepete ekleyin, sipariş sayfasında servis şeklini belirleyin.</p>
+          <div class="dondurma-grid">
+            ${cesitler.map(s => `
+              <div class="cesit-card" id="cesit-${k.id}-${s.id}">
+                <div class="cesit-emoji">🍦</div>
+                <div class="cesit-isim">${s.isim}</div>
+                <div class="cesit-fiyat">${topFiyat + (s.ekFiyat||0)} ₺/top</div>
+                <div class="cesit-ctrl">
+                  <button class="cesit-btn" onclick="cesitAzalt('${k.id}','${s.id}','${s.isim}',${s.ekFiyat||0})">−</button>
+                  <span class="cesit-sayi" id="cs-${k.id}-${s.id}">0</span>
+                  <button class="cesit-btn" onclick="cesitArtir('${k.id}','${s.id}','${s.isim}',${s.ekFiyat||0})">+</button>
+                </div>
+                <button class="cesit-ekle-btn" id="ceb-${k.id}-${s.id}" onclick="cesitSepete('${k.id}','${k.isim}','${s.id}','${s.isim}',${s.ekFiyat||0})">Sepete Ekle</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+      } else {
+        // Normal ürünler
+        const katUrunler = urunlerData[k.id] || {};
+        const urunler = Object.entries(katUrunler)
+          .map(([key, u]) => ({ key, ...u }))
+          .filter(u => !u.pasif && (u.stok === undefined || u.stok > 0));
+        if (!urunler.length) return;
+
+        html += `<div class="cat-section" id="cat-${k.id}">
+          <div class="cat-title">${k.emoji || ''} <em>${k.isim}</em></div>
+          <div class="cat-divider"></div>
+          <div class="products-grid">
+            ${urunler.map(u => `
+              <div class="product-card" onclick="window.location.href='urun.html?id=${u.key}&kat=${k.id}'">
+                ${u.foto
+                  ? `<img class="product-img" src="${u.foto}" alt="${u.isim}" onerror="this.style.display='none'">`
+                  : `<div class="product-no-img">${k.emoji || '🍦'}</div>`
+                }
+                <div class="product-body">
+                  <div class="product-name">${u.isim}</div>
+                  ${u.aciklama ? `<div class="product-desc">${u.aciklama}</div>` : ''}
+                  <div class="product-footer">
+                    <div class="product-price">${u.fiyat > 0 ? u.fiyat + ' ₺' : ''}</div>
+                    <button class="add-to-cart" onclick="event.stopPropagation();sepeteEkle('${k.id}','${u.key}',1)">+ Sepet</button>
+                  </div>
                 </div>
               </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>`;
+            `).join('')}
+          </div>
+        </div>`;
+      }
     });
 
     section.innerHTML = html || '<div class="empty-state"><p>Bu kategoride ürün bulunamadı.</p></div>';
   }
+
+  // Dondurma çeşit kontrolleri
+  const cesitSayilari = {}; // { 'katId-cesitId': sayi }
+
+  window.cesitArtir = function(katId, cesitId, isim, ekFiyat) {
+    const key = katId + '-' + cesitId;
+    cesitSayilari[key] = (cesitSayilari[key] || 0) + 1;
+    document.getElementById('cs-' + katId + '-' + cesitId).textContent = cesitSayilari[key];
+    document.getElementById('ceb-' + katId + '-' + cesitId).classList.add('visible');
+    guncelleSepetFab();
+  };
+
+  window.cesitAzalt = function(katId, cesitId, isim, ekFiyat) {
+    const key = katId + '-' + cesitId;
+    if (!cesitSayilari[key]) return;
+    cesitSayilari[key]--;
+    document.getElementById('cs-' + katId + '-' + cesitId).textContent = cesitSayilari[key];
+    if (cesitSayilari[key] === 0) {
+      document.getElementById('ceb-' + katId + '-' + cesitId).classList.remove('visible');
+    }
+    guncelleSepetFab();
+  };
+
+  window.cesitSepete = function(katId, katIsim, cesitId, isim, ekFiyat) {
+    const key = katId + '-' + cesitId;
+    const adet = cesitSayilari[key] || 0;
+    if (!adet) return;
+    const fiyat = (topFiyat + ekFiyat) * adet;
+    sepet.push({
+      id: cesitId, katId,
+      isim: `Dondurma — ${isim} (${adet} top)`,
+      katIsim,
+      emoji: '🍦', foto: '',
+      fiyat, adet: 1,
+      eklenme: Date.now()
+    });
+    localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
+    // Sıfırla
+    cesitSayilari[key] = 0;
+    document.getElementById('cs-' + katId + '-' + cesitId).textContent = '0';
+    document.getElementById('ceb-' + katId + '-' + cesitId).classList.remove('visible');
+    guncelleSepetFab();
+    showToast(`✓ ${adet} top ${isim} sepete eklendi`);
+  };
 
   window.urunDetay = function(katId, urunKey) {
     // Artık kullanılmıyor — urun.html'e yönlendiriliyor
