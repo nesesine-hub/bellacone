@@ -108,8 +108,11 @@
     .story-img { height: 300px; }
     .story-content { padding: 3rem 2rem; }
     .values-header { padding: 4rem 1.5rem 2rem; }
-    .value-row, .value-row.reverse .value-photo, .value-row.reverse .value-content { grid-template-columns: 1fr; display: block; }
     .value-row { display: flex; flex-direction: column; }
+    .value-row .value-photo { order: 1 !important; }
+    .value-row .value-content { order: 2 !important; }
+    .value-row.reverse .value-photo { order: 1 !important; }
+    .value-row.reverse .value-content { order: 2 !important; }
     .value-photo { height: 260px; }
     .value-content { padding: 2.5rem 1.5rem; }
     .team { padding: 4rem 1.5rem; }
