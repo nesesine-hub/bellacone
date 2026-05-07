@@ -268,7 +268,7 @@
     const burger = document.getElementById('burger-btn');
     menu.classList.toggle('open');
     burger.classList.toggle('open');
-    document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+    if (menu.classList.contains('open')) { document.body.style.overflow = 'hidden'; } else { document.body.style.overflow = ''; }
   }
   function closeMobile() {
     document.getElementById('mobile-menu').classList.remove('open');
