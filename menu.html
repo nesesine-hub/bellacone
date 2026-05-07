@@ -7,14 +7,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --cream: #fdf6ee; --warm: #f5e6d0; --brown: #5c3d2e;
-    --accent: #c9663c; --soft: #e8d5c0; --text: #2d1f14;
-    --muted: #8a6a56; --card: #fff9f3; --radius: 16px;
+    --cream: #fef2f7; --warm: #fac8df; --brown: #320d1e;
+    --accent: #d44f82; --soft: #f094bc; --text: #c0336a;
+    --muted: #8a3860; --card: #fffafc; --radius: 16px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--cream); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding-bottom: 100px; }
 
-  .header { background: var(--brown); color: #fff; padding: 0.75rem 1.25rem; text-align: center; position: sticky; top: 0; z-index: 100; }
+  .header { background: var(--accent); color: #fff; padding: 0.75rem 1.25rem; text-align: center; position: sticky; top: 0; z-index: 100; }
   .header img { height: 65px; width: auto; object-fit: contain; display: block; margin: 0 auto; }
 
   /* MASA BAR */
@@ -22,7 +22,7 @@
   .masa-bar label { font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; }
   .masa-bar input { flex: 1; border: 1.5px solid var(--soft); border-radius: 10px; padding: 8px 12px; font-size: 14px; background: #fff; color: var(--text); font-family: 'DM Sans', sans-serif; outline: none; }
   .masa-bar input:focus { border-color: var(--accent); }
-  .masa-pill { background: var(--brown); color: #fff; font-size: 12px; padding: 6px 12px; border-radius: 999px; white-space: nowrap; font-weight: 500; }
+  .masa-pill { background: var(--accent); color: #fff; font-size: 12px; padding: 6px 12px; border-radius: 999px; white-space: nowrap; font-weight: 500; }
 
   /* EKRANLAR */
   .screen { display: none; }
@@ -38,12 +38,12 @@
 
   /* DETAY HEADER */
   .detail-header { background: var(--warm); border-bottom: 1.5px solid var(--soft); padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 99; }
-  .back-btn { background: transparent; border: 2px solid var(--brown); border-radius: 10px; padding: 7px 16px; font-size: 14px; color: var(--brown); cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 700; white-space: nowrap; }
+  .back-btn { background: transparent; border: 2px solid var(--accent); border-radius: 10px; padding: 7px 16px; font-size: 14px; color: var(--accent); cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 700; white-space: nowrap; }
   .back-btn:hover { background: var(--soft); }
 
-  .detail-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--brown); flex: 1; }
+  .detail-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--accent); flex: 1; }
   .section { padding: 1.25rem 1.25rem 0; }
-  .section-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--brown); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 8px; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--accent); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 8px; }
   .section-title::after { content: ''; flex: 1; height: 1px; background: var(--soft); }
 
   /* ÜRÜN GRID */
@@ -66,7 +66,7 @@
   .not-input:focus { border-color: var(--accent); }
 
   /* ALT BAR */
-  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--brown); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 10px; z-index: 200; }
+  .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--accent); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 10px; z-index: 200; }
   .sorun-btn { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.3); background: transparent; color: #fff; font-size: 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .miktar-ctrl { display: flex; align-items: center; gap: 8px; }
   .miktar-btn { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.3); background: transparent; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -77,7 +77,7 @@
   .sepete-ekle-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
   /* SEPET BALONCUĞU */
-  .sepet-fab { position: fixed; bottom: 90px; right: 20px; background: var(--brown); color: #fff; border: none; border-radius: 999px; padding: 12px 20px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; z-index: 300; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+  .sepet-fab { position: fixed; bottom: 90px; right: 20px; background: var(--accent); color: #fff; border: none; border-radius: 999px; padding: 12px 20px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; z-index: 300; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(212,79,130,0.3); }
   .sepet-fab.visible { display: flex; }
   .sepet-badge { background: var(--accent); color: #fff; border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
 
@@ -98,7 +98,7 @@
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
   .modal-box { background: var(--card); border-radius: 16px; padding: 1.5rem; width: 90%; max-width: 340px; }
-  .modal-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--brown); margin-bottom: 0.5rem; }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--accent); margin-bottom: 0.5rem; }
   .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 1rem; }
   .modal-actions { display: flex; gap: 8px; margin-top: 1rem; }
   .modal-cancel { flex: 1; padding: 10px; border: 1.5px solid var(--soft); border-radius: 10px; background: transparent; color: var(--muted); font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
