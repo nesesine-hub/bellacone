@@ -1234,23 +1234,39 @@
   // KATEGORİLER EKRANI
   function lzRenderKategoriler() {
     const grid = document.getElementById('lz-kat-grid');
-    if (!kategoriler.length) { grid.innerHTML = '<span class="empty-list">Henüz kategori yok</span>'; return; }
-    grid.innerHTML = kategoriler.map(k => {
-      const urunSayisi = lzUrunSayisi(k.id);
-      return `
-        <div class="lz-kat-card" onclick="lzKatAc('${k.id}')">
-          ${k.foto ? `<img src="${k.foto}" class="lz-kat-foto" onerror="this.style.display='none'">` : `<div class="lz-kat-emoji">${k.emoji || '🍦'}</div>`}
-          <div class="lz-kat-name">${k.isim}</div>
-          <div class="lz-kat-count">${urunSayisi} ürün</div>
-          <div style="margin-top:8px;display:flex;gap:4px;justify-content:center;">
-            <button onclick="lzDuzenleKat('${k.id}', event)" style="font-size:11px;padding:3px 10px;border:1px solid var(--soft);border-radius:999px;background:#fff;color:var(--muted);cursor:pointer;">Düzenle</button>
-          </div>
+    grid.innerHTML = '<div class="loading">Yükleniyor...</div>';
+
+    // Önce tüm kategorilerin ürün sayısını Firebase'den çek
+    const promises = kategoriler.map(k =>
+      new Promise(res => {
+        onValue(ref(db, `menu/urunler/${k.id}`), snap => {
+          const count = snap.val() ? Object.keys(snap.val()).length : 0;
+          if (!window._lzUrunSayilari) window._lzUrunSayilari = {};
+          window._lzUrunSayilari[k.id] = count;
+          res();
+        }, { onlyOnce: true });
+      })
+    );
+
+    Promise.all(promises).then(() => {
+      if (!kategoriler.length) { grid.innerHTML = '<span class="empty-list">Henüz kategori yok</span>'; return; }
+      grid.innerHTML = kategoriler.map(k => {
+        const urunSayisi = window._lzUrunSayilari?.[k.id] || 0;
+        return `
+          <div class="lz-kat-card" onclick="lzKatAc('${k.id}')">
+            ${k.foto ? `<img src="${k.foto}" class="lz-kat-foto" onerror="this.style.display='none'">` : `<div class="lz-kat-emoji">${k.emoji || '🍦'}</div>`}
+            <div class="lz-kat-name">${k.isim}</div>
+            <div class="lz-kat-count">${urunSayisi} ürün</div>
+            <div style="margin-top:8px;display:flex;gap:4px;justify-content:center;">
+              <button onclick="lzDuzenleKat('${k.id}', event)" style="font-size:11px;padding:3px 10px;border:1px solid var(--soft);border-radius:999px;background:#fff;color:var(--muted);cursor:pointer;">Düzenle</button>
+            </div>
+          </div>`;
+      }).join('') + `
+        <div class="lz-kat-card lz-add-kat-card" onclick="lzYeniKategori()">
+          <div class="plus">＋</div>
+          <div class="txt">Kategori Ekle</div>
         </div>`;
-    }).join('') + `
-      <div class="lz-kat-card lz-add-kat-card" onclick="lzYeniKategori()">
-        <div class="plus">＋</div>
-        <div class="txt">Kategori Ekle</div>
-      </div>`;
+    });
   }
 
   function lzUrunSayisi(katId) {
