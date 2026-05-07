@@ -1278,8 +1278,18 @@
   window.lzKatAc = function(katId) {
     lzAktifKatId = katId;
     lzKatFormKapat();
-    lzGo('urunler');
-    lzRenderUrunler(katId);
+
+    // Dondurma mu kontrol et
+    onValue(ref(db, `menu/${katId}/topDestegi`), (snap) => {
+      const isDondurma = snap.val() === true;
+      if (isDondurma) {
+        lzGo('urunler');
+        lzRenderDondurma(katId);
+      } else {
+        lzGo('urunler');
+        lzRenderUrunler(katId);
+      }
+    }, { onlyOnce: true });
   };
 
   // Yeni kategori formu
@@ -1341,6 +1351,58 @@
   };
 
   // ÜRÜNLER EKRANI
+  // DONDURMA ÇEŞİTLERİ YÖNETİMİ
+  function lzRenderDondurma(katId) {
+    const kat = kategoriler.find(k => k.id === katId);
+    document.getElementById('lz-urun-baslik').textContent = `${kat?.emoji||''} ${kat?.isim||''} — Çeşitler`;
+    const grid = document.getElementById('lz-urun-grid');
+    grid.innerHTML = '<div class="loading">Yükleniyor...</div>';
+
+    onValue(ref(db, `menu/${katId}/bolumler`), (snap) => {
+      const bolumler = snap.val() || {};
+      const cesitBolum = Object.values(bolumler).find(b => b.topIcinKullan) || Object.values(bolumler)[0];
+      
+      if (!cesitBolum) {
+        grid.innerHTML = '<span class="empty-list">Çeşit bölümü bulunamadı. Admin → Menü İçerikleri\'nden ekleyin.</span>';
+        return;
+      }
+
+      const secenekler = Object.values(cesitBolum.secenekler || {});
+      const bolumId = Object.keys(bolumler).find(k => bolumler[k] === cesitBolum);
+
+      grid.innerHTML = `
+        <div style="grid-column:1/-1;background:var(--warm);border-radius:12px;padding:1rem;margin-bottom:0.5rem;font-size:13px;color:var(--brown);">
+          <strong>${cesitBolum.isim}</strong> — ${secenekler.length} çeşit
+          <span style="float:right;font-size:12px;color:var(--muted);">Her top ${topFiyat||80} ₺</span>
+        </div>
+        ${secenekler.map(s => `
+          <div class="lz-urun-card" style="cursor:default;">
+            <div class="lz-urun-img"><span style="font-size:36px;">🍦</span></div>
+            <div class="lz-urun-body">
+              <div class="lz-urun-name">${s.isim}</div>
+              <div class="lz-urun-price">${(topFiyat||80) + (s.ekFiyat||0)} ₺/top${s.ekFiyat?` (+${s.ekFiyat}₺)`:''}</div>
+              <span class="lz-urun-status ${s.pasif?'pasif':'aktif'}">${s.pasif?'Pasif':'Aktif'}</span>
+            </div>
+          </div>`).join('')}
+        <div class="lz-add-urun-card" onclick="lzCesitEkle('${katId}','${bolumId}')">
+          <div style="font-size:28px;color:var(--soft);">＋</div>
+          <div style="font-size:12px;color:var(--muted);">Çeşit Ekle</div>
+        </div>`;
+    }, { onlyOnce: true });
+  }
+
+  window.lzCesitEkle = async function(katId, bolumId) {
+    const isim = prompt('Yeni çeşit adı:');
+    if (!isim) return;
+    const ekFiyat = prompt('Ek ücret (₺) — 0 ise boş bırak:', '0');
+    const key = 'g' + (Date.now() % 100000);
+    const yeni = { id: key, isim: isim.trim(), fiyat: 80, pasif: false };
+    if (ekFiyat && parseInt(ekFiyat) > 0) yeni.ekFiyat = parseInt(ekFiyat);
+    await set(ref(db, `menu/${katId}/bolumler/${bolumId}/secenekler/${key}`), yeni);
+    showToast(`"${isim}" eklendi ✓`);
+    lzRenderDondurma(katId);
+  };
+
   function lzRenderUrunler(katId) {
     const kat = kategoriler.find(k => k.id === katId);
     document.getElementById('lz-urun-baslik').textContent = `${kat?.emoji || ''} ${kat?.isim || ''} — Ürünler`;
@@ -1415,18 +1477,36 @@
       document.getElementById('lz-d-edit-id').value = urunId;
       document.getElementById('lz-d-kat-id').value = katId;
       document.getElementById('lz-urun-sil-btn').style.display = 'inline-block';
+
+      // Ürünün kendi bölümleri (lezzetler path'inden)
       lzBolumler = u.bolumler ? JSON.parse(JSON.stringify(u.bolumler)) : [];
 
-      // Fotoğraf önizle
-      if (u.foto) {
-        document.getElementById('lz-detail-foto-prev').innerHTML = `<img src="${u.foto}" onerror="this.parentElement.innerHTML='<span id=lz-detail-emoji-prev>${u.emoji||'🍦'}</span>'">`;
-      } else {
-        document.getElementById('lz-detail-foto-prev').innerHTML = `<span id="lz-detail-emoji-prev">${u.emoji||'🍦'}</span>`;
-      }
+      // Kategorinin menü bölümlerini de çek (waffle malzeme/sos vs.)
+      onValue(ref(db, `menu/${katId}/bolumler`), (bSnap) => {
+        const menüBolumler = bSnap.val() || {};
+        // Menü bölümlerini lzBolumler'e ekle (olmayanları)
+        const mevcutAdlar = lzBolumler.map(b => b.ad || b.isim);
+        Object.values(menüBolumler).forEach(b => {
+          if (b.topIcinKullan) return; // dondurma çeşitlerini atla
+          if (!mevcutAdlar.includes(b.isim)) {
+            lzBolumler.push({
+              ad: b.isim,
+              secenekler: Object.values(b.secenekler || {}).map(s => s.isim),
+              _menuBolumId: Object.keys(menüBolumler).find(k => menüBolumler[k] === b)
+            });
+          }
+        });
 
-      lzKategorileriDoldur(katId);
-      lzRenderBolumler();
-      lzGo('detay', u.isim);
+        if (u.foto) {
+          document.getElementById('lz-detail-foto-prev').innerHTML = `<img src="${u.foto}" onerror="this.parentElement.innerHTML='<span id=lz-detail-emoji-prev>${u.emoji||'🍦'}</span>'">`;
+        } else {
+          document.getElementById('lz-detail-foto-prev').innerHTML = `<span id="lz-detail-emoji-prev">${u.emoji||'🍦'}</span>`;
+        }
+
+        lzKategorileriDoldur(katId);
+        lzRenderBolumler();
+        lzGo('detay', u.isim);
+      }, { onlyOnce: true });
     }, { onlyOnce: true });
   };
 
