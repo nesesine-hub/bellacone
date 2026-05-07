@@ -1235,7 +1235,7 @@
           <div class="lz-kat-name">${k.isim}</div>
           <div class="lz-kat-count">${urunSayisi} ürün</div>
           <div style="margin-top:8px;display:flex;gap:4px;justify-content:center;">
-            <button onclick="event.stopPropagation();lzDuzenleKat('${k.id}')" style="font-size:11px;padding:3px 10px;border:1px solid var(--soft);border-radius:999px;background:#fff;color:var(--muted);cursor:pointer;">Düzenle</button>
+            <button onclick="lzDuzenleKat('${k.id}', event)" style="font-size:11px;padding:3px 10px;border:1px solid var(--soft);border-radius:999px;background:#fff;color:var(--muted);cursor:pointer;">Düzenle</button>
           </div>
         </div>`;
     }).join('') + `
@@ -1270,9 +1270,12 @@
     document.getElementById('lz-kat-isim').focus();
   };
 
-  window.lzDuzenleKat = function(katId) {
+  window.lzDuzenleKat = function(katId, event) {
+    if (event) { event.stopPropagation(); event.preventDefault(); }
     const kat = kategoriler.find(k => k.id === katId);
     if (!kat) return;
+    // Önce kategoriler ekranına git
+    lzGo('kategoriler');
     document.getElementById('lz-kat-form-card').style.display = 'block';
     document.getElementById('lz-kat-form-title').textContent = `Düzenle: ${kat.isim}`;
     document.getElementById('lz-kat-emoji').value = kat.emoji || '🍦';
@@ -1280,6 +1283,8 @@
     document.getElementById('lz-kat-foto').value = kat.foto || '';
     document.getElementById('lz-kat-edit-id').value = katId;
     document.getElementById('lz-kat-sil-btn').style.display = 'inline-block';
+    // Forma scroll et
+    setTimeout(() => document.getElementById('lz-kat-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
   };
 
   window.lzKatFormKapat = function() {
@@ -1333,7 +1338,10 @@
             <div class="lz-urun-name">${u.isim}</div>
             <div class="lz-urun-price">${u.fiyat ? u.fiyat + ' ₺' : '—'}</div>
             ${u.aciklama ? `<div class="lz-urun-desc">${u.aciklama}</div>` : ''}
-            <span class="lz-urun-status ${u.aktif === false ? 'pasif' : 'aktif'}">${u.aktif === false ? 'Pasif' : 'Aktif'}</span>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
+              <span class="lz-urun-status ${u.aktif === false ? 'pasif' : 'aktif'}">${u.aktif === false ? 'Pasif' : 'Aktif'}</span>
+              <a href="urun.html?id=${u.id}&kat=${katId}" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:var(--accent);text-decoration:none;border:1px solid var(--cream2);border-radius:999px;padding:2px 8px;">Sayfayı Gör ↗</a>
+            </div>
           </div>
         </div>`).join('') + `
         <div class="lz-add-urun-card" onclick="lzYeniUrun()">

@@ -118,7 +118,7 @@
     <a href="hakkimizda.html" onclick="closeMobile()">Hakkımızda</a>
     <a href="lezzetler.html" onclick="closeMobile()">Lezzetler</a>
     <a href="siparis.html" onclick="closeMobile()">Sipariş Ver</a>
-    <a href="index.html#iletisim" onclick="closeMobile()">İletişim</a>
+    <a href="iletisim.html" onclick="closeMobile()">İletişim</a>
   <a href="menu.html" class="mob-cta" onclick="closeMobile()">QR Menü →</a>
 </div>
 
@@ -128,7 +128,7 @@
     <a href="index.html">Ana Sayfa</a>
     <a href="hakkimizda.html">Hakkımızda</a>
     <a href="lezzetler.html" class="active">Lezzetler</a>
-    <a href="index.html#iletisim">İletişim</a>
+    <a href="iletisim.html">İletişim</a>
     <a href="siparis.html">Sipariş Ver</a>
   </div>
   <button class="burger" id="burger-btn" onclick="toggleMobile()" aria-label="Menü">
@@ -172,7 +172,7 @@
   <span class="footer-text">© 2025 Bellacone. Tüm hakları saklıdır. &nbsp;|&nbsp; Web Tasarım: <a href="https://www.instagram.com/kerem.cdr/" target="_blank" style="color:#fff;text-decoration:none;">@nesesine</a></span>
   <div class="footer-links">
     <a href="index.html">Ana Sayfa</a>
-    <a href="index.html#iletisim">İletişim</a>
+    <a href="iletisim.html">İletişim</a>
   </div>
 </footer>
 
@@ -250,7 +250,7 @@
         <div class="cat-divider"></div>
         <div class="products-grid">
           ${urunler.map(u => `
-            <div class="product-card" onclick="urunDetay('${k.id}','${u.key}')">
+            <div class="product-card" onclick="window.location.href='urun.html?id=${u.key}&kat=${k.id}'">
               ${u.foto
                 ? `<img class="product-img" src="${u.foto}" alt="${u.isim}" onerror="this.style.display='none'">`
                 : `<div class="product-no-img">${k.emoji || '🍦'}</div>`
