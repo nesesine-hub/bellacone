@@ -859,15 +859,19 @@
       // 1) Logo küçülüp sol üste uçar
       splashImg.classList.add('shrinking');
 
-      // 2) Arka plan solar (logo animasyonu bittikten sonra)
+      // 2) Arka plan solar
       setTimeout(function() {
         splash.style.transition = 'opacity 0.4s ease';
         splash.style.opacity    = '0';
       }, 650);
 
-      // 3) Tamamen kaldır
+      // 3) Tamamen kaldır + body kilidini aç + en üste al
       setTimeout(function() {
         splash.style.display = 'none';
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
+        window.scrollTo({ top: 0, behavior: 'instant' });
       }, 1100);
     }
 
@@ -875,6 +879,10 @@
     splash.onwheel  = hideSplash;
     document.onkeydown = function() { hideSplash(); document.onkeydown = null; };
 
+    // Splash açıkken arka planda scroll olmasın
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
     var ty0 = 0;
     splash.addEventListener('touchstart', function(e){ ty0 = e.touches[0].clientY; }, {passive:true});
     splash.addEventListener('touchend',   function(e){
