@@ -98,6 +98,64 @@
   .toast.show { opacity: 1; }
   .loading { text-align: center; padding: 1rem; color: var(--muted); font-size: 13px; }
   .empty-list { font-size: 13px; color: var(--muted); font-style: italic; }
+  /* LEZZETLERİ YÖNET */
+  .lz-screen { display: none; }
+  .lz-screen.active { display: block; }
+  .lz-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .lz-breadcrumb span { cursor: pointer; color: var(--accent); font-weight: 500; }
+  .lz-breadcrumb span:hover { text-decoration: underline; }
+  .lz-breadcrumb .sep { color: var(--soft); }
+  .lz-breadcrumb .current { color: var(--brown); font-weight: 600; cursor: default; }
+
+  .lz-kat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  .lz-kat-card { background: var(--card); border: 1.5px solid var(--soft); border-radius: 14px; padding: 1.25rem 1rem; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
+  .lz-kat-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(212,79,130,0.12); }
+  .lz-kat-card .lz-kat-emoji { font-size: 32px; margin-bottom: 8px; }
+  .lz-kat-card .lz-kat-name { font-size: 13px; font-weight: 600; color: var(--brown); }
+  .lz-kat-card .lz-kat-count { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .lz-kat-card .lz-kat-foto { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; }
+  .lz-add-kat-card { border: 2px dashed var(--soft); background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 120px; }
+  .lz-add-kat-card:hover { border-color: var(--accent); background: var(--cream); }
+  .lz-add-kat-card .plus { font-size: 28px; color: var(--soft); }
+  .lz-add-kat-card .txt { font-size: 12px; color: var(--muted); }
+
+  .lz-urun-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  .lz-urun-card { background: var(--card); border: 1.5px solid var(--soft); border-radius: 14px; overflow: hidden; cursor: pointer; transition: all 0.2s; }
+  .lz-urun-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(212,79,130,0.12); }
+  .lz-urun-img { width: 100%; height: 120px; object-fit: cover; background: var(--cream2); display: flex; align-items: center; justify-content: center; font-size: 36px; }
+  .lz-urun-img img { width: 100%; height: 100%; object-fit: cover; }
+  .lz-urun-body { padding: 0.75rem; }
+  .lz-urun-name { font-size: 13px; font-weight: 600; color: var(--brown); margin-bottom: 4px; }
+  .lz-urun-price { font-size: 13px; color: var(--accent); font-weight: 500; }
+  .lz-urun-desc { font-size: 11px; color: var(--muted); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lz-urun-status { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 999px; margin-top: 6px; }
+  .lz-urun-status.aktif { background: #e8f8ef; color: var(--green); }
+  .lz-urun-status.pasif { background: #fef0f0; color: var(--red); }
+  .lz-add-urun-card { border: 2px dashed var(--soft); background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 160px; border-radius: 14px; transition: all 0.2s; }
+  .lz-add-urun-card:hover { border-color: var(--accent); background: var(--cream); }
+
+  /* ÜRÜN DETAY SAYFASI */
+  .lz-detail-form { background: var(--card); border: 1.5px solid var(--soft); border-radius: 14px; padding: 1.5rem; }
+  .lz-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .lz-foto-preview { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; border: 1.5px solid var(--soft); background: var(--cream2); display: flex; align-items: center; justify-content: center; font-size: 48px; margin-bottom: 0.75rem; overflow: hidden; }
+  .lz-foto-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .lz-save-btn { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 11px 28px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.2s; }
+  .lz-save-btn:hover { opacity: 0.85; }
+  .lz-del-btn { background: transparent; color: var(--red); border: 1px solid var(--red); border-radius: 10px; padding: 11px 20px; font-size: 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .lz-del-btn:hover { background: #fff0f0; }
+  .lz-status-toggle { display: flex; align-items: center; gap: 10px; padding: 0.75rem 1rem; background: var(--cream); border-radius: 10px; border: 1px solid var(--soft); margin-bottom: 1rem; }
+  .lz-bolum { background: var(--cream); border: 1px solid var(--soft); border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; }
+  .lz-bolum-title { font-size: 13px; font-weight: 600; color: var(--brown); margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
+  .lz-chip { display: inline-flex; align-items: center; gap: 5px; background: #fff; border: 1px solid var(--soft); border-radius: 999px; padding: 4px 10px; font-size: 12px; margin: 3px; }
+  .lz-chip button { background: none; border: none; color: var(--red); cursor: pointer; font-size: 13px; line-height: 1; padding: 0; }
+
+  /* MOBİL */
+  @media (max-width: 600px) {
+    .lz-kat-grid { grid-template-columns: repeat(2, 1fr); }
+    .lz-urun-grid { grid-template-columns: 1fr; }
+    .lz-detail-grid { grid-template-columns: 1fr; }
+  }
+
   .foto-preview { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid var(--soft); }
 
   /* FOTO YÖNETİMİ */
@@ -157,6 +215,7 @@
 
 <div class="tabs">
   <button class="tab active" onclick="switchTab('kategoriler', this)">Kategoriler</button>
+  <button class="tab" onclick="switchTab('lezzetler', this)">🛍 Lezzetleri Yönet</button>
   <button class="tab" onclick="switchTab('menu', this)">Menü İçerikleri</button>
   <button class="tab" onclick="switchTab('stok', this)">Stok</button>
   <button class="tab" onclick="switchTab('foto', this)">Fotoğraflar</button>
@@ -194,6 +253,136 @@
       <button class="add-btn" onclick="onlineAyarKaydet()">Kaydet</button>
     </div>
     <p style="font-size:12px; color:var(--muted);" id="online-ayar-mevcut"></p>
+  </div>
+</div>
+
+<!-- LEZZETLERİ YÖNET PANELİ -->
+<div class="panel" id="panel-lezzetler">
+  <div class="section-card" style="padding:1rem 1.25rem 0.5rem;">
+    <div id="lz-breadcrumb" class="lz-breadcrumb">
+      <span onclick="lzGo('kategoriler')">Ana Menü</span>
+    </div>
+  </div>
+
+  <!-- EKRAN 1: KATEGORİLER -->
+  <div class="lz-screen active" id="lz-screen-kategoriler">
+    <div class="section-card">
+      <div class="section-header">
+        <h2>Kategoriler</h2>
+        <button class="add-btn" onclick="lzYeniKategori()">+ Kategori Ekle</button>
+      </div>
+      <div class="lz-kat-grid" id="lz-kat-grid">
+        <div class="loading">Yükleniyor...</div>
+      </div>
+    </div>
+
+    <!-- Kategori Ekle/Düzenle Formu -->
+    <div class="section-card" id="lz-kat-form-card" style="display:none;">
+      <div class="section-header">
+        <h2 id="lz-kat-form-title">Yeni Kategori</h2>
+        <button onclick="lzKatFormKapat()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);">✕</button>
+      </div>
+      <div style="display:grid;grid-template-columns:60px 1fr 1fr;gap:10px;margin-bottom:1rem;">
+        <div class="form-group"><label>Emoji</label><input class="form-input emoji-select" id="lz-kat-emoji" type="text" value="🍦" maxlength="2"></div>
+        <div class="form-group"><label>Kategori Adı</label><input class="form-input" id="lz-kat-isim" type="text" placeholder="Örn: Waffle"></div>
+        <div class="form-group"><label>Fotoğraf URL</label><input class="form-input" id="lz-kat-foto" type="text" placeholder="https://... veya dosya adı"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="lz-save-btn" onclick="lzKatKaydet()">Kaydet</button>
+        <button id="lz-kat-sil-btn" class="lz-del-btn" onclick="lzKatSil()" style="display:none;">Kategoriyi Sil</button>
+      </div>
+      <input type="hidden" id="lz-kat-edit-id">
+    </div>
+  </div>
+
+  <!-- EKRAN 2: ÜRÜNLER -->
+  <div class="lz-screen" id="lz-screen-urunler">
+    <div class="section-card">
+      <div class="section-header">
+        <h2 id="lz-urun-baslik">Ürünler</h2>
+        <button class="add-btn" onclick="lzYeniUrun()">+ Ürün Ekle</button>
+      </div>
+      <div class="lz-urun-grid" id="lz-urun-grid">
+        <div class="loading">Yükleniyor...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EKRAN 3: ÜRÜN DETAY -->
+  <div class="lz-screen" id="lz-screen-detay">
+    <div class="lz-detail-form">
+      <div class="lz-detail-grid">
+        <!-- SOL: Fotoğraf + Durum -->
+        <div>
+          <div class="lz-foto-preview" id="lz-detail-foto-prev">
+            <span id="lz-detail-emoji-prev">🍦</span>
+          </div>
+          <div class="form-group" style="margin-bottom:0.75rem;">
+            <label>Fotoğraf URL</label>
+            <input class="form-input" id="lz-d-foto" type="text" placeholder="https://... veya GitHub dosya adı" oninput="lzFotoOnizle(this.value)">
+          </div>
+          <div class="lz-status-toggle">
+            <label class="toggle"><input type="checkbox" id="lz-d-aktif" checked><span class="toggle-slider"></span></label>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--brown);">Ürün Aktif</div>
+              <div style="font-size:11px;color:var(--muted);">Kapalıysa menüde görünmez</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SAĞ: Bilgiler -->
+        <div>
+          <div class="form-group" style="margin-bottom:0.75rem;">
+            <label>Emoji</label>
+            <input class="form-input emoji-select" id="lz-d-emoji" type="text" value="🍦" maxlength="2" oninput="document.getElementById('lz-detail-emoji-prev').textContent=this.value">
+          </div>
+          <div class="form-group" style="margin-bottom:0.75rem;">
+            <label>Ürün Adı</label>
+            <input class="form-input" id="lz-d-isim" type="text" placeholder="Örn: Çikolatalı Waffle">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:0.75rem;">
+            <div class="form-group">
+              <label>Fiyat (₺)</label>
+              <input class="form-input" id="lz-d-fiyat" type="number" placeholder="80">
+            </div>
+            <div class="form-group">
+              <label>Kategori</label>
+              <select class="form-input" id="lz-d-kategori"></select>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0.75rem;">
+            <label>Kısa Açıklama</label>
+            <input class="form-input" id="lz-d-aciklama" type="text" placeholder="Ürünü kısaca tanıtın...">
+          </div>
+          <div class="form-group" style="margin-bottom:0.75rem;">
+            <label>Detaylı Açıklama</label>
+            <textarea class="form-input" id="lz-d-detay" rows="3" placeholder="İçindekiler, hazırlanışı, özellikler..." style="resize:vertical;"></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:0.75rem;">
+            <label>Alerjen / Notlar</label>
+            <input class="form-input" id="lz-d-alerjen" type="text" placeholder="Gluten, Süt, Yumurta...">
+          </div>
+        </div>
+      </div>
+
+      <!-- SEÇENEK BÖLÜMLERİ -->
+      <div style="margin-top:1.25rem;border-top:1px solid var(--soft);padding-top:1.25rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <div style="font-size:14px;font-weight:600;color:var(--brown);">Seçenek Bölümleri</div>
+          <button class="add-btn" style="font-size:12px;padding:6px 14px;" onclick="lzBolumEkle()">+ Bölüm Ekle</button>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:1rem;">Örn: "Sos", "Malzeme", "Büyüklük" — müşteri bunlardan seçim yapar</p>
+        <div id="lz-bolumler"></div>
+      </div>
+
+      <!-- KAYDET / SİL -->
+      <div style="display:flex;gap:10px;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--soft);">
+        <button class="lz-save-btn" onclick="lzUrunKaydet()">💾 Kaydet</button>
+        <button id="lz-urun-sil-btn" class="lz-del-btn" onclick="lzUrunSil()" style="display:none;">Ürünü Sil</button>
+      </div>
+      <input type="hidden" id="lz-d-edit-id">
+      <input type="hidden" id="lz-d-kat-id">
+    </div>
   </div>
 </div>
 
@@ -1006,12 +1195,329 @@
     showToast(`Top fiyatı ${fiyat} ₺ olarak kaydedildi`);
   };
 
+  // ══════════════════════════════════════════
+  // LEZZETLERİ YÖNET
+  // ══════════════════════════════════════════
+  let lzAktifKatId = null;
+  let lzAktifUrunId = null;
+  let lzBolumler = []; // aktif ürünün bölümleri
+
+  // Breadcrumb & ekran geçişi
+  function lzGo(screen, extra) {
+    document.querySelectorAll('.lz-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('lz-screen-' + screen).classList.add('active');
+    lzBreadcrumb(screen, extra);
+  }
+
+  function lzBreadcrumb(screen, extra) {
+    const el = document.getElementById('lz-breadcrumb');
+    if (screen === 'kategoriler') {
+      el.innerHTML = `<span class="current">Ana Menü</span>`;
+    } else if (screen === 'urunler') {
+      const kat = kategoriler.find(k => k.id === lzAktifKatId);
+      el.innerHTML = `<span onclick="lzGo('kategoriler')">Ana Menü</span><span class="sep">›</span><span class="current">${kat?.emoji || ''} ${kat?.isim || ''}</span>`;
+    } else if (screen === 'detay') {
+      const kat = kategoriler.find(k => k.id === lzAktifKatId);
+      const isim = document.getElementById('lz-d-isim').value || 'Yeni Ürün';
+      el.innerHTML = `<span onclick="lzGo('kategoriler')">Ana Menü</span><span class="sep">›</span><span onclick="lzGo('urunler')">${kat?.emoji || ''} ${kat?.isim || ''}</span><span class="sep">›</span><span class="current">${extra || isim}</span>`;
+    }
+  }
+
+  // KATEGORİLER EKRANI
+  function lzRenderKategoriler() {
+    const grid = document.getElementById('lz-kat-grid');
+    if (!kategoriler.length) { grid.innerHTML = '<span class="empty-list">Henüz kategori yok</span>'; return; }
+    grid.innerHTML = kategoriler.map(k => {
+      const urunSayisi = lzUrunSayisi(k.id);
+      return `
+        <div class="lz-kat-card" onclick="lzKatAc('${k.id}')">
+          ${k.foto ? `<img src="${k.foto}" class="lz-kat-foto" onerror="this.style.display='none'">` : `<div class="lz-kat-emoji">${k.emoji || '🍦'}</div>`}
+          <div class="lz-kat-name">${k.isim}</div>
+          <div class="lz-kat-count">${urunSayisi} ürün</div>
+          <div style="margin-top:8px;display:flex;gap:4px;justify-content:center;">
+            <button onclick="event.stopPropagation();lzDuzenleKat('${k.id}')" style="font-size:11px;padding:3px 10px;border:1px solid var(--soft);border-radius:999px;background:#fff;color:var(--muted);cursor:pointer;">Düzenle</button>
+          </div>
+        </div>`;
+    }).join('') + `
+      <div class="lz-kat-card lz-add-kat-card" onclick="lzYeniKategori()">
+        <div class="plus">＋</div>
+        <div class="txt">Kategori Ekle</div>
+      </div>`;
+  }
+
+  function lzUrunSayisi(katId) {
+    // Firebase'den anlık sayıyı döndür
+    return window._lzUrunSayilari?.[katId] || 0;
+  }
+
+  // Kategori aç → ürünler ekranı
+  window.lzKatAc = function(katId) {
+    lzAktifKatId = katId;
+    lzKatFormKapat();
+    lzGo('urunler');
+    lzRenderUrunler(katId);
+  };
+
+  // Yeni kategori formu
+  window.lzYeniKategori = function() {
+    document.getElementById('lz-kat-form-card').style.display = 'block';
+    document.getElementById('lz-kat-form-title').textContent = 'Yeni Kategori';
+    document.getElementById('lz-kat-emoji').value = '🍦';
+    document.getElementById('lz-kat-isim').value = '';
+    document.getElementById('lz-kat-foto').value = '';
+    document.getElementById('lz-kat-edit-id').value = '';
+    document.getElementById('lz-kat-sil-btn').style.display = 'none';
+    document.getElementById('lz-kat-isim').focus();
+  };
+
+  window.lzDuzenleKat = function(katId) {
+    const kat = kategoriler.find(k => k.id === katId);
+    if (!kat) return;
+    document.getElementById('lz-kat-form-card').style.display = 'block';
+    document.getElementById('lz-kat-form-title').textContent = `Düzenle: ${kat.isim}`;
+    document.getElementById('lz-kat-emoji').value = kat.emoji || '🍦';
+    document.getElementById('lz-kat-isim').value = kat.isim;
+    document.getElementById('lz-kat-foto').value = kat.foto || '';
+    document.getElementById('lz-kat-edit-id').value = katId;
+    document.getElementById('lz-kat-sil-btn').style.display = 'inline-block';
+  };
+
+  window.lzKatFormKapat = function() {
+    document.getElementById('lz-kat-form-card').style.display = 'none';
+  };
+
+  window.lzKatKaydet = async function() {
+    const isim = document.getElementById('lz-kat-isim').value.trim();
+    if (!isim) { showToast('Kategori adı gerekli!'); return; }
+    const emoji = document.getElementById('lz-kat-emoji').value || '🍦';
+    const foto = document.getElementById('lz-kat-foto').value.trim();
+    const editId = document.getElementById('lz-kat-edit-id').value;
+
+    if (editId) {
+      await set(ref(db, `menu/kategoriler/${editId}`), { id: editId, isim, emoji, foto, sira: kategoriler.findIndex(k => k.id === editId) });
+    } else {
+      const id = 'kat_' + Date.now();
+      await set(ref(db, `menu/kategoriler/${id}`), { id, isim, emoji, foto, sira: kategoriler.length });
+    }
+    lzKatFormKapat();
+    showToast('Kategori kaydedildi ✓');
+  };
+
+  window.lzKatSil = async function() {
+    const editId = document.getElementById('lz-kat-edit-id').value;
+    if (!editId || !confirm('Bu kategoriyi silmek istediğinden emin misin?')) return;
+    await remove(ref(db, `menu/kategoriler/${editId}`));
+    lzKatFormKapat();
+    showToast('Kategori silindi');
+  };
+
+  // ÜRÜNLER EKRANI
+  function lzRenderUrunler(katId) {
+    const kat = kategoriler.find(k => k.id === katId);
+    document.getElementById('lz-urun-baslik').textContent = `${kat?.emoji || ''} ${kat?.isim || ''} — Ürünler`;
+    const grid = document.getElementById('lz-urun-grid');
+    grid.innerHTML = '<div class="loading">Yükleniyor...</div>';
+
+    onValue(ref(db, `menu/urunler/${katId}`), (snap) => {
+      const data = snap.val() || {};
+      const urunler = Object.values(data);
+      if (!window._lzUrunSayilari) window._lzUrunSayilari = {};
+      window._lzUrunSayilari[katId] = urunler.length;
+
+      grid.innerHTML = urunler.map(u => `
+        <div class="lz-urun-card" onclick="lzUrunAc('${katId}','${u.id}')">
+          <div class="lz-urun-img">
+            ${u.foto ? `<img src="${u.foto}" onerror="this.parentElement.innerHTML='<span style=font-size:36px>${u.emoji||'🍦'}</span>'">` : `<span>${u.emoji||'🍦'}</span>`}
+          </div>
+          <div class="lz-urun-body">
+            <div class="lz-urun-name">${u.isim}</div>
+            <div class="lz-urun-price">${u.fiyat ? u.fiyat + ' ₺' : '—'}</div>
+            ${u.aciklama ? `<div class="lz-urun-desc">${u.aciklama}</div>` : ''}
+            <span class="lz-urun-status ${u.aktif === false ? 'pasif' : 'aktif'}">${u.aktif === false ? 'Pasif' : 'Aktif'}</span>
+          </div>
+        </div>`).join('') + `
+        <div class="lz-add-urun-card" onclick="lzYeniUrun()">
+          <div style="font-size:28px;color:var(--soft);">＋</div>
+          <div style="font-size:12px;color:var(--muted);">Ürün Ekle</div>
+        </div>`;
+    }, { onlyOnce: true });
+  }
+
+  // YENİ ÜRÜN
+  window.lzYeniUrun = function() {
+    lzAktifUrunId = null;
+    lzBolumler = [];
+    document.getElementById('lz-d-isim').value = '';
+    document.getElementById('lz-d-emoji').value = '🍦';
+    document.getElementById('lz-d-fiyat').value = '';
+    document.getElementById('lz-d-foto').value = '';
+    document.getElementById('lz-d-aciklama').value = '';
+    document.getElementById('lz-d-detay').value = '';
+    document.getElementById('lz-d-alerjen').value = '';
+    document.getElementById('lz-d-aktif').checked = true;
+    document.getElementById('lz-d-edit-id').value = '';
+    document.getElementById('lz-d-kat-id').value = lzAktifKatId;
+    document.getElementById('lz-urun-sil-btn').style.display = 'none';
+    document.getElementById('lz-detail-emoji-prev').textContent = '🍦';
+    document.getElementById('lz-detail-foto-prev').innerHTML = '<span id="lz-detail-emoji-prev">🍦</span>';
+    lzKategorileriDoldur();
+    lzRenderBolumler();
+    lzGo('detay', 'Yeni Ürün');
+  };
+
+  // ÜRÜN AÇ (düzenle)
+  window.lzUrunAc = function(katId, urunId) {
+    lzAktifKatId = katId;
+    lzAktifUrunId = urunId;
+    onValue(ref(db, `menu/urunler/${katId}/${urunId}`), (snap) => {
+      const u = snap.val();
+      if (!u) return;
+      document.getElementById('lz-d-isim').value = u.isim || '';
+      document.getElementById('lz-d-emoji').value = u.emoji || '🍦';
+      document.getElementById('lz-d-fiyat').value = u.fiyat || '';
+      document.getElementById('lz-d-foto').value = u.foto || '';
+      document.getElementById('lz-d-aciklama').value = u.aciklama || '';
+      document.getElementById('lz-d-detay').value = u.detay || '';
+      document.getElementById('lz-d-alerjen').value = u.alerjen || '';
+      document.getElementById('lz-d-aktif').checked = u.aktif !== false;
+      document.getElementById('lz-d-edit-id').value = urunId;
+      document.getElementById('lz-d-kat-id').value = katId;
+      document.getElementById('lz-urun-sil-btn').style.display = 'inline-block';
+      lzBolumler = u.bolumler ? JSON.parse(JSON.stringify(u.bolumler)) : [];
+
+      // Fotoğraf önizle
+      if (u.foto) {
+        document.getElementById('lz-detail-foto-prev').innerHTML = `<img src="${u.foto}" onerror="this.parentElement.innerHTML='<span id=lz-detail-emoji-prev>${u.emoji||'🍦'}</span>'">`;
+      } else {
+        document.getElementById('lz-detail-foto-prev').innerHTML = `<span id="lz-detail-emoji-prev">${u.emoji||'🍦'}</span>`;
+      }
+
+      lzKategorileriDoldur(katId);
+      lzRenderBolumler();
+      lzGo('detay', u.isim);
+    }, { onlyOnce: true });
+  };
+
+  // Fotoğraf önizle
+  window.lzFotoOnizle = function(url) {
+    const prev = document.getElementById('lz-detail-foto-prev');
+    if (url) {
+      prev.innerHTML = `<img src="${url}" onerror="this.parentElement.innerHTML='<span id=lz-detail-emoji-prev>' + document.getElementById('lz-d-emoji').value + '</span>'">`;
+    } else {
+      prev.innerHTML = `<span id="lz-detail-emoji-prev">${document.getElementById('lz-d-emoji').value}</span>`;
+    }
+  };
+
+  // Kategori select doldur
+  function lzKategorileriDoldur(seciliId) {
+    const sel = document.getElementById('lz-d-kategori');
+    sel.innerHTML = kategoriler.map(k => `<option value="${k.id}" ${k.id === (seciliId||lzAktifKatId) ? 'selected' : ''}>${k.emoji||''} ${k.isim}</option>`).join('');
+  }
+
+  // Bölümler
+  function lzRenderBolumler() {
+    const el = document.getElementById('lz-bolumler');
+    if (!lzBolumler.length) { el.innerHTML = '<p style="font-size:12px;color:var(--muted);">Henüz seçenek bölümü yok.</p>'; return; }
+    el.innerHTML = lzBolumler.map((b, i) => `
+      <div class="lz-bolum">
+        <div class="lz-bolum-title">
+          <span>${b.ad}</span>
+          <button onclick="lzBolumSil(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;">✕</button>
+        </div>
+        <div style="margin-bottom:6px;">
+          ${(b.secenekler||[]).map((s,j) => `<span class="lz-chip">${s}<button onclick="lzSecenek Sil(${i},${j})">✕</button></span>`).join('')}
+        </div>
+        <div style="display:flex;gap:6px;">
+          <input class="form-input" id="lz-secenek-${i}" type="text" placeholder="Seçenek ekle..." style="font-size:12px;padding:6px 10px;">
+          <button class="add-btn" style="font-size:12px;padding:6px 12px;" onclick="lzSecenekEkle(${i})">Ekle</button>
+        </div>
+      </div>`).join('');
+  }
+
+  window.lzBolumEkle = function() {
+    const ad = prompt('Bölüm adı girin (Örn: Sos, Büyüklük):');
+    if (!ad) return;
+    lzBolumler.push({ ad: ad.trim(), secenekler: [] });
+    lzRenderBolumler();
+  };
+
+  window.lzBolumSil = function(i) {
+    lzBolumler.splice(i, 1);
+    lzRenderBolumler();
+  };
+
+  window.lzSecenekEkle = function(i) {
+    const inp = document.getElementById('lz-secenek-' + i);
+    const val = inp.value.trim();
+    if (!val) return;
+    if (!lzBolumler[i].secenekler) lzBolumler[i].secenekler = [];
+    lzBolumler[i].secenekler.push(val);
+    inp.value = '';
+    lzRenderBolumler();
+  };
+
+  window.lzSecenekSil = function(i, j) {
+    lzBolumler[i].secenekler.splice(j, 1);
+    lzRenderBolumler();
+  };
+
+  // ÜRÜN KAYDET
+  window.lzUrunKaydet = async function() {
+    const isim = document.getElementById('lz-d-isim').value.trim();
+    if (!isim) { showToast('Ürün adı gerekli!'); return; }
+    const katId = document.getElementById('lz-d-kategori').value || lzAktifKatId;
+    const editId = document.getElementById('lz-d-edit-id').value;
+    const id = editId || ('urun_' + Date.now());
+
+    const urun = {
+      id,
+      isim,
+      emoji: document.getElementById('lz-d-emoji').value || '🍦',
+      fiyat: Number(document.getElementById('lz-d-fiyat').value) || 0,
+      foto: document.getElementById('lz-d-foto').value.trim(),
+      aciklama: document.getElementById('lz-d-aciklama').value.trim(),
+      detay: document.getElementById('lz-d-detay').value.trim(),
+      alerjen: document.getElementById('lz-d-alerjen').value.trim(),
+      aktif: document.getElementById('lz-d-aktif').checked,
+      bolumler: lzBolumler
+    };
+
+    // Eğer kategori değiştiyse eskisinden sil
+    if (editId && lzAktifKatId && katId !== lzAktifKatId) {
+      await remove(ref(db, `menu/urunler/${lzAktifKatId}/${editId}`));
+    }
+
+    await set(ref(db, `menu/urunler/${katId}/${id}`), urun);
+    lzAktifKatId = katId;
+    showToast('Ürün kaydedildi ✓');
+    lzGo('urunler');
+    lzRenderUrunler(katId);
+  };
+
+  // ÜRÜN SİL
+  window.lzUrunSil = async function() {
+    const editId = document.getElementById('lz-d-edit-id').value;
+    const katId = document.getElementById('lz-d-kat-id').value;
+    if (!editId || !confirm('Bu ürünü silmek istediğinden emin misin?')) return;
+    await remove(ref(db, `menu/urunler/${katId}/${editId}`));
+    showToast('Ürün silindi');
+    lzGo('urunler');
+    lzRenderUrunler(katId);
+  };
+
+  // Lezzetler sekmesi açılınca render et
+  const origSwitchTab = window.switchTab;
+
   window.switchTab = function(tab, el) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById('panel-' + tab).classList.add('active');
     el.classList.add('active');
     if (tab === 'stok') stokKategorileriDoldur();
+    if (tab === 'lezzetler') {
+      lzGo('kategoriler');
+      lzRenderKategoriler();
+    }
   };
 
   function stokKategorileriDoldur() {
