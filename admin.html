@@ -1275,21 +1275,19 @@
   }
 
   // Kategori aç → ürünler ekranı
-  window.lzKatAc = function(katId) {
+  window.lzKatAc = async function(katId) {
     lzAktifKatId = katId;
     lzKatFormKapat();
 
-    // Dondurma mu kontrol et
-    onValue(ref(db, `menu/${katId}/topDestegi`), (snap) => {
-      const isDondurma = snap.val() === true;
-      if (isDondurma) {
-        lzGo('urunler');
-        lzRenderDondurma(katId);
-      } else {
-        lzGo('urunler');
-        lzRenderUrunler(katId);
-      }
-    }, { onlyOnce: true });
+    const snap = await new Promise(res => onValue(ref(db, `menu/${katId}/topDestegi`), res, { onlyOnce: true }));
+    const isDondurma = snap.val() === true;
+
+    lzGo('urunler');
+    if (isDondurma) {
+      lzRenderDondurma(katId);
+    } else {
+      lzRenderUrunler(katId);
+    }
   };
 
   // Yeni kategori formu
@@ -1351,7 +1349,6 @@
   };
 
   // ÜRÜNLER EKRANI
-  // DONDURMA ÇEŞİTLERİ YÖNETİMİ
   function lzRenderDondurma(katId) {
     const kat = kategoriler.find(k => k.id === katId);
     document.getElementById('lz-urun-baslik').textContent = `${kat?.emoji||''} ${kat?.isim||''} — Çeşitler`;
@@ -1359,16 +1356,22 @@
     grid.innerHTML = '<div class="loading">Yükleniyor...</div>';
 
     onValue(ref(db, `menu/${katId}/bolumler`), (snap) => {
-      const bolumler = snap.val() || {};
-      const cesitBolum = Object.values(bolumler).find(b => b.topIcinKullan) || Object.values(bolumler)[0];
-      
+      const bolumler = snap.val();
+      if (!bolumler) {
+        grid.innerHTML = '<span class="empty-list">Çeşit bölümü bulunamadı.</span>';
+        return;
+      }
+
+      // topIcinKullan olan bölümü bul, yoksa ilkini al
+      const bolumEntries = Object.entries(bolumler);
+      const [bolumId, cesitBolum] = bolumEntries.find(([,b]) => b.topIcinKullan) || bolumEntries[0] || [];
+
       if (!cesitBolum) {
-        grid.innerHTML = '<span class="empty-list">Çeşit bölümü bulunamadı. Admin → Menü İçerikleri\'nden ekleyin.</span>';
+        grid.innerHTML = '<span class="empty-list">Çeşit bölümü bulunamadı.</span>';
         return;
       }
 
       const secenekler = Object.values(cesitBolum.secenekler || {});
-      const bolumId = Object.keys(bolumler).find(k => bolumler[k] === cesitBolum);
 
       grid.innerHTML = `
         <div style="grid-column:1/-1;background:var(--warm);border-radius:12px;padding:1rem;margin-bottom:0.5rem;font-size:13px;color:var(--brown);">
