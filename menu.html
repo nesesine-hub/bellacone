@@ -277,12 +277,13 @@
   window.openKategori = function(id) {
     aktifKategori = kategoriler.find(k => k.id === id);
     if (!aktifKategori) return;
-    const data = {}; const katUrunler = menuData.urunler?.[id] || {};
-    const tumUrunler = Object.values(katUrunler);
+    const data = menuData[id] || {};
+    window._katUrunler = data.urunler || {};
+    const tumUrunler = Object.values(window._katUrunler);
     const aktifUrunler = tumUrunler.filter(u => !u.pasif && (u.stok === undefined || u.stok > 0));
     const pasifUrunler = tumUrunler.filter(u => u.pasif || (u.stok !== undefined && u.stok <= 0));
-    const bolumler = [];
-    const topDestegi = false;
+    const bolumler = data.bolumler ? Object.entries(data.bolumler).sort((a,b) => (a[1].sira??999)-(b[1].sira??999)) : [];
+    const topDestegi = data.topDestegi || false;
 
     document.getElementById('detail-title').textContent = aktifKategori.isim;
     state = { urun: null, toplar: [], secimler: {}, miktar: 1 };
@@ -383,7 +384,7 @@
   // TOP SIRALAMASI
   window.selectUrunTop = function(id) {
     const data = menuData[aktifKategori.id] || {};
-    const urunler = Object.values(katUrunler);
+    const urunler = Object.values(window._katUrunler || {});
     state.urun = state.urun === id ? null : id;
     state.toplar = [];
     urunler.forEach(u => {
@@ -407,7 +408,7 @@
     if (!alan) return;
     const data = menuData[aktifKategori.id] || {};
     const bolumler = data.bolumler || {};
-    const urunler2 = Object.values(katUrunler);
+    const urunler2 = Object.values(window._katUrunler || {});
     const secilenUrun = urunler2.find(u => u.id === state.urun);
     const kulahFiyat = secilenUrun?.fiyat || 0;
 
@@ -481,7 +482,7 @@
 
   window.selectUrun = function(id) {
     const data = menuData[aktifKategori.id] || {};
-    const urunler = Object.values(katUrunler);
+    const urunler = Object.values(window._katUrunler || {});
     state.urun = state.urun === id ? null : id;
     urunler.forEach(u => {
       const el = document.getElementById('uc-' + u.id);
@@ -507,7 +508,7 @@
   window.sepeteEkle = function() {
     if (!aktifKategori) return;
     const data = menuData[aktifKategori.id] || {};
-    const urunler = Object.values(katUrunler);
+    const urunler = Object.values(window._katUrunler || {});
     const bolumler = data.bolumler || {};
     const topDestegi = false;
 
