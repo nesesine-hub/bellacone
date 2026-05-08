@@ -7,9 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --cream: #faf5ee; --cream2: #f5ede0; --brown: #3d2314; --brown2: #5c3d2e;
-    --accent: #c9663c; --gold: #c9a96e; --text: #2a1a0e; --muted: #8a6a56;
-    --white: #fffdf9; --green: #3a9b65; --red: #c0392b;
+    --cream: #fef2f7; --cream2: #fac8df; --brown: #320d1e; --brown2: #f094bc;
+    --accent: #d44f82; --gold: #eaaa40; --text: #c0336a; --muted: #8a3860;
+    --white: #fffafc; --green: #3a9b65; --red: #c0392b;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--cream); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
@@ -174,15 +174,9 @@
           <label>Adres *</label>
           <textarea class="form-input" id="adres" rows="3" placeholder="Mahalle, Sokak, Bina No..." style="resize:none;"></textarea>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Semt / İlçe *</label>
-            <input class="form-input" id="semt" type="text" placeholder="Çorlu">
-          </div>
-          <div class="form-group">
-            <label>Blok / Daire / Kat *</label>
-            <input class="form-input" id="daire" type="text" placeholder="A Blok, Kat 2, No 4">
-          </div>
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label>Blok / Daire / Kat *</label>
+          <input class="form-input" id="daire" type="text" placeholder="A Blok, Kat 2, No 4">
         </div>
         <div class="form-group" style="margin-top:1rem;">
           <label>Adres Tarifi (opsiyonel)</label>
@@ -372,13 +366,11 @@
     const ad    = document.getElementById('ad-soyad').value.trim();
     const tel   = document.getElementById('telefon').value.trim();
     const adres = document.getElementById('adres').value.trim();
-    const semt  = document.getElementById('semt').value.trim();
     const daire = document.getElementById('daire').value.trim();
 
     if (!ad)    { flashHata('ad-soyad'); return; }
     if (!tel)   { flashHata('telefon'); return; }
     if (!adres) { flashHata('adres'); return; }
-    if (!semt)  { flashHata('semt'); return; }
     if (!daire) { flashHata('daire'); return; }
 
     const btn = document.getElementById('siparis-btn');
@@ -390,7 +382,7 @@
       musteri: { ad, tel },
       adres: {
         adres,
-        semt,
+        semt: 'Çorlu',
         daire: document.getElementById('daire').value.trim(),
         tarif: document.getElementById('tarif').value.trim()
       },
@@ -416,7 +408,7 @@
     }
   };
 
-  ['ad-soyad','telefon','adres','semt','daire'].forEach(id => {
+  ['ad-soyad','telefon','adres','daire'].forEach(id => {
     document.getElementById(id)?.addEventListener('input', function() {
       this.classList.remove('error');
     });
