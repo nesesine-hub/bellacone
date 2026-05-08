@@ -1402,7 +1402,7 @@
       const s = snap.val();
       if (!s) return;
       document.getElementById('cesit-edit-isim').value = s.isim || '';
-      document.getElementById('cesit-edit-ekfiyat').value = s.ekFiyat || '';
+      document.getElementById('cesit-edit-ekfiyat').value = s.fiyat || topFiyat || 80;
       document.getElementById('cesit-edit-aktif').checked = !s.pasif;
       document.getElementById('cesit-edit-katid').value = katId;
       document.getElementById('cesit-edit-bolumid').value = bolumId;
@@ -1421,11 +1421,10 @@
     const bolumId = document.getElementById('cesit-edit-bolumid').value;
     const cesitId = document.getElementById('cesit-edit-id').value;
     const isim    = document.getElementById('cesit-edit-isim').value.trim();
-    const ekFiyat = parseInt(document.getElementById('cesit-edit-ekfiyat').value) || 0;
+    const fiyat   = parseInt(document.getElementById('cesit-edit-ekfiyat').value) || topFiyat;
     const aktif   = document.getElementById('cesit-edit-aktif').checked;
     if (!isim) { showToast('İsim boş olamaz!'); return; }
-    const guncelleme = { id: cesitId, isim, fiyat: topFiyat, pasif: !aktif };
-    if (ekFiyat > 0) guncelleme.ekFiyat = ekFiyat;
+    const guncelleme = { id: cesitId, isim, fiyat, pasif: !aktif };
     await set(ref(db, `menu/${katId}/bolumler/${bolumId}/secenekler/${cesitId}`), guncelleme);
     showToast('Çeşit güncellendi ✓');
     cesitModalKapat();
@@ -1761,7 +1760,7 @@
       const s = snap.val();
       if (!s) return;
       document.getElementById('cesit-edit-isim').value = s.isim || '';
-      document.getElementById('cesit-edit-ekfiyat').value = s.ekFiyat || '';
+      document.getElementById('cesit-edit-ekfiyat').value = s.fiyat || topFiyat || 80;
       document.getElementById('cesit-edit-aktif').checked = !s.pasif;
       document.getElementById('cesit-edit-katid').value = katId;
       document.getElementById('cesit-edit-bolumid').value = bolumId;
@@ -1779,11 +1778,10 @@
     const bolumId = document.getElementById('cesit-edit-bolumid').value;
     const cesitId = document.getElementById('cesit-edit-id').value;
     const isim    = document.getElementById('cesit-edit-isim').value.trim();
-    const ekFiyat = parseInt(document.getElementById('cesit-edit-ekfiyat').value) || 0;
+    const fiyat   = parseInt(document.getElementById('cesit-edit-ekfiyat').value) || topFiyat;
     const aktif   = document.getElementById('cesit-edit-aktif').checked;
     if (!isim) { showToast('İsim boş olamaz!'); return; }
-    const guncelleme = { id: cesitId, isim, fiyat: topFiyat, pasif: !aktif };
-    if (ekFiyat > 0) guncelleme.ekFiyat = ekFiyat;
+    const guncelleme = { id: cesitId, isim, fiyat, pasif: !aktif };
     await set(ref(db, `menu/${katId}/bolumler/${bolumId}/secenekler/${cesitId}`), guncelleme);
     showToast('Çeşit güncellendi ✓');
     cesitModalKapat();
@@ -1815,8 +1813,8 @@
       <input class="form-input" id="cesit-edit-isim" type="text">
     </div>
     <div class="form-group" style="margin-bottom:0.75rem;">
-      <label>Ek Ücret (₺) — 0 ise boş bırak</label>
-      <input class="form-input" id="cesit-edit-ekfiyat" type="number" min="0" placeholder="0">
+      <label>Fiyat (₺)</label>
+      <input class="form-input" id="cesit-edit-ekfiyat" type="number" min="0" placeholder="80">
     </div>
     <div style="display:flex;align-items:center;gap:10px;padding:0.75rem 1rem;background:var(--cream);border-radius:10px;border:1px solid var(--soft);margin-bottom:1rem;">
       <label class="toggle"><input type="checkbox" id="cesit-edit-aktif"><span class="toggle-slider"></span></label>
