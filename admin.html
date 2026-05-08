@@ -1752,6 +1752,54 @@
     stokListesiYukle(katId);
     showToast('Silindi');
   };
+
+  // ÇEŞİT DÜZENLE FONKSİYONLARI
+  window.lzCesitDuzenle = function(katId, bolumId, cesitId) {
+    onValue(ref(db, `menu/${katId}/bolumler/${bolumId}/secenekler/${cesitId}`), snap => {
+      const s = snap.val();
+      if (!s) return;
+      document.getElementById('cesit-edit-isim').value = s.isim || '';
+      document.getElementById('cesit-edit-ekfiyat').value = s.ekFiyat || '';
+      document.getElementById('cesit-edit-aktif').checked = !s.pasif;
+      document.getElementById('cesit-edit-katid').value = katId;
+      document.getElementById('cesit-edit-bolumid').value = bolumId;
+      document.getElementById('cesit-edit-id').value = cesitId;
+      document.getElementById('cesit-modal-overlay').style.display = 'flex';
+    }, { onlyOnce: true });
+  };
+
+  window.cesitModalKapat = function() {
+    document.getElementById('cesit-modal-overlay').style.display = 'none';
+  };
+
+  window.cesitKaydet = async function() {
+    const katId   = document.getElementById('cesit-edit-katid').value;
+    const bolumId = document.getElementById('cesit-edit-bolumid').value;
+    const cesitId = document.getElementById('cesit-edit-id').value;
+    const isim    = document.getElementById('cesit-edit-isim').value.trim();
+    const ekFiyat = parseInt(document.getElementById('cesit-edit-ekfiyat').value) || 0;
+    const aktif   = document.getElementById('cesit-edit-aktif').checked;
+    if (!isim) { showToast('İsim boş olamaz!'); return; }
+    const guncelleme = { id: cesitId, isim, fiyat: topFiyat, pasif: !aktif };
+    if (ekFiyat > 0) guncelleme.ekFiyat = ekFiyat;
+    await set(ref(db, `menu/${katId}/bolumler/${bolumId}/secenekler/${cesitId}`), guncelleme);
+    showToast('Çeşit güncellendi ✓');
+    cesitModalKapat();
+    lzRenderDondurma(katId);
+  };
+
+  window.cesitSil = async function() {
+    const katId   = document.getElementById('cesit-edit-katid').value;
+    const bolumId = document.getElementById('cesit-edit-bolumid').value;
+    const cesitId = document.getElementById('cesit-edit-id').value;
+    const isim    = document.getElementById('cesit-edit-isim').value;
+    if (!confirm(`"${isim}" çeşidini silmek istiyor musun?`)) return;
+    await remove(ref(db, `menu/${katId}/bolumler/${bolumId}/secenekler/${cesitId}`));
+    showToast('Çeşit silindi');
+    cesitModalKapat();
+    lzRenderDondurma(katId);
+  };
+
 </script>
 <!-- ÇEŞİT DÜZENLE MODALI -->
 <div id="cesit-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9999;align-items:center;justify-content:center;">
@@ -1781,6 +1829,5 @@
     <input type="hidden" id="cesit-edit-id">
   </div>
 </div>
-
 </body>
 </html>
