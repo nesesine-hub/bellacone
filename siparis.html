@@ -7,9 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --cream: #fef2f7; --cream2: #fac8df; --brown: #320d1e; --brown2: #f094bc;
-    --accent: #d44f82; --gold: #eaaa40; --text: #c0336a; --muted: #8a3860;
-    --white: #fffafc; --green: #3a9b65; --red: #c0392b;
+    --cream: #faf5ee; --cream2: #f5ede0; --brown: #3d2314; --brown2: #5c3d2e;
+    --accent: #c9663c; --gold: #c9a96e; --text: #2a1a0e; --muted: #8a6a56;
+    --white: #fffdf9; --green: #3a9b65; --red: #c0392b;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--cream); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
@@ -19,7 +19,7 @@
   .nav-links { display: flex; gap: 2.5rem; align-items: center; }
   .nav-links a { font-size: 13px; font-weight: 500; color: var(--brown2); text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
   .nav-links a:hover { color: var(--accent); }
-  .nav-cta { background: var(--accent) !important; color: var(--cream) !important; padding: 9px 22px; border-radius: 999px; font-size: 12px !important; }
+  .nav-cta { background: var(--brown) !important; color: var(--cream) !important; padding: 9px 22px; border-radius: 999px; font-size: 12px !important; }
 
   .siparis-layout { display: grid; grid-template-columns: 1fr 420px; gap: 2rem; padding: 8rem 4rem 4rem; max-width: 1200px; margin: 0 auto; }
 
@@ -30,20 +30,24 @@
 
   .form-card { background: var(--white); border-radius: 20px; padding: 2rem; margin-bottom: 1.5rem; border: 1px solid var(--cream2); }
   .form-card-title { font-size: 14px; font-weight: 600; color: var(--brown); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
-  .form-card-title .num { width: 24px; height: 24px; background: var(--accent); color: var(--cream); border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+  .form-card-title .num { width: 24px; height: 24px; background: var(--brown); color: var(--cream); border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
 
   .form-row { display: flex; gap: 12px; margin-bottom: 1rem; }
   .form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; }
   .form-group label { font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.05em; }
   .form-input { border: 1.5px solid var(--cream2); border-radius: 12px; padding: 11px 14px; font-size: 14px; color: var(--text); font-family: 'DM Sans', sans-serif; background: var(--cream); outline: none; transition: border-color 0.2s; }
   .form-input:focus { border-color: var(--accent); background: var(--white); }
-  .form-input.error { border-color: var(--red); }
+  .form-input.error { border-color: var(--red); box-shadow: 0 0 0 3px rgba(231,76,60,0.15); }
+  @keyframes flashError {
+    0%, 100% { background: var(--white); }
+    50% { background: rgba(231,76,60,0.08); }
+  }
   textarea.form-input { resize: none; }
 
   .odeme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .odeme-opt { border: 2px solid var(--cream2); border-radius: 14px; padding: 1rem 1.25rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
   .odeme-opt:hover { border-color: var(--brown2); }
-  .odeme-opt.selected { border-color: var(--accent); background: var(--cream2); }
+  .odeme-opt.selected { border-color: var(--brown); background: var(--cream2); }
   .odeme-icon { font-size: 24px; }
   .odeme-label { font-size: 14px; font-weight: 500; color: var(--brown); }
   .odeme-desc { font-size: 12px; color: var(--muted); }
@@ -52,7 +56,7 @@
   .bos-sepet-icon { font-size: 56px; margin-bottom: 1rem; }
   .bos-sepet h3 { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--brown); margin-bottom: 0.5rem; }
   .bos-sepet p { font-size: 14px; color: var(--muted); margin-bottom: 1.5rem; }
-  .btn-go { background: var(--accent); color: var(--cream); padding: 12px 28px; border-radius: 999px; text-decoration: none; font-size: 13px; font-weight: 500; display: inline-block; transition: all 0.2s; }
+  .btn-go { background: var(--brown); color: var(--cream); padding: 12px 28px; border-radius: 999px; text-decoration: none; font-size: 13px; font-weight: 500; display: inline-block; transition: all 0.2s; }
   .btn-go:hover { background: var(--accent); }
 
   /* SAĞ — SEPET ÖZET */
@@ -80,7 +84,7 @@
   .min-warning { font-size: 12px; color: var(--red); margin-top: 8px; display: none; }
   .min-warning.show { display: block; }
 
-  .siparis-btn { width: 100%; background: var(--accent); color: var(--cream); border: none; border-radius: 14px; padding: 16px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; margin-top: 1rem; }
+  .siparis-btn { width: 100%; background: var(--brown); color: var(--cream); border: none; border-radius: 14px; padding: 16px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; margin-top: 1rem; }
   .siparis-btn:hover { background: var(--accent); }
   .siparis-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
@@ -93,11 +97,11 @@
   .success-modal p { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; }
   .success-modal .btn-go { display: inline-block; }
 
-  footer { background: var(--accent); padding: 3rem 6rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  footer { background: var(--brown); padding: 3rem 6rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
   footer img { height: 40px; filter: brightness(0) invert(1) opacity(0.7); }
-  .footer-text { font-size: 12px; color: rgba(255,255,255,0.7); }
+  .footer-text { font-size: 12px; color: rgba(250,245,238,0.4); }
   .footer-links { display: flex; gap: 1.5rem; }
-  .footer-links a { font-size: 12px; color: rgba(255,255,255,0.7); text-decoration: none; }
+  .footer-links a { font-size: 12px; color: rgba(250,245,238,0.5); text-decoration: none; }
 
   @media (max-width: 900px) {
     nav { padding: 1rem 1.5rem; }
@@ -168,7 +172,7 @@
         <div class="form-card-title"><span class="num">2</span> Teslimat Adresi</div>
         <div class="form-group" style="margin-bottom:1rem;">
           <label>Adres *</label>
-          <input class="form-input" id="adres" type="text" placeholder="Mahalle, Sokak, Bina No...">
+          <textarea class="form-input" id="adres" rows="3" placeholder="Mahalle, Sokak, Bina No..." style="resize:none;"></textarea>
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -176,8 +180,8 @@
             <input class="form-input" id="semt" type="text" placeholder="Çorlu">
           </div>
           <div class="form-group">
-            <label>Daire / Kat (opsiyonel)</label>
-            <input class="form-input" id="daire" type="text" placeholder="Kat 2, Daire 4">
+            <label>Blok / Daire / Kat *</label>
+            <input class="form-input" id="daire" type="text" placeholder="A Blok, Kat 2, No 4">
           </div>
         </div>
         <div class="form-group" style="margin-top:1rem;">
@@ -242,7 +246,7 @@
 
 <footer>
   <img src="bellacone_logo.png" alt="Bellacone" onerror="this.style.display='none'">
-  <span class="footer-text">© 2025 Bellacone. &nbsp;|&nbsp; Web: <a href="https://www.instagram.com/kerem.cdr/" target="_blank" style="color:#fff;text-decoration:none;">@nesesine</a></span>
+  <span class="footer-text">© 2025 Bellacone. &nbsp;|&nbsp; Web: <a href="https://www.instagram.com/kerem.cdr/" target="_blank" style="color:var(--gold);text-decoration:none;">@nesesine</a></span>
   <div class="footer-links">
     <a href="index.html">Ana Sayfa</a>
     <a href="lezzetler.html">Lezzetler</a>
@@ -352,16 +356,30 @@
     document.getElementById('odeme-kart').classList.toggle('selected', tip === 'kart');
   };
 
-  window.siparisVer = async function() {
-    const ad = document.getElementById('ad-soyad').value.trim();
-    const tel = document.getElementById('telefon').value.trim();
-    const adres = document.getElementById('adres').value.trim();
-    const semt = document.getElementById('semt').value.trim();
+  function flashHata(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('error');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.style.animation = 'none';
+    setTimeout(() => {
+      el.style.animation = 'flashError 0.5s ease 2';
+    }, 100);
+    setTimeout(() => { el.style.animation = ''; }, 1200);
+  }
 
-    if (!ad) { document.getElementById('ad-soyad').classList.add('error'); document.getElementById('ad-soyad').focus(); return; }
-    if (!tel) { document.getElementById('telefon').classList.add('error'); document.getElementById('telefon').focus(); return; }
-    if (!adres) { document.getElementById('adres').classList.add('error'); document.getElementById('adres').focus(); return; }
-    if (!semt) { document.getElementById('semt').classList.add('error'); document.getElementById('semt').focus(); return; }
+  window.siparisVer = async function() {
+    const ad    = document.getElementById('ad-soyad').value.trim();
+    const tel   = document.getElementById('telefon').value.trim();
+    const adres = document.getElementById('adres').value.trim();
+    const semt  = document.getElementById('semt').value.trim();
+    const daire = document.getElementById('daire').value.trim();
+
+    if (!ad)    { flashHata('ad-soyad'); return; }
+    if (!tel)   { flashHata('telefon'); return; }
+    if (!adres) { flashHata('adres'); return; }
+    if (!semt)  { flashHata('semt'); return; }
+    if (!daire) { flashHata('daire'); return; }
 
     const btn = document.getElementById('siparis-btn');
     btn.disabled = true; btn.textContent = 'Gönderiliyor...';
@@ -398,7 +416,7 @@
     }
   };
 
-  ['ad-soyad','telefon','adres','semt'].forEach(id => {
+  ['ad-soyad','telefon','adres','semt','daire'].forEach(id => {
     document.getElementById(id)?.addEventListener('input', function() {
       this.classList.remove('error');
     });
