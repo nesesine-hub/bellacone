@@ -350,26 +350,27 @@ function hesaplaFiyat() {
 window.sepeteEkleVeGit = function() {
   if (!urunData) return;
 
-  // Bölüm seçimi zorunluluğu kontrolü
-  const bolumList = Object.values(bolumlerData);
-  for (const b of bolumList) {
-    if (b.topIcinKullan) continue; // dondurma çeşitleri hariç
-    const secs = Object.values(b.secenekler || {}).filter(s => !s.pasif);
-    if (!secs.length) continue;
-    const secilen = secimler[Object.keys(bolumlerData).find(k => bolumlerData[k] === b)] || [];
-    if (!secilen.length) {
-      // Zorunlu seçim eksik — o bölümü vurgula
-      const bolumCards = document.querySelectorAll('.bolum-card');
-      bolumCards.forEach(card => {
-        if (card.querySelector('.bolum-title')?.textContent === b.isim) {
-          card.style.border = '2px solid var(--accent)';
-          card.style.animation = 'shake 0.3s ease';
-          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          setTimeout(() => { card.style.border = ''; card.style.animation = ''; }, 2000);
-        }
-      });
-      showToast(`"${b.isim}" için en az 1 seçim yapın!`);
-      return;
+  // Bölüm seçimi zorunluluğu kontrolü — dondurma kategorisi hariç
+  if (!isDondurma) {
+    const bolumList = Object.entries(bolumlerData);
+    for (const [bKey, b] of bolumList) {
+      if (b.topIcinKullan) continue;
+      const secs = Object.values(b.secenekler || {}).filter(s => !s.pasif);
+      if (!secs.length) continue;
+      const secilen = secimler[bKey] || [];
+      if (!secilen.length) {
+        const bolumCards = document.querySelectorAll('.bolum-card');
+        bolumCards.forEach(card => {
+          if (card.querySelector('.bolum-title')?.textContent === b.isim) {
+            card.style.border = '2px solid var(--accent)';
+            card.style.animation = 'shake 0.3s ease';
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => { card.style.border = ''; card.style.animation = ''; }, 2000);
+          }
+        });
+        showToast(`"${b.isim}" için en az 1 seçim yapın!`);
+        return;
+      }
     }
   }
 
