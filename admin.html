@@ -1443,6 +1443,8 @@
     cesitModalKapat();
     lzRenderDondurma(katId);
   };
+
+  window.lzCesitEkle = async function(katId, bolumId) {
     const isim = prompt('Yeni çeşit adı:');
     if (!isim) return;
     const ekFiyat = prompt('Ek ücret (₺) — 0 ise boş bırak:', '0');
