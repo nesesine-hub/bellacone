@@ -115,7 +115,7 @@
 </div>
 
 <div class="sepet-fixed" id="sepet-fixed" style="display:none;">
-  <button class="sepet-btn" id="sepet-btn" onclick="sepeteEkleVeGit()">🛒 Sipariş Ver</button>
+  <button class="sepet-btn" id="sepet-btn" onclick="sepeteEkleVeGit()">Sipariş Ver</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -340,14 +340,14 @@ function hesaplaFiyat() {
   if (isDondurma) {
     const tamam = toplar.slice(0, topSayisi).filter(Boolean).length === topSayisi;
     btn.disabled = !tamam;
-    btn.textContent = tamam ? `🛒 Sipariş Ver — ${toplam} ₺` : `${topSayisi} top için çeşit seçin`;
+    btn.textContent = tamam ? `Sipariş Ver — ${toplam} ₺` : `${topSayisi} top için çeşit seçin`;
   } else if (Object.keys(bolumlerData).length > 0) {
     const toplamSecim = Object.values(secimler).reduce((sum, list) => sum + list.length, 0);
     btn.disabled = toplamSecim === 0;
-    btn.textContent = toplamSecim === 0 ? 'En az 1 seçenek seçin' : `🛒 Sipariş Ver — ${toplam} ₺`;
+    btn.textContent = toplamSecim === 0 ? 'En az 1 seçenek seçin' : `Sipariş Ver — ${toplam} ₺`;
   } else {
     btn.disabled = false;
-    btn.textContent = `🛒 Sipariş Ver — ${toplam} ₺`;
+    btn.textContent = `Sipariş Ver — ${toplam} ₺`;
   }
 }
 
