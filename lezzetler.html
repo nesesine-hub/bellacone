@@ -239,6 +239,15 @@
 
     renderFilter();
     renderProducts('hepsi');
+
+    // URL'de anchor varsa o kategoriye scroll et
+    const hash = window.location.hash;
+    if (hash) {
+      setTimeout(() => {
+        const el = document.querySelector(hash);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 600);
+    }
   });
 
   function renderFilter() {
