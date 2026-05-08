@@ -341,6 +341,10 @@ function hesaplaFiyat() {
     const tamam = toplar.slice(0, topSayisi).filter(Boolean).length === topSayisi;
     btn.disabled = !tamam;
     btn.textContent = tamam ? `🛒 Sipariş Ver — ${toplam} ₺` : `${topSayisi} top için çeşit seçin`;
+  } else if (Object.keys(bolumlerData).length > 0) {
+    const toplamSecim = Object.values(secimler).reduce((sum, list) => sum + list.length, 0);
+    btn.disabled = toplamSecim === 0;
+    btn.textContent = toplamSecim === 0 ? 'En az 1 seçenek seçin' : `🛒 Sipariş Ver — ${toplam} ₺`;
   } else {
     btn.disabled = false;
     btn.textContent = `🛒 Sipariş Ver — ${toplam} ₺`;
@@ -349,6 +353,16 @@ function hesaplaFiyat() {
 
 window.sepeteEkleVeGit = function() {
   if (!urunData) return;
+
+  // Bölümü olan ürünlerde en az 1 toplam seçim zorunlu
+  if (!isDondurma && Object.keys(bolumlerData).length > 0) {
+    const toplamSecim = Object.values(secimler).reduce((sum, list) => sum + list.length, 0);
+    if (toplamSecim === 0) {
+      document.querySelectorAll('.bolum-card')[0]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      showToast('Lütfen en az 1 seçenek seçin!');
+      return;
+    }
+  }
 
   const not = document.getElementById('urun-not').value.trim();
   let isimDetay = urunData.isim, fiyat = 0;
