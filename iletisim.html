@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>İletişim — Bellacone</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fef2f7; --cream2: #fac8df; --brown: #320d1e;
+    --brown2: #f094bc; --accent: #d44f82; --accent2: #f2c5b0;
+    --gold: #eaaa40; --text: #c0336a; --muted: #8a3860; --white: #fffafc;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 1.25rem 4rem; display: flex; align-items: center; justify-content: space-between; background: rgba(254,242,247,0.95); backdrop-filter: blur(12px); box-shadow: 0 1px 0 rgba(212,79,130,0.1); transition: all 0.3s; }
+  nav.scrolled { padding: 0.75rem 4rem; }
+  .nav-logo a { display: flex; align-items: center; text-decoration: none; }
+  .nav-logo img { height: 52px; width: auto; transition: height 0.4s ease; }
+  .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+  .nav-links a { font-size: 13px; font-weight: 500; color: var(--brown2); text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+  .burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; z-index: 1100; }
+  .burger span { display: block; width: 24px; height: 2px; background: var(--brown); border-radius: 2px; transition: all 0.3s; }
+  .mobile-menu { display: none; position: fixed; inset: 0; background: rgba(254,242,247,0.98); backdrop-filter: blur(16px); z-index: 1050; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; color: var(--brown); text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s; }
+  .mobile-menu a:hover, .mobile-menu a.active { color: var(--accent); }
+  .mob-close { position: absolute; top: 2rem; right: 2rem; background: none; border: none; font-size: 28px; color: var(--brown); cursor: pointer; line-height: 1; }
+
+  /* HERO */
+  .page-hero { padding: 10rem 6rem 5rem; background: var(--cream); position: relative; overflow: hidden; }
+  .page-hero::before { content: ''; position: absolute; top: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(212,79,130,0.12), transparent 70%); border-radius: 50%; }
+  .page-hero-inner { position: relative; z-index: 1; max-width: 600px; }
+  .section-tag { font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; gap: 8px; margin-bottom: 1.25rem; }
+  .section-tag::before, .section-tag::after { content: ''; width: 30px; height: 1px; background: var(--gold); }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(42px, 6vw, 72px); font-weight: 300; color: var(--brown); line-height: 1.1; margin-bottom: 1rem; }
+  h1 em { font-style: italic; color: var(--accent); }
+  .hero-desc { font-size: 16px; color: var(--muted); line-height: 1.8; }
+
+  /* HARİTA + BİLGİ */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; }
+  .contact-map iframe { width: 100%; height: 100%; min-height: 500px; border: none; display: block; }
+  .contact-info { padding: 5rem; background: var(--white); display: flex; flex-direction: column; justify-content: center; gap: 2.5rem; }
+  .contact-item { display: flex; gap: 1.25rem; align-items: flex-start; }
+  .contact-icon { width: 50px; height: 50px; background: var(--cream2); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .contact-label { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+  .contact-value { font-size: 15px; color: var(--text); line-height: 1.7; }
+  .contact-value a { color: var(--text); text-decoration: none; transition: color 0.2s; }
+  .contact-value a:hover { color: var(--accent); }
+  .hours-time { color: var(--accent); font-weight: 600; }
+
+  /* SOSYAL */
+  .social-section { background: var(--accent); padding: 5rem 6rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+  .social-section .section-tag { color: rgba(255,255,255,0.7); }
+  .social-section .section-tag::before, .social-section .section-tag::after { background: rgba(255,255,255,0.7); }
+  .social-section h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 3vw, 42px); font-weight: 300; color: #fff; }
+  .social-section h2 em { font-style: italic; }
+  .social-section p { color: rgba(255,255,255,0.8); font-size: 15px; max-width: 400px; line-height: 1.7; }
+  .ig-btn { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.2); color: #fff; padding: 12px 28px; border-radius: 999px; text-decoration: none; font-size: 15px; font-weight: 500; transition: all 0.2s; margin-top: 0.5rem; }
+  .ig-btn:hover { background: rgba(255,255,255,0.35); transform: translateY(-2px); }
+
+  /* CTA */
+  .cta-strip { background: var(--cream2); padding: 4rem 6rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+  .cta-strip h3 { font-family: 'Cormorant Garamond', serif; font-size: clamp(24px, 3vw, 36px); font-weight: 300; color: var(--brown); }
+  .cta-strip h3 em { font-style: italic; color: var(--accent); }
+  .btn-primary { background: var(--accent); color: #fff; padding: 14px 32px; border-radius: 999px; text-decoration: none; font-size: 14px; font-weight: 500; letter-spacing: 0.05em; transition: all 0.3s; display: inline-block; }
+  .btn-primary:hover { background: var(--brown); transform: translateY(-2px); }
+
+  /* FOOTER */
+  footer { background: var(--accent); padding: 3rem 6rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  footer img { height: 40px; filter: brightness(0) invert(1) opacity(0.85); }
+  .footer-text { font-size: 12px; color: rgba(255,255,255,0.7); }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { font-size: 12px; color: rgba(255,255,255,0.7); text-decoration: none; }
+  .footer-links a:hover { color: #fff; }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .burger { display: flex; }
+    .page-hero { padding: 8rem 1.5rem 3rem; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .contact-map iframe { min-height: 300px; }
+    .contact-info { padding: 3rem 1.5rem; }
+    .social-section, .cta-strip { padding: 4rem 1.5rem; text-align: center; justify-content: center; }
+    footer { padding: 2rem; flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mobile-menu" id="mobile-menu">
+  <button class="mob-close" onclick="closeMobile()">✕</button>
+  <a href="index.html" onclick="closeMobile()">Ana Sayfa</a>
+  <a href="hakkimizda.html" onclick="closeMobile()">Hakkımızda</a>
+  <a href="lezzetler.html" onclick="closeMobile()">Lezzetler</a>
+  <a href="iletisim.html" onclick="closeMobile()" class="active">İletişim</a>
+  <a href="siparis.html" onclick="closeMobile()">Sipariş Ver</a>
+</div>
+
+<nav id="navbar">
+  <div class="nav-logo">
+    <a href="index.html"><img src="bellacone_logo.png" alt="Bellacone" onerror="this.style.display='none'"></a>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">Ana Sayfa</a>
+    <a href="hakkimizda.html">Hakkımızda</a>
+    <a href="lezzetler.html">Lezzetler</a>
+    <a href="iletisim.html" class="active">İletişim</a>
+    <a href="siparis.html">Sipariş Ver</a>
+  </div>
+  <button class="burger" id="burger-btn" onclick="toggleMobile()" aria-label="Menü">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-inner reveal">
+    <div class="section-tag">Çorlu, Tekirdağ</div>
+    <h1>Bizi <em>ziyaret</em> edin</h1>
+    <p class="hero-desc">Sıcak bir ortamda İtalyan gelato sanatıyla buluşmak için bekliyoruz. Rezervasyon gerekmez, kapımız her zaman açık.</p>
+  </div>
+</div>
+
+<div class="contact-grid">
+  <div class="contact-map">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010!2d27.8!3d41.15!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14b4e7b995a35533%3A0x892f7ce44a98678d!2sBellacone!5e0!3m2!1str!2str!4v1" allowfullscreen="" loading="lazy"></iframe>
+  </div>
+  <div class="contact-info reveal">
+    <div class="contact-item">
+      <div class="contact-icon">📍</div>
+      <div>
+        <div class="contact-label">Adres</div>
+        <div class="contact-value">
+          <a href="https://maps.google.com/?q=Bellacone+Corlu" target="_blank">
+            Kervancı Çorlu, Şeyh Sinan,<br>
+            Ali Osman Çelebi Blv. D:10 b2 no 50,<br>
+            59850 Çorlu / Tekirdağ
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="contact-item">
+      <div class="contact-icon">📞</div>
+      <div>
+        <div class="contact-label">Telefon</div>
+        <div class="contact-value"><a href="tel:+905335109559">0533 510 95 59</a></div>
+      </div>
+    </div>
+    <div class="contact-item">
+      <div class="contact-icon">🕐</div>
+      <div>
+        <div class="contact-label">Çalışma Saatleri</div>
+        <div class="contact-value">
+          <div style="display:flex;justify-content:space-between;gap:16px;font-size:14px;padding:6px 0;border-bottom:1px solid var(--cream2);">
+            <span>Haftanın Her Günü</span>
+            <span class="hours-time">11:00 – 00:00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="contact-item">
+      <div class="contact-icon">📸</div>
+      <div>
+        <div class="contact-label">Instagram</div>
+        <div class="contact-value"><a href="https://www.instagram.com/bella.cone59/" target="_blank">@bella.cone59</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="social-section reveal">
+  <div class="section-tag">Sosyal Medya</div>
+  <h2>Bizi <em>takip edin</em></h2>
+  <p>Yeni lezzetler, kampanyalar ve leziz anlar için Instagram'da bizi takip edin.</p>
+  <a href="https://www.instagram.com/bella.cone59/" target="_blank" class="ig-btn">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+    @bella.cone59
+  </a>
+</section>
+
+<div class="cta-strip reveal">
+  <h3>Sipariş vermek ister <em>misiniz?</em></h3>
+  <a href="siparis.html" class="btn-primary">Sipariş Ver →</a>
+</div>
+
+<footer>
+  <img src="bellacone_logo.png" alt="Bellacone" onerror="this.style.display='none'">
+  <span class="footer-text">© 2025 Bellacone. Tüm hakları saklıdır. &nbsp;|&nbsp; Web Tasarım: <a href="https://www.instagram.com/kerem.cdr/" target="_blank" style="color:#fff;text-decoration:none;">@nesesine</a></span>
+  <div class="footer-links">
+    <a href="lezzetler.html">Lezzetler</a>
+    <a href="iletisim.html">İletişim</a>
+    <a href="siparis.html">Sipariş Ver</a>
+  </div>
+</footer>
+
+<script>
+  const navbar = document.getElementById('navbar');
+  const navLogo = document.querySelector('.nav-logo img');
+  window.addEventListener('scroll', function() {
+    const y = window.scrollY;
+    if (y > 60) navbar.classList.add('scrolled');
+    else navbar.classList.remove('scrolled');
+    if (navLogo) navLogo.style.height = Math.max(34, 52 - y * 0.12) + 'px';
+  });
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  function toggleMobile() {
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('open');
+    document.getElementById('burger-btn').classList.toggle('open');
+    document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+  }
+  function closeMobile() {
+    document.getElementById('mobile-menu').classList.remove('open');
+    document.getElementById('burger-btn').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+</script>
+</body>
+</html>
