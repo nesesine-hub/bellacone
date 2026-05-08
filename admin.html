@@ -1386,7 +1386,7 @@
             <div class="lz-urun-img"><span style="font-size:36px;">🍦</span></div>
             <div class="lz-urun-body">
               <div class="lz-urun-name">${s.isim}</div>
-              <div class="lz-urun-price">${(topFiyat||80) + (s.ekFiyat||0)} ₺/top${s.ekFiyat?` (+${s.ekFiyat}₺)`:''}</div>
+              <div class="lz-urun-price">${s.fiyat || topFiyat} ₺/top</div>
               <span class="lz-urun-status ${s.pasif?'pasif':'aktif'}">${s.pasif?'Pasif':'Aktif'}</span>
             </div>
           </div>`).join('')}

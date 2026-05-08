@@ -284,13 +284,13 @@
               <div class="cesit-card" id="cesit-${k.id}-${s.id}">
                 <div class="cesit-emoji">🍦</div>
                 <div class="cesit-isim">${s.isim}</div>
-                <div class="cesit-fiyat">${topFiyat + (s.ekFiyat||0)} ₺/top</div>
+                <div class="cesit-fiyat">${s.fiyat || topFiyat} ₺/top</div>
                 <div class="cesit-ctrl">
-                  <button class="cesit-btn" onclick="cesitAzalt('${k.id}','${s.id}','${s.isim}',${s.ekFiyat||0})">−</button>
+                  <button class="cesit-btn" onclick="cesitAzalt('${k.id}','${s.id}','${s.isim}',${s.fiyat||topFiyat})">−</button>
                   <span class="cesit-sayi" id="cs-${k.id}-${s.id}">0</span>
-                  <button class="cesit-btn" onclick="cesitArtir('${k.id}','${s.id}','${s.isim}',${s.ekFiyat||0})">+</button>
+                  <button class="cesit-btn" onclick="cesitArtir('${k.id}','${s.id}','${s.isim}',${s.fiyat||topFiyat})">+</button>
                 </div>
-                <button class="cesit-ekle-btn" id="ceb-${k.id}-${s.id}" onclick="cesitSepete('${k.id}','${k.isim}','${s.id}','${s.isim}',${s.ekFiyat||0})">Sepete Ekle</button>
+                <button class="cesit-ekle-btn" id="ceb-${k.id}-${s.id}" onclick="cesitSepete('${k.id}','${k.isim}','${s.id}','${s.isim}',${s.fiyat||topFiyat})">Sepete Ekle</button>
               </div>
             `).join('')}
           </div>
@@ -353,17 +353,17 @@
     guncelleSepetFab();
   };
 
-  window.cesitSepete = function(katId, katIsim, cesitId, isim, ekFiyat) {
+  window.cesitSepete = function(katId, katIsim, cesitId, isim, fiyat) {
     const key = katId + '-' + cesitId;
     const adet = cesitSayilari[key] || 0;
     if (!adet) return;
-    const fiyat = (topFiyat + ekFiyat) * adet;
+    const toplam = fiyat * adet;
     sepet.push({
       id: cesitId, katId,
       isim: `Dondurma — ${isim} (${adet} top)`,
       katIsim,
       emoji: '🍦', foto: '',
-      fiyat, adet: 1,
+      fiyat: toplam, adet: 1,
       eklenme: Date.now()
     });
     localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
