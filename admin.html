@@ -537,6 +537,9 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
+  let topFiyat = 80; // varsayılan, Firebase'den güncellenir
+  onValue(ref(db, 'ayarlar/topFiyat'), snap => { if (snap.exists()) topFiyat = snap.val(); });
+
   let kategoriler = [];
   let aktifKatId = null;
 
