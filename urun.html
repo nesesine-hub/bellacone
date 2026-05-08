@@ -64,6 +64,11 @@
   .sepet-btn:hover { background: var(--brown); }
   .sepet-btn:disabled { background: var(--cream2); color: var(--muted); cursor: not-allowed; }
   .sepet-btn.success { background: var(--green); }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
   .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(60px); background: var(--brown); color: #fff; padding: 10px 22px; border-radius: 999px; font-size: 13px; z-index: 999; transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; white-space: nowrap; }
   .toast.show { transform: translateX(-50%) translateY(0); }
 </style>
@@ -344,6 +349,30 @@ function hesaplaFiyat() {
 
 window.sepeteEkleVeGit = function() {
   if (!urunData) return;
+
+  // Bölüm seçimi zorunluluğu kontrolü
+  const bolumList = Object.values(bolumlerData);
+  for (const b of bolumList) {
+    if (b.topIcinKullan) continue; // dondurma çeşitleri hariç
+    const secs = Object.values(b.secenekler || {}).filter(s => !s.pasif);
+    if (!secs.length) continue;
+    const secilen = secimler[Object.keys(bolumlerData).find(k => bolumlerData[k] === b)] || [];
+    if (!secilen.length) {
+      // Zorunlu seçim eksik — o bölümü vurgula
+      const bolumCards = document.querySelectorAll('.bolum-card');
+      bolumCards.forEach(card => {
+        if (card.querySelector('.bolum-title')?.textContent === b.isim) {
+          card.style.border = '2px solid var(--accent)';
+          card.style.animation = 'shake 0.3s ease';
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => { card.style.border = ''; card.style.animation = ''; }, 2000);
+        }
+      });
+      showToast(`"${b.isim}" için en az 1 seçim yapın!`);
+      return;
+    }
+  }
+
   const not = document.getElementById('urun-not').value.trim();
   let isimDetay = urunData.isim, fiyat = 0;
   if (isDondurma) {

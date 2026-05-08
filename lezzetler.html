@@ -318,7 +318,7 @@
                   ${u.aciklama ? `<div class="product-desc">${u.aciklama}</div>` : ''}
                   <div class="product-footer">
                     <div class="product-price">${u.fiyat > 0 ? u.fiyat + ' ₺' : ''}</div>
-                    <button class="add-to-cart" onclick="event.stopPropagation();sepeteEkle('${k.id}','${u.key}',1)">+ Sepet</button>
+                    <button class="add-to-cart" onclick="event.stopPropagation();window.location.href='urun.html?id=${u.key}&kat=${k.id}'">Seç →</button>
                   </div>
                 </div>
               </div>
