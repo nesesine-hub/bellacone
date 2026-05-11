@@ -261,6 +261,17 @@
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
     renderProducts(id);
+
+    // Scroll — hepsi ise sayfanın başına, belirli kategori ise o section'a
+    setTimeout(() => {
+      if (id === 'hepsi') {
+        const section = document.getElementById('products-section');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        const target = document.getElementById('cat-' + id);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   function renderProducts(katId) {
