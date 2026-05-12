@@ -21,11 +21,7 @@
   .nav-cta { background: var(--brown) !important; color: var(--cream) !important; padding: 9px 22px; border-radius: 999px; font-size: 12px !important; }
   .nav-cta:hover { background: var(--accent) !important; }
   .nav-logo a { display:flex; align-items:center; text-decoration:none; }
-  .mobile-menu .mob-cta { font-family: 'DM Sans', sans-serif !important; font-size: 15px !important; background: var(--brown); color: var(--cream) !important; padding: 12px 32px; border-radius: 999px; font-weight: 500 !important; }
-  .mobile-menu .mob-cta:hover { background: var(--accent) !important; color: #fff !important; }
   @media (max-width: 900px) {
-    .nav-links { display: none; }
-    .burger { display: flex; }
   }
 
   .page-hero { padding: 10rem 6rem 5rem; background: var(--cream2); text-align: center; }
@@ -110,11 +106,7 @@
     footer { padding: 2rem; flex-direction: column; text-align: center; }
   }
 
-  @media (max-width: 900px) {
-  }
-
-
-
+  /* BURGER & MOBİL MENU */
   .burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; z-index: 1100; }
   .burger span { display: block; width: 24px; height: 2px; background: var(--brown); border-radius: 2px; transition: all 0.3s; }
   nav.scrolled .burger span { background: var(--brown); }
@@ -125,11 +117,15 @@
   .mobile-menu.open { display: flex; }
   .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; color: var(--brown); text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s; }
   .mobile-menu a:hover, .mobile-menu a.active { color: var(--accent); }
-  .mob-close { position: absolute; top: 2rem; right: 2rem; background: none; border: none; font-size: 28px; color: var(--brown); cursor: pointer; line-height: 1; }</style>
+  @media (max-width: 900px) {
+    .burger { display: flex; }
+    .nav-links { display: none !important; }
+  }
+</style>
 </head>
 <body>
 <div class="mobile-menu" id="mobile-menu">
-  <button class="mob-close" onclick="closeMobile()">✕</button>
+  <button onclick="closeMobile()" style="position:absolute;top:2rem;right:2rem;background:none;border:none;font-size:28px;color:var(--brown);cursor:pointer;line-height:1;">✕</button>
   <a href="index.html" onclick="closeMobile()">Ana Sayfa</a>
   <a href="hakkimizda.html" onclick="closeMobile()" class="active">Hakkımızda</a>
   <a href="lezzetler.html" onclick="closeMobile()">Lezzetler</a>
@@ -150,7 +146,7 @@
   </button>
 </nav>
 
-<div class="page-hero reveal">
+<div class="page-hero">
   <div class="section-tag">Hikayemiz</div>
   <h1>İtalyan gelato geleneği<br><em>Çorlu'da</em> hayat buluyor</h1>
 </div>
@@ -264,10 +260,8 @@
   const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0 });
+  }, { threshold: 0.1 });
   reveals.forEach(el => observer.observe(el));
-  // Fallback: görünür alanda olanları hemen göster
-  setTimeout(() => { reveals.forEach(el => { const r = el.getBoundingClientRect(); if (r.top < window.innerHeight) el.classList.add('visible'); }); }, 100);
 </script>
 
 <script>

@@ -114,8 +114,6 @@
   .footer-links a:hover { color: var(--gold); }
 
   @media (max-width: 900px) {
-    .nav-links { display: none; }
-    .burger { display: flex; }
     nav { padding: 1rem 1.5rem; }
     .page-hero { padding: 7rem 2rem 3rem; }
     .cat-filter { padding: 0.75rem 1rem; top: 72px; }
@@ -127,11 +125,7 @@
     .products-grid { grid-template-columns: 1fr; }
   }
 
-  @media (max-width: 900px) {
-  }
-
-
-
+  /* BURGER & MOBİL MENU */
   .burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; z-index: 1100; }
   .burger span { display: block; width: 24px; height: 2px; background: var(--brown); border-radius: 2px; transition: all 0.3s; }
   nav.scrolled .burger span { background: var(--brown); }
@@ -142,11 +136,15 @@
   .mobile-menu.open { display: flex; }
   .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; color: var(--brown); text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s; }
   .mobile-menu a:hover, .mobile-menu a.active { color: var(--accent); }
-  .mob-close { position: absolute; top: 2rem; right: 2rem; background: none; border: none; font-size: 28px; color: var(--brown); cursor: pointer; line-height: 1; }</style>
+  @media (max-width: 900px) {
+    .burger { display: flex; }
+    .nav-links { display: none !important; }
+  }
+</style>
 </head>
 <body>
 <div class="mobile-menu" id="mobile-menu">
-  <button class="mob-close" onclick="closeMobile()">✕</button>
+  <button onclick="closeMobile()" style="position:absolute;top:2rem;right:2rem;background:none;border:none;font-size:28px;color:var(--brown);cursor:pointer;line-height:1;">✕</button>
   <a href="index.html" onclick="closeMobile()">Ana Sayfa</a>
   <a href="hakkimizda.html" onclick="closeMobile()">Hakkımızda</a>
   <a href="lezzetler.html" onclick="closeMobile()" class="active">Lezzetler</a>
