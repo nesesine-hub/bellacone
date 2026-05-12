@@ -568,19 +568,28 @@
     .social-section { padding: 4rem 2rem; }
     footer { padding: 2rem; flex-direction: column; text-align: center; }
   }
+
+  /* BURGER MENU FIX */
+  @media (max-width: 900px) {
+    .nav-links { display: none !important; }
+    .burger { display: flex !important; }
+  }
+  .burger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+  .burger.open span:nth-child(2) { opacity: 0; }
+  .burger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
 </style>
 </head>
 <body>
 
 <div class="mobile-menu" id="mobile-menu">
-  <button onclick="closeMobile()" style="position:absolute;top:2rem;right:2rem;background:none;border:none;font-size:28px;color:var(--brown);cursor:pointer;line-height:1;">✕</button>
-  
-  <a href="index.html" onclick="closeMobile()">Ana Sayfa</a>
+  <button class="mob-close" onclick="closeMobile()">✕</button>
+  <a href="index.html" onclick="closeMobile()" class="active">Ana Sayfa</a>
   <a href="hakkimizda.html" onclick="closeMobile()">Hakkımızda</a>
   <a href="lezzetler.html" onclick="closeMobile()">Lezzetler</a>
   <a href="iletisim.html" onclick="closeMobile()">İletişim</a>
   <a href="siparis.html" onclick="closeMobile()">Sipariş Ver</a>
-  </div>
+</div>
 <!-- SPLASH -->
 <div id="splash">
   <img id="splash-logo" src="bellacone_logo.png" alt="Bellacone">
@@ -593,7 +602,7 @@
 <!-- NAV -->
 <nav id="navbar">
   <div class="nav-logo">
-    <a href="index.html"><img src="bellacone_logo.png" alt="Bellacone" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'font-family:Cormorant Garamond,serif;font-size:24px;font-weight:400;color:#3d2314;\'>BellaCone</span>'"></a>
+    <a href="index.html"><img src="bellacone_logo.png" alt="Bellacone" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'font-family:Cormorant Garamond,serif;font-size:24px;font-weight:400;color:#320d1e;\'>BellaCone</span>'"></a>
   </div>
     <div class="nav-links">
     <a href="index.html" class="active">Ana Sayfa</a>
@@ -832,15 +841,16 @@
     const burger = document.getElementById('burger-btn');
     menu.classList.toggle('open');
     burger.classList.toggle('open');
-    if (menu.classList.contains('open')) {
-      document.body.style.overflow = 'hidden';
-    } else {
+    document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+  } else {
       document.body.style.overflow = '';
     }
   }
   function closeMobile() {
-    document.getElementById('mobile-menu').classList.remove('open');
-    document.getElementById('burger-btn').classList.remove('open');
+    const menu = document.getElementById('mobile-menu');
+    const burger = document.getElementById('burger-btn');
+    menu.classList.remove('open');
+    burger.classList.remove('open');
     document.body.style.overflow = '';
   }
 </script>

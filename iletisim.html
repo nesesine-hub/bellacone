@@ -92,6 +92,16 @@
     .social-section, .cta-strip { padding: 4rem 1.5rem; text-align: center; justify-content: center; }
     footer { padding: 2rem; flex-direction: column; text-align: center; }
   }
+
+  /* BURGER MENU FIX */
+  @media (max-width: 900px) {
+    .nav-links { display: none !important; }
+    .burger { display: flex !important; }
+  }
+  .burger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+  .burger.open span:nth-child(2) { opacity: 0; }
+  .burger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
 </style>
 </head>
 <body>
@@ -218,13 +228,16 @@
 
   function toggleMobile() {
     const menu = document.getElementById('mobile-menu');
+    const burger = document.getElementById('burger-btn');
     menu.classList.toggle('open');
-    document.getElementById('burger-btn').classList.toggle('open');
+    burger.classList.toggle('open');
     document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
   }
   function closeMobile() {
-    document.getElementById('mobile-menu').classList.remove('open');
-    document.getElementById('burger-btn').classList.remove('open');
+    const menu = document.getElementById('mobile-menu');
+    const burger = document.getElementById('burger-btn');
+    menu.classList.remove('open');
+    burger.classList.remove('open');
     document.body.style.overflow = '';
   }
 </script>

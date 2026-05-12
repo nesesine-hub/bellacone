@@ -120,18 +120,26 @@
     .cta-strip { padding: 3rem 2rem; text-align: center; justify-content: center; }
     footer { padding: 2rem; flex-direction: column; text-align: center; }
   }
+
+  /* BURGER MENU FIX */
+  @media (max-width: 900px) {
+    .nav-links { display: none !important; }
+    .burger { display: flex !important; }
+  }
+  .burger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+  .burger.open span:nth-child(2) { opacity: 0; }
+  .burger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
 </style>
 </head>
 <body>
 <div class="mobile-menu" id="mobile-menu">
-  <button onclick="closeMobile()" style="position:absolute;top:2rem;right:2rem;background:none;border:none;font-size:28px;color:var(--brown);cursor:pointer;line-height:1;">✕</button>
-
-    <a href="index.html" onclick="closeMobile()">Ana Sayfa</a>
-    <a href="hakkimizda.html" onclick="closeMobile()">Hakkımızda</a>
-    <a href="lezzetler.html" onclick="closeMobile()">Lezzetler</a>
-    <a href="siparis.html" onclick="closeMobile()">Sipariş Ver</a>
-    <a href="index.html#iletisim" onclick="closeMobile()">İletişim</a>
-  <a href="menu.html" class="mob-cta" onclick="closeMobile()">QR Menü →</a>
+  <button class="mob-close" onclick="closeMobile()">✕</button>
+  <a href="index.html" onclick="closeMobile()">Ana Sayfa</a>
+  <a href="hakkimizda.html" onclick="closeMobile()" class="active">Hakkımızda</a>
+  <a href="lezzetler.html" onclick="closeMobile()">Lezzetler</a>
+  <a href="iletisim.html" onclick="closeMobile()">İletişim</a>
+  <a href="siparis.html" onclick="closeMobile()">Sipariş Ver</a>
 </div>
 <nav>
   <div class="nav-logo"><a href="index.html"><img src="bellacone_logo.png" alt="Bellacone" onerror="this.style.display='none'"></a></div>
@@ -139,7 +147,7 @@
     <a href="index.html">Ana Sayfa</a>
     <a href="hakkimizda.html" class="active">Hakkımızda</a>
     <a href="lezzetler.html">Lezzetler</a>
-    <a href="index.html#iletisim">İletişim</a>
+    <a href="iletisim.html">İletişim</a>
     <a href="siparis.html">Sipariş Ver</a>
   </div>
   <button class="burger" id="burger-btn" onclick="toggleMobile()" aria-label="Menü">
@@ -253,7 +261,7 @@
   <div class="footer-links">
     <a href="index.html">Ana Sayfa</a>
     <a href="lezzetler.html">Lezzetler</a>
-    <a href="index.html#iletisim">İletişim</a>
+    <a href="iletisim.html">İletişim</a>
   </div>
 </footer>
 
@@ -271,11 +279,14 @@
     const burger = document.getElementById('burger-btn');
     menu.classList.toggle('open');
     burger.classList.toggle('open');
-    if (menu.classList.contains('open')) { document.body.style.overflow = 'hidden'; } else { document.body.style.overflow = ''; }
+    document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+  } else { document.body.style.overflow = ''; }
   }
   function closeMobile() {
-    document.getElementById('mobile-menu').classList.remove('open');
-    document.getElementById('burger-btn').classList.remove('open');
+    const menu = document.getElementById('mobile-menu');
+    const burger = document.getElementById('burger-btn');
+    menu.classList.remove('open');
+    burger.classList.remove('open');
     document.body.style.overflow = '';
   }
 </script>
