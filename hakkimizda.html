@@ -157,7 +157,7 @@
   </button>
 </nav>
 
-<div class="page-hero">
+<div class="page-hero reveal">
   <div class="section-tag">Hikayemiz</div>
   <h1>İtalyan gelato geleneği<br><em>Çorlu'da</em> hayat buluyor</h1>
 </div>
@@ -271,8 +271,10 @@
   const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.1 });
+  }, { threshold: 0 });
   reveals.forEach(el => observer.observe(el));
+  // Fallback: görünür alanda olanları hemen göster
+  setTimeout(() => { reveals.forEach(el => { const r = el.getBoundingClientRect(); if (r.top < window.innerHeight) el.classList.add('visible'); }); }, 100);
 </script>
 
 <script>
