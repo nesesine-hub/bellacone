@@ -115,6 +115,7 @@
 
   @media (max-width: 900px) {
     nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
     .page-hero { padding: 7rem 2rem 3rem; }
     .cat-filter { padding: 0.75rem 1rem; top: 72px; }
     .products-section { padding: 2rem 1.5rem; }
@@ -124,32 +125,18 @@
   @media (max-width: 480px) {
     .products-grid { grid-template-columns: 1fr; }
   }
-
-  /* BURGER & MOBİL MENU */
-  .burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; z-index: 1100; }
-  .burger span { display: block; width: 24px; height: 2px; background: var(--brown); border-radius: 2px; transition: all 0.3s; }
-  nav.scrolled .burger span { background: var(--brown); }
-  .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-  .burger.open span:nth-child(2) { opacity: 0; }
-  .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-  .mobile-menu { display: none; position: fixed; inset: 0; background: rgba(254,242,247,0.98); backdrop-filter: blur(16px); z-index: 1050; flex-direction: column; align-items: center; justify-content: flex-start; gap: 1.5rem; padding: 6rem 2rem 3rem; overflow-y: auto; }
-  .mobile-menu.open { display: flex; }
-  .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; color: var(--brown); text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s; }
-  .mobile-menu a:hover, .mobile-menu a.active { color: var(--accent); }
-  @media (max-width: 900px) {
-    .burger { display: flex; }
-    .nav-links { display: none !important; }
-  }
 </style>
 </head>
 <body>
 <div class="mobile-menu" id="mobile-menu">
   <button onclick="closeMobile()" style="position:absolute;top:2rem;right:2rem;background:none;border:none;font-size:28px;color:var(--brown);cursor:pointer;line-height:1;">✕</button>
-  <a href="index.html" onclick="closeMobile()">Ana Sayfa</a>
-  <a href="hakkimizda.html" onclick="closeMobile()">Hakkımızda</a>
-  <a href="lezzetler.html" onclick="closeMobile()" class="active">Lezzetler</a>
-  <a href="iletisim.html" onclick="closeMobile()">İletişim</a>
-  <a href="siparis.html" onclick="closeMobile()">Sipariş Ver</a>
+
+    <a href="index.html" onclick="closeMobile()">Ana Sayfa</a>
+    <a href="hakkimizda.html" onclick="closeMobile()">Hakkımızda</a>
+    <a href="lezzetler.html" onclick="closeMobile()">Lezzetler</a>
+    <a href="siparis.html" onclick="closeMobile()">Sipariş Ver</a>
+    <a href="iletisim.html" onclick="closeMobile()">İletişim</a>
+  <a href="menu.html" class="mob-cta" onclick="closeMobile()">QR Menü →</a>
 </div>
 
 <nav>
@@ -331,8 +318,14 @@
       } else {
         // Normal ürünler
         const katUrunler = urunlerData[k.id] || {};
+        // menu/urunler/[katId] path'indeki foto'ları da al
+        const lzUrunler = data['urunler']?.[k.id] || {};
         const urunler = Object.entries(katUrunler)
-          .map(([key, u]) => ({ key, ...u }))
+          .map(([key, u]) => {
+            // Foto yoksa lezzetler path'inden bak
+            const lzU = Object.values(lzUrunler).find(l => l.isim === u.isim);
+            return { key, ...u, foto: u.foto || lzU?.foto || '' };
+          })
           .filter(u => !u.pasif && (u.stok === undefined || u.stok > 0));
         if (!urunler.length) return;
 
@@ -492,11 +485,7 @@
     const burger = document.getElementById('burger-btn');
     menu.classList.toggle('open');
     burger.classList.toggle('open');
-    if (menu.classList.contains('open')) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    if (menu.classList.contains('open')) { document.body.style.overflow = 'hidden'; } else { document.body.style.overflow = ''; }
   }
   function closeMobile() {
     document.getElementById('mobile-menu').classList.remove('open');
