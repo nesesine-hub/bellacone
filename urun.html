@@ -110,7 +110,7 @@
   </div>
   <div class="fiyat-bar">
     <span class="fiyat-label">Toplam</span>
-    <span class="fiyat-toplam" id="fiyat-goster">0 ₺</span>
+    <span class="fiyat-toplam" id="fiyat-goster">0 TL</span>
   </div>
 </div>
 
@@ -171,8 +171,8 @@ function render(u, katBilgi) {
   if (katBilgi) document.getElementById('urun-kat').textContent = `${katBilgi.emoji||''} ${katBilgi.isim}`;
   document.getElementById('urun-baslik').textContent = u.isim;
   document.getElementById('urun-fiyat-temel').textContent = isDondurma
-    ? `Her top ${topFiyat} ₺ · Aromalı çeşitler için ek ücret`
-    : (u.fiyat > 0 ? `${u.fiyat} ₺` : '');
+    ? `Her top ${topFiyat} TL · Aromalı çeşitler için ek ücret`
+    : (u.fiyat > 0 ? `${u.fiyat} TL` : '');
   if (u.aciklama) { const el = document.getElementById('urun-aciklama'); el.textContent = u.aciklama; el.style.display = 'block'; }
   if (u.alerjen) { document.getElementById('alerjen-text').textContent = u.alerjen; document.getElementById('alerjen-wrap').style.display = 'flex'; }
   renderBolumler();
@@ -204,7 +204,7 @@ function renderBolumler() {
         </div>
         <span class="top-sayac-label" id="top-max-label">Maks. 5 top</span>
       </div>
-      <div class="top-info">Her top <strong>${topFiyat} ₺</strong> · Aromalı çeşitler ek ücretli.</div>`;
+      <div class="top-info">Her top <strong>${topFiyat} TL</strong> · Aromalı çeşitler ek ücretli.</div>`;
     wrap.appendChild(kart1);
 
     // Çeşit seçim kartı
@@ -221,7 +221,7 @@ function renderBolumler() {
       const div = document.createElement('div');
       div.className = 'bolum-card';
       div.innerHTML = `<div class="bolum-title">${b.isim}</div><div class="chips">${secs.map(s => {
-        const ekF = s.ekFiyat ? ` +${s.ekFiyat}₺` : '';
+        const ekF = s.ekFiyat ? ` +${s.ekFiyat}TL` : '';
         return `<span class="chip" onclick="toggleChip(this,'${bKey}','${s.isim}',${s.ekFiyat||0})">${s.isim}${ekF}</span>`;
       }).join('')}</div>`;
       wrap.appendChild(div);
@@ -236,7 +236,7 @@ function renderBolumler() {
       const div = document.createElement('div');
       div.className = 'bolum-card';
       div.innerHTML = `<div class="bolum-title">${b.isim}</div><div class="chips">${secs.map(s => {
-        const ekF = s.ekFiyat ? ` +${s.ekFiyat}₺` : '';
+        const ekF = s.ekFiyat ? ` +${s.ekFiyat}TL` : '';
         return `<span class="chip" onclick="toggleChip(this,'${bKey}','${s.isim}',${s.ekFiyat||0})">${s.isim}${ekF}</span>`;
       }).join('')}</div>`;
       wrap.appendChild(div);
@@ -252,7 +252,7 @@ function renderTopSlots() {
     const sel = toplar[i] || null;
     html += `<div class="top-slot"><div class="top-slot-title">${i+1}. Top</div><div class="chips">${
       cesitlerCache.map(s => {
-        const ekF = s.ekFiyat ? ` +${s.ekFiyat}₺` : '';
+        const ekF = s.ekFiyat ? ` +${s.ekFiyat}TL` : '';
         return `<span class="chip ${sel===s.isim?'selected':''}" onclick="topSec(${i},'${s.isim}',this)">${s.isim}${ekF}</span>`;
       }).join('')
     }</div></div>`;
@@ -270,7 +270,7 @@ function renderTopOzet() {
   ozet.innerHTML = secilen.map((t, i) => {
     const s = cesitlerCache.find(x => x.isim === t);
     const f = topFiyat + (s?.ekFiyat||0);
-    return `<div class="top-ozet-item"><span class="top-no">${i+1}. top</span><span class="top-isim">${t}</span><span class="top-fiyat">${f} ₺</span><button onclick="topSil(${i})">✕</button></div>`;
+    return `<div class="top-ozet-item"><span class="top-no">${i+1}. top</span><span class="top-isim">${t}</span><span class="top-fiyat">${f} TL</span><button onclick="topSil(${i})">✕</button></div>`;
   }).join('');
 }
 
@@ -335,19 +335,19 @@ function hesaplaFiyat() {
       toplam += s?.ekFiyat||0;
     });
   });
-  document.getElementById('fiyat-goster').textContent = toplam + ' ₺';
+  document.getElementById('fiyat-goster').textContent = toplam + ' TL';
   const btn = document.getElementById('sepet-btn');
   if (isDondurma) {
     const tamam = toplar.slice(0, topSayisi).filter(Boolean).length === topSayisi;
     btn.disabled = !tamam;
-    btn.textContent = tamam ? `Sipariş Ver — ${toplam} ₺` : `${topSayisi} top için çeşit seçin`;
+    btn.textContent = tamam ? `Sipariş Ver — ${toplam} TL` : `${topSayisi} top için çeşit seçin`;
   } else if (Object.keys(bolumlerData).length > 0) {
     const toplamSecim = Object.values(secimler).reduce((sum, list) => sum + list.length, 0);
     btn.disabled = toplamSecim === 0;
-    btn.textContent = toplamSecim === 0 ? 'En az 1 seçenek seçin' : `Sipariş Ver — ${toplam} ₺`;
+    btn.textContent = toplamSecim === 0 ? 'En az 1 seçenek seçin' : `Sipariş Ver — ${toplam} TL`;
   } else {
     btn.disabled = false;
-    btn.textContent = `Sipariş Ver — ${toplam} ₺`;
+    btn.textContent = `Sipariş Ver — ${toplam} TL`;
   }
 }
 
@@ -382,7 +382,7 @@ window.sepeteEkleVeGit = function() {
   sepet.push({ id: urunData.id||urunId, katId, isim: isimDetay, katIsim: document.getElementById('urun-kat').textContent, emoji: urunData.emoji||'🍦', foto: urunData.foto||'', fiyat, adet: 1, bolumDetay: bolumDetay.join(' | '), not, eklenme: Date.now() });
   localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
   const btn = document.getElementById('sepet-btn');
-  btn.classList.add('success'); btn.textContent = '✓ Eklendi!';
+  btn.classList.add('success'); btn.textContent = 'Eklendi!';
   setTimeout(() => { window.location.href = 'siparis.html'; }, 700);
 };
 
