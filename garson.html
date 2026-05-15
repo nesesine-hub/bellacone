@@ -588,7 +588,7 @@
         .toplam { font-size: 14px; font-weight: bold; }
       </style>
       </head><body>
-      <img class="logo" src="https://raw.githubusercontent.com/nesesine-hub/bellacone/main/bellacone_logo.png" style="width:140px;height:auto;display:block;margin:0 auto 6px;">
+      <div class="center" style="font-size:18px;font-weight:bold;letter-spacing:1px;">BellaCone</div>
       <div class="center">Tel: 0533 510 95 59</div>
       <div class="line"></div>
       <div class="center bold">ADİSYON FİŞİ</div>
@@ -611,15 +611,7 @@
     w.document.write(fis);
     w.document.close();
     w.focus();
-    // Resim yüklendikten sonra yazdır
-    const img = w.document.querySelector('img.logo');
-    if (img) {
-      img.onload = () => { setTimeout(() => w.print(), 300); };
-      img.onerror = () => { setTimeout(() => w.print(), 300); };
-      setTimeout(() => { if (!img.complete) w.print(); }, 3000);
-    } else {
-      setTimeout(() => { w.print(); }, 500);
-    }
+    setTimeout(() => { w.print(); }, 500);
   };
 
   window.setDurum = async function(key, durum, islemAdi, detay) {
