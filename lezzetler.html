@@ -331,8 +331,13 @@
       } else {
         // Normal ürünler
         const katUrunler = urunlerData[k.id] || {};
+        const lzUrunler = data['urunler']?.[k.id] || {};
         const urunler = Object.entries(katUrunler)
-          .map(([key, u]) => ({ key, ...u }))
+          .map(([key, u]) => {
+            // Foto yoksa menu/urunler/[katId] path'inden bak
+            const lzU = Object.values(lzUrunler).find(l => l.isim === u.isim);
+            return { key, ...u, foto: u.foto || lzU?.foto || '' };
+          })
           .filter(u => !u.pasif && (u.stok === undefined || u.stok > 0));
         if (!urunler.length) return;
 
