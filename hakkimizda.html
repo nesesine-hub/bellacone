@@ -20,8 +20,22 @@
   .nav-links a:hover, .nav-links a.active { color: var(--accent); }
   .nav-cta { background: var(--brown) !important; color: var(--cream) !important; padding: 9px 22px; border-radius: 999px; font-size: 12px !important; }
   .nav-cta:hover { background: var(--accent) !important; }
+  /* BURGER & MOBİL MENU */
   .nav-logo a { display:flex; align-items:center; text-decoration:none; }
+  .burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; z-index: 1100; }
+  .burger span { display: block; width: 24px; height: 2px; background: var(--brown2); border-radius: 2px; transition: all 0.3s; }
+  .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .burger.open span:nth-child(2) { opacity: 0; }
+  .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .mobile-menu { display: none; position: fixed; inset: 0; background: rgba(250,245,238,0.98); backdrop-filter: blur(16px); z-index: 1050; flex-direction: column; align-items: center; justify-content: flex-start; gap: 1.5rem; padding: 6rem 2rem 3rem; overflow-y: auto; }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; color: var(--brown); text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s; }
+  .mobile-menu a:hover { color: var(--accent); }
+  .mobile-menu .mob-cta { font-family: 'DM Sans', sans-serif !important; font-size: 15px !important; background: var(--brown); color: var(--cream) !important; padding: 12px 32px; border-radius: 999px; font-weight: 500 !important; }
+  .mobile-menu .mob-cta:hover { background: var(--accent) !important; color: #fff !important; }
   @media (max-width: 900px) {
+    .burger { display: flex; }
+    .nav-links { display: none !important; }
   }
 
   .page-hero { padding: 10rem 6rem 5rem; background: var(--cream2); text-align: center; }
@@ -88,6 +102,7 @@
 
   @media (max-width: 900px) {
     nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
     .page-hero { padding: 7rem 2rem 3rem; }
     .story { grid-template-columns: 1fr; }
     .story-img { height: 300px; }
@@ -105,32 +120,17 @@
     .cta-strip { padding: 3rem 2rem; text-align: center; justify-content: center; }
     footer { padding: 2rem; flex-direction: column; text-align: center; }
   }
-
-  /* BURGER & MOBİL MENU */
-  .burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; z-index: 1100; }
-  .burger span { display: block; width: 24px; height: 2px; background: var(--brown); border-radius: 2px; transition: all 0.3s; }
-  nav.scrolled .burger span { background: var(--brown); }
-  .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-  .burger.open span:nth-child(2) { opacity: 0; }
-  .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-  .mobile-menu { display: none; position: fixed; inset: 0; background: rgba(254,242,247,0.98); backdrop-filter: blur(16px); z-index: 1050; flex-direction: column; align-items: center; justify-content: flex-start; gap: 1.5rem; padding: 6rem 2rem 3rem; overflow-y: auto; }
-  .mobile-menu.open { display: flex; }
-  .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; color: var(--brown); text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s; }
-  .mobile-menu a:hover, .mobile-menu a.active { color: var(--accent); }
-  @media (max-width: 900px) {
-    .burger { display: flex; }
-    .nav-links { display: none !important; }
-  }
 </style>
 </head>
 <body>
 <div class="mobile-menu" id="mobile-menu">
   <button onclick="closeMobile()" style="position:absolute;top:2rem;right:2rem;background:none;border:none;font-size:28px;color:var(--brown);cursor:pointer;line-height:1;">✕</button>
-  <a href="index.html" onclick="closeMobile()">Ana Sayfa</a>
-  <a href="hakkimizda.html" onclick="closeMobile()" class="active">Hakkımızda</a>
-  <a href="lezzetler.html" onclick="closeMobile()">Lezzetler</a>
-  <a href="iletisim.html" onclick="closeMobile()">İletişim</a>
-  <a href="siparis.html" onclick="closeMobile()">Sipariş Ver</a>
+
+    <a href="index.html" onclick="closeMobile()">Ana Sayfa</a>
+    <a href="hakkimizda.html" onclick="closeMobile()">Hakkımızda</a>
+    <a href="lezzetler.html" onclick="closeMobile()">Lezzetler</a>
+    <a href="siparis.html" onclick="closeMobile()">Sipariş Ver</a>
+    <a href="iletisim.html" onclick="closeMobile()">İletişim</a>
 </div>
 <nav>
   <div class="nav-logo"><a href="index.html"><img src="bellacone_logo.png" alt="Bellacone" onerror="this.style.display='none'"></a></div>
@@ -223,20 +223,20 @@
   </div>
   <div class="stats-grid">
     <div class="stat-card reveal">
-      <div class="stat-num">30+</div>
-      <div class="stat-label">Gelato Çeşidi</div>
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Belçika Çikolatası</div>
     </div>
     <div class="stat-card reveal" style="transition-delay:0.1s">
-      <div class="stat-num">7</div>
-      <div class="stat-label">Gün Açık</div>
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Koruyucusuz & Katkısız</div>
     </div>
     <div class="stat-card reveal" style="transition-delay:0.2s">
       <div class="stat-num">100%</div>
-      <div class="stat-label">Taze Malzeme</div>
+      <div class="stat-label">Renklendirici & Yapay Tatlandırıcı İçermez</div>
     </div>
     <div class="stat-card reveal" style="transition-delay:0.3s">
-      <div class="stat-num">∞</div>
-      <div class="stat-label">Mutlu Müşteri</div>
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Pancar Şekeri</div>
     </div>
   </div>
 </section>
@@ -270,11 +270,7 @@
     const burger = document.getElementById('burger-btn');
     menu.classList.toggle('open');
     burger.classList.toggle('open');
-    if (menu.classList.contains('open')) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    if (menu.classList.contains('open')) { document.body.style.overflow = 'hidden'; } else { document.body.style.overflow = ''; }
   }
   function closeMobile() {
     document.getElementById('mobile-menu').classList.remove('open');
