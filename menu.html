@@ -504,7 +504,7 @@
     const data = menuData[aktifKategori.id] || {};
     const urunler = Object.values(window._katUrunler || {});
     const bolumler = data.bolumler || {};
-    const topDestegi = false;
+    const topDestegi = data.topDestegi === true;
 
     let urunIsim, fiyat, topBilgi = null;
 
