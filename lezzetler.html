@@ -331,7 +331,7 @@
       } else {
         // Normal ürünler
         const katUrunler = urunlerData[k.id] || {};
-        const lzUrunler = data['urunler']?.[k.id] || {};
+        const lzUrunler = menuData['urunler']?.[k.id] || {};
         const urunler = Object.entries(katUrunler)
           .map(([key, u]) => {
             // Foto yoksa menu/urunler/[katId] path'inden bak
