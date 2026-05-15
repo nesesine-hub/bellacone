@@ -518,6 +518,7 @@
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:13px;font-weight:600;color:var(--accent);">${masaToplam} ₺</span>
             <span style="font-size:11px;color:var(--muted);">${kalemler.length} kalem</span>
+            <button onclick="fisYazdir('${masa}', ${JSON.stringify(kalemler).replace(/"/g,'&quot;')})" style="padding:5px 12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;">🖨 Fiş</button>
           </div>
         </div>
         <!-- KALEMLERİ -->
@@ -557,6 +558,60 @@
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
     renderOrders();
+  };
+
+  window.fisYazdir = function(masa, kalemler) {
+    const parsed = typeof kalemler === 'string' ? JSON.parse(kalemler) : kalemler;
+    const toplam = parsed.reduce((s, o) => s + (o.toplamFiyat || 0), 0);
+    const sipNo = '#' + new Date().toISOString().slice(2,10).replace(/-/g,'') + '-' + String(Math.floor(Math.random()*9999)).padStart(4,'0');
+    const tarih = new Date().toLocaleString('tr-TR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+
+    const satirlar = parsed.map(o => {
+      const isim = (o.urun || '').toUpperCase().substring(0, 20).padEnd(20);
+      const adet = String(o.miktar || 1).padStart(2);
+      const fiyat = String((o.toplamFiyat || 0).toFixed(2)).padStart(8);
+      const satir_toplam = String((o.toplamFiyat || 0).toFixed(2)).padStart(8);
+      return `${isim} ${adet} ${fiyat} ${satir_toplam}`;
+    }).join('\n');
+
+    const fis = `
+      <html><head><meta charset="UTF-8">
+      <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Courier New', monospace; font-size: 12px; width: 280px; padding: 10px; }
+        .center { text-align: center; }
+        .bold { font-weight: bold; }
+        .line { border-top: 1px solid #000; margin: 6px 0; }
+        .dashed { border-top: 1px dashed #000; margin: 6px 0; }
+        .row { display: flex; justify-content: space-between; }
+        pre { font-family: 'Courier New', monospace; font-size: 11px; white-space: pre; }
+        .toplam { font-size: 14px; font-weight: bold; }
+      </style>
+      </head><body>
+      <div class="center bold" style="font-size:16px;">BellaCone</div>
+      <div class="center">Tel: 0533 510 95 59</div>
+      <div class="line"></div>
+      <div class="center bold">ADİSYON FİŞİ</div>
+      <div class="dashed"></div>
+      <div>Sipariş No: ${sipNo}</div>
+      <div>Masa: Masa ${masa}</div>
+      <div>Tarih: ${tarih}</div>
+      <div class="dashed"></div>
+      <pre>Ürün                 Adet   Fiyat   Toplam</pre>
+      <pre>--------------------------------------------</pre>
+      <pre>${satirlar}</pre>
+      <div class="line"></div>
+      <div class="row toplam"><span>TOPLAM:</span><span>${toplam.toFixed(2)} TL</span></div>
+      <div class="dashed"></div>
+      <div class="center" style="margin-top:8px;">Bizi tercih ettiğiniz için teşekkürler!</div>
+      <div class="center">bellacone.com.tr</div>
+      </body></html>`;
+
+    const w = window.open('', '_blank', 'width=320,height=600');
+    w.document.write(fis);
+    w.document.close();
+    w.focus();
+    setTimeout(() => { w.print(); }, 500);
   };
 
   window.setDurum = async function(key, durum, islemAdi, detay) {
