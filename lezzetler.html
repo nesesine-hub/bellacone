@@ -488,15 +488,22 @@
     const key = katId + '-' + cesitId;
     const adet = cesitSayilari[key] || 0;
     if (!adet) return;
-    const toplam = fiyat * adet;
-    sepet.push({
-      id: cesitId, katId,
-      isim: `Dondurma — ${isim} (${adet} top)`,
-      katIsim,
-      emoji: '🍦', foto: '',
-      fiyat: toplam, adet: 1,
-      eklenme: Date.now()
-    });
+    // Mevcut sepette aynı ürün var mı?
+    const mevcutIdx = sepet.findIndex(x => x.id === cesitId && x.katId === katId);
+    if (mevcutIdx >= 0) {
+      sepet[mevcutIdx].adet += adet;
+      sepet[mevcutIdx].fiyat += fiyat * adet;
+    } else {
+      sepet.push({
+        id: cesitId, katId,
+        isim: `Dondurma — ${isim}`,
+        katIsim,
+        emoji: '🍦', foto: '',
+        fiyat: fiyat * adet, adet: adet,
+        fiyatBirim: fiyat,
+        eklenme: Date.now()
+      });
+    }
     localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
     window.dispatchEvent(new Event('bellaconeCartUpdate'));
     // Sıfırla

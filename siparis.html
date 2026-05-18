@@ -349,18 +349,20 @@
 
   renderSepet();
 
-  // Aynı isimli ürünleri birleştir
+  // Aynı ürünleri birleştir (eski localStorage kayıtları için de güvenli)
   function birlestirilmisSepet() {
     const map = {};
     sepet.forEach(item => {
-      // Dondurma top sayısını isimden sıyırarak birleştirme anahtarı oluştur
-      const key = (item.katId || '') + '||' + (item.id || item.isim);
+      const temizIsim = (item.isim || '').replace(/\s*\(\d+ top\)/g, '');
+      const key = (item.katId || '') + '||' + (item.id || temizIsim);
+      const adet = item.adet || 1;
+      const birim = item.fiyatBirim || (item.fiyat / adet);
       if (map[key]) {
-        map[key].adet += item.adet || 1;
-        map[key].fiyatBirim = map[key].fiyat / (map[key].adet - (item.adet||1)) || item.fiyat;
-        map[key].fiyat += item.fiyat;
+        map[key].adet += adet;
+        map[key].fiyat += birim * adet;
+        map[key].fiyatBirim = birim;
       } else {
-        map[key] = { ...item, adet: item.adet || 1, fiyatBirim: item.fiyat / (item.adet||1), _key: key };
+        map[key] = { ...item, isim: temizIsim, adet, fiyat: birim * adet, fiyatBirim: birim, _key: key };
       }
     });
     return Object.values(map);
@@ -419,7 +421,8 @@
     const yeniAdet = Math.max(1, grup.adet + d);
     // Sepetten bu key'e ait tüm kayıtları sil, tek kayıt olarak yaz
     sepet = sepet.filter(x => ((x.katId||'')+'||'+(x.id||x.isim)) !== key);
-    sepet.push({ ...grup, adet: yeniAdet, fiyat: birimFiyat * yeniAdet, isim: grup.isim.replace(/\s*\(\d+ top\)/, '') });
+    const temizIsim = grup.isim.replace(/\s*\(\d+ top\)/g, '');
+    sepet.push({ ...grup, adet: yeniAdet, fiyat: birimFiyat * yeniAdet, isim: temizIsim, toplamFiyat: birimFiyat * yeniAdet, toplamTop: yeniAdet });
     localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
     window.dispatchEvent(new Event('bellaconeCartUpdate'));
     renderSepet();
