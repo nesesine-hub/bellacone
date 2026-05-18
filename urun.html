@@ -108,6 +108,19 @@
   .cart-siparis-btn:hover { background: var(--brown, #320d1e); transform: translateY(-1px); }
   .cart-clear-btn { display: block; width: 100%; background: none; border: none; color: var(--muted, #8a3860); font-size: 12px; cursor: pointer; margin-top: 10px; font-family: 'DM Sans', sans-serif; padding: 4px; transition: color 0.2s; }
   .cart-clear-btn:hover { color: var(--accent, #d44f82); }
+
+  @media (max-width: 900px) {
+    nav {
+      padding: 0.85rem 1.25rem;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+    }
+    .burger { display: flex !important; order: 0; justify-self: start; }
+    .nav-logo { order: 1; justify-self: center; }
+    .nav-links { display: none !important; }
+    .nav-cart-btn { order: 2; justify-self: end; margin-left: 0; }
+  }
 </style>
 </head>
 <body>
