@@ -897,9 +897,19 @@
     var navLogo   = document.querySelector('.nav-logo img');
     var gone      = false;
 
+    // sessionStorage: sekme kapanana kadar tekrar gösterme
+    if (sessionStorage.getItem('bellacone_splash_shown')) {
+      splash.style.display = 'none';
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      gone = true;
+    }
+
     function hideSplash() {
       if (gone) return;
       gone = true;
+      sessionStorage.setItem('bellacone_splash_shown', '1');
 
       // 1) Logo küçülüp sol üste uçar
       splashImg.classList.add('shrinking');
