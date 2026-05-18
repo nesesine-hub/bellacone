@@ -383,7 +383,7 @@ window.sepeteEkleVeGit = function() {
   localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
   const btn = document.getElementById('sepet-btn');
   btn.classList.add('success'); btn.textContent = 'Sepete Eklendi!';
-  setTimeout(() => { history.back(); }, 700);
+  setTimeout(() => { btn.classList.remove('success'); btn.textContent = `Sepete Ekle — ${fiyat} TL`; }, 2000);
 };
 
 function showError() { document.getElementById('loading-screen').style.display = 'none'; document.getElementById('error-screen').style.display = 'flex'; }
