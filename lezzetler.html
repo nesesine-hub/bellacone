@@ -177,6 +177,25 @@
   .cart-siparis-btn:hover { background: var(--brown, #320d1e); transform: translateY(-1px); }
   .cart-clear-btn { display: block; width: 100%; background: none; border: none; color: var(--muted, #8a3860); font-size: 12px; cursor: pointer; margin-top: 10px; font-family: 'DM Sans', sans-serif; padding: 4px; transition: color 0.2s; }
   .cart-clear-btn:hover { color: var(--accent, #d44f82); }
+
+  /* İÇECEK KARTLARI */
+  .icecek-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+  .icecek-card { background: var(--white); border: 1.5px solid var(--cream2); border-radius: 16px; overflow: hidden; transition: all 0.2s; }
+  .icecek-card:hover { border-color: var(--accent); box-shadow: 0 4px 16px rgba(212,79,130,0.1); }
+  .icecek-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: var(--cream2); }
+  .icecek-no-img { width: 100%; aspect-ratio: 4/3; background: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 48px; }
+  .icecek-body { padding: 0.9rem 1rem; }
+  .icecek-isim { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; color: var(--brown); margin-bottom: 4px; line-height: 1.2; }
+  .icecek-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+  .icecek-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .icecek-fiyat { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--accent); }
+  .icecek-ctrl { display: flex; align-items: center; gap: 0; background: var(--cream); border: 1.5px solid var(--cream2); border-radius: 999px; overflow: hidden; }
+  .icecek-btn { width: 30px; height: 30px; border: none; background: transparent; font-size: 18px; cursor: pointer; color: var(--accent); transition: background 0.15s; }
+  .icecek-btn:hover { background: var(--cream2); }
+  .icecek-sayi { min-width: 24px; text-align: center; font-size: 14px; font-weight: 600; color: var(--brown); }
+  .icecek-ekle-btn { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 999px; padding: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 8px; display: none; transition: all 0.2s; }
+  .icecek-ekle-btn.visible { display: block; }
+  .icecek-ekle-btn:hover { opacity: 0.85; }
 </style>
 </head>
 <body>
@@ -371,40 +390,73 @@
           </div>
         </div>`;
       } else {
-        // Normal ürünler
+        // Normal ürünler — içecek/waffle tarzı direkt sepete ekle
         const katUrunler = urunlerData[k.id] || {};
         const lzUrunler = menuData['urunler']?.[k.id] || {};
         const urunler = Object.entries(katUrunler)
           .map(([key, u]) => {
-            // Foto yoksa menu/urunler/[katId] path'inden bak
             const lzU = Object.values(lzUrunler).find(l => l.isim === u.isim);
             return { key, ...u, foto: u.foto || lzU?.foto || '' };
           })
           .filter(u => !u.pasif && (u.stok === undefined || u.stok > 0));
         if (!urunler.length) return;
 
-        html += `<div class="cat-section" id="cat-${k.id}">
-          <div class="cat-title">${k.emoji || ''} <em>${k.isim}</em></div>
-          <div class="cat-divider"></div>
-          <div class="products-grid">
-            ${urunler.map(u => `
-              <div class="product-card" onclick="window.location.href='urun.html?id=${u.key}&kat=${k.id}'">
-                ${u.foto
-                  ? `<img class="product-img" src="${u.foto}" alt="${u.isim}" onerror="this.style.display='none'">`
-                  : `<div class="product-no-img">${k.emoji || '🍦'}</div>`
-                }
-                <div class="product-body">
-                  <div class="product-name">${u.isim}</div>
-                  ${u.aciklama ? `<div class="product-desc">${u.aciklama}</div>` : ''}
-                  <div class="product-footer">
-                    <div class="product-price">${u.fiyat > 0 ? u.fiyat + ' ₺' : ''}</div>
-                    <button class="add-to-cart" onclick="event.stopPropagation();window.location.href='urun.html?id=${u.key}&kat=${k.id}'">Seç →</button>
+        // Kategori adında içecek/drink ipucu var mı? → direkt sepet kartı
+        const icecekAnahtar = ['içecek','içeçek','drink','smoothie','milkshake','limonata','kahve','çay','su','meyve'];
+        const isIcecek = icecekAnahtar.some(kw => (k.isim||'').toLowerCase().includes(kw));
+
+        if (isIcecek) {
+          html += `<div class="cat-section" id="cat-${k.id}">
+            <div class="cat-title">${k.emoji || ''} <em>${k.isim}</em></div>
+            <div class="cat-divider"></div>
+            <div class="icecek-grid">
+              ${urunler.map(u => `
+                <div class="icecek-card">
+                  ${u.foto
+                    ? `<img class="icecek-img" src="${u.foto}" alt="${u.isim}" onerror="this.parentElement.querySelector('.icecek-img')?.remove();this.insertAdjacentHTML('afterend','<div class=\"icecek-no-img\">${k.emoji||'🥤'}</div>')">`
+                    : `<div class="icecek-no-img">${k.emoji || '🥤'}</div>`
+                  }
+                  <div class="icecek-body">
+                    <div class="icecek-isim">${u.isim}</div>
+                    ${u.aciklama ? `<div class="icecek-desc">${u.aciklama}</div>` : ''}
+                    <div class="icecek-footer">
+                      <span class="icecek-fiyat">${u.fiyat > 0 ? u.fiyat + ' ₺' : ''}</span>
+                      <div class="icecek-ctrl">
+                        <button class="icecek-btn" onclick="icecekAzalt('${k.id}','${u.key}','${u.isim}',${u.fiyat||0})">−</button>
+                        <span class="icecek-sayi" id="is-${k.id}-${u.key}">0</span>
+                        <button class="icecek-btn" onclick="icecekArtir('${k.id}','${u.key}','${u.isim}',${u.fiyat||0})">+</button>
+                      </div>
+                    </div>
+                    <button class="icecek-ekle-btn" id="ieb-${k.id}-${u.key}" onclick="icecekSepete('${k.id}','${k.isim}','${u.key}','${u.isim}','${k.emoji||'🥤'}',${u.fiyat||0})">Sepete Ekle</button>
                   </div>
                 </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>`;
+              `).join('')}
+            </div>
+          </div>`;
+        } else {
+          html += `<div class="cat-section" id="cat-${k.id}">
+            <div class="cat-title">${k.emoji || ''} <em>${k.isim}</em></div>
+            <div class="cat-divider"></div>
+            <div class="products-grid">
+              ${urunler.map(u => `
+                <div class="product-card" onclick="window.location.href='urun.html?id=${u.key}&kat=${k.id}'">
+                  ${u.foto
+                    ? `<img class="product-img" src="${u.foto}" alt="${u.isim}" onerror="this.style.display='none'">`
+                    : `<div class="product-no-img">${k.emoji || '🍦'}</div>`
+                  }
+                  <div class="product-body">
+                    <div class="product-name">${u.isim}</div>
+                    ${u.aciklama ? `<div class="product-desc">${u.aciklama}</div>` : ''}
+                    <div class="product-footer">
+                      <div class="product-price">${u.fiyat > 0 ? u.fiyat + ' ₺' : ''}</div>
+                      <button class="add-to-cart" onclick="event.stopPropagation();window.location.href='urun.html?id=${u.key}&kat=${k.id}'">Seç →</button>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>`;
+        }
       }
     });
 
@@ -460,6 +512,49 @@
     // Artık kullanılmıyor — urun.html'e yönlendiriliyor
     window.location.href = `urun.html?id=${urunKey}&kat=${katId}`;
   };
+  // İçecek kontrolleri
+  const icecekSayilari = {};
+
+  window.icecekArtir = function(katId, urunKey, isim, fiyat) {
+    const key = katId + '-' + urunKey;
+    icecekSayilari[key] = (icecekSayilari[key] || 0) + 1;
+    document.getElementById('is-' + katId + '-' + urunKey).textContent = icecekSayilari[key];
+    document.getElementById('ieb-' + katId + '-' + urunKey).classList.add('visible');
+    guncelleSepetFab();
+  };
+
+  window.icecekAzalt = function(katId, urunKey, isim, fiyat) {
+    const key = katId + '-' + urunKey;
+    if (!icecekSayilari[key]) return;
+    icecekSayilari[key]--;
+    document.getElementById('is-' + katId + '-' + urunKey).textContent = icecekSayilari[key];
+    if (icecekSayilari[key] === 0) {
+      document.getElementById('ieb-' + katId + '-' + urunKey).classList.remove('visible');
+    }
+    guncelleSepetFab();
+  };
+
+  window.icecekSepete = function(katId, katIsim, urunKey, isim, emoji, fiyat) {
+    const key = katId + '-' + urunKey;
+    const adet = icecekSayilari[key] || 0;
+    if (!adet) return;
+    sepet.push({
+      id: urunKey, katId,
+      isim: isim + (adet > 1 ? ' (' + adet + ' adet)' : ''),
+      katIsim,
+      emoji: emoji || '🥤', foto: '',
+      fiyat: fiyat * adet, adet: 1,
+      eklenme: Date.now()
+    });
+    localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
+    window.dispatchEvent(new Event('bellaconeCartUpdate'));
+    icecekSayilari[key] = 0;
+    document.getElementById('is-' + katId + '-' + urunKey).textContent = '0';
+    document.getElementById('ieb-' + katId + '-' + urunKey).classList.remove('visible');
+    guncelleSepetFab();
+    showToast('✓ ' + adet + 'x ' + isim + ' sepete eklendi');
+  };
+
 
   window.modalQtyDegistir = function(d) {
     modalQty = Math.max(1, modalQty + d);
