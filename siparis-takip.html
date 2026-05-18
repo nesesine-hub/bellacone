@@ -184,7 +184,7 @@
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getDatabase, ref, query, orderByChild, equalTo, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+  import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
   const app = initializeApp({
     apiKey: "AIzaSyC18gKyPhFWEWH_244nDLOW0nQE2QgS6kA",
@@ -276,7 +276,7 @@
     const siparisNo = rawInput.startsWith('BL-') ? rawInput : 'BL-' + rawInput;
     const hint = document.getElementById('search-hint');
 
-    if (!siparisNo || siparisNo.length < 4) {
+    if (!rawInput || rawInput.length < 3) {
       hint.style.color = 'var(--accent)';
       hint.textContent = 'Lütfen geçerli bir sipariş numarası girin (örn: BL-1234)';
       return;
@@ -286,22 +286,23 @@
     document.getElementById('result').style.display = 'none';
 
     try {
-      const q = query(ref(db, 'online_siparisler'), orderByChild('siparisNo'), equalTo(siparisNo));
-      const snap = await get(q);
-      if (!snap.exists()) {
-        document.getElementById('result').style.display = 'block';
-        document.getElementById('result').innerHTML = \`<div class="result-card not-found"><div class="not-found-icon">🔍</div><p>Bu numarayla sipariş bulunamadı.<br>Numarayı kontrol edip tekrar deneyin.</p></div>\`;
-        hint.textContent = '';
-        return;
-      }
-      const siparis = Object.values(snap.val())[0];
+      const snap = await get(ref(db, 'online_siparisler'));
+      if (!snap.exists()) { showNotFound(); hint.textContent = ''; return; }
+      const bulunan = Object.values(snap.val()).find(s => s.siparisNo === siparisNo);
       hint.textContent = '';
-      renderSonuc(siparis);
+      if (!bulunan) { showNotFound(); return; }
+      renderSonuc(bulunan);
     } catch(e) {
       hint.style.color = 'var(--accent)';
       hint.textContent = 'Bir hata oluştu, tekrar deneyin.';
+      console.error(e);
     }
   };
+
+  function showNotFound() {
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('result').innerHTML = '<div class="result-card not-found"><div class="not-found-icon">🔍</div><p>Bu numarayla sipariş bulunamadı.<br>Numarayı kontrol edip tekrar deneyin.</p></div>';
+  }
 
   // URL'de ?no= varsa otomatik ara
   const params = new URLSearchParams(location.search);
