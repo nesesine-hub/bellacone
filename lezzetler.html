@@ -488,11 +488,11 @@
     const key = katId + '-' + cesitId;
     const adet = cesitSayilari[key] || 0;
     if (!adet) return;
-    // Mevcut sepette aynı ürün var mı?
-    const mevcutIdx = sepet.findIndex(x => x.id === cesitId && x.katId === katId);
+    // Aynı ürün + aynı top sayısı varsa birleştir, farklı top sayısı ayrı satır
+    const mevcutIdx = sepet.findIndex(x => x.id === cesitId && x.katId === katId && x.adet === adet);
     if (mevcutIdx >= 0) {
-      sepet[mevcutIdx].adet += adet;
       sepet[mevcutIdx].fiyat += fiyat * adet;
+      sepet[mevcutIdx].adet += adet;
     } else {
       sepet.push({
         id: cesitId, katId,
