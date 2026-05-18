@@ -424,7 +424,7 @@
               ${urunler.map(u => `
                 <div class="icecek-card">
                   ${u.foto
-                    ? `<img class="icecek-img" src="${u.foto}" alt="${u.isim}" onerror="this.parentElement.querySelector('.icecek-img')?.remove();this.insertAdjacentHTML('afterend','<div class=\"icecek-no-img\">${k.emoji||'🥤'}</div>')">`
+                    ? `<img class="icecek-img" src="${u.foto}" alt="${u.isim}" onerror="this.style.display='none'">`
                     : `<div class="icecek-no-img">${k.emoji || '🥤'}</div>`
                   }
                   <div class="icecek-body">
