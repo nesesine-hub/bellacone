@@ -402,8 +402,7 @@
         if (!urunler.length) return;
 
         // Kategori adında içecek/drink ipucu var mı? → direkt sepet kartı
-        const icecekAnahtar = ['içecek','içeçek','drink','smoothie','milkshake','limonata','kahve','çay','su','meyve'];
-        const isIcecek = icecekAnahtar.some(kw => (k.isim||'').toLowerCase().includes(kw));
+        const isIcecek = /i[c̈çc]ecek|içecek|icecek|drink|smoothie|milkshake|limonata|kahve|çay/i.test(k.isim||'') || (k.id||'').includes('iecek') || (k.id||'').includes('icecek');
 
         if (isIcecek) {
           html += `<div class="cat-section" id="cat-${k.id}">
