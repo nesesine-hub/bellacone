@@ -115,10 +115,10 @@
 </div>
 
 <div class="sepet-fixed" id="sepet-fixed" style="display:none;">
-  <button class="sepet-btn" id="sepet-btn" onclick="sepeteEkleVeGit()">Sipariş Ver</button>
+  <button class="sepet-btn" id="sepet-btn" onclick="sepeteEkleVeGit()">Sepete Ekle</button>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" style="display:none;"></div>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
@@ -340,14 +340,14 @@ function hesaplaFiyat() {
   if (isDondurma) {
     const tamam = toplar.slice(0, topSayisi).filter(Boolean).length === topSayisi;
     btn.disabled = !tamam;
-    btn.textContent = tamam ? `Sipariş Ver — ${toplam} TL` : `${topSayisi} top için çeşit seçin`;
+    btn.textContent = tamam ? `Sepete Ekle — ${toplam} TL` : `${topSayisi} top için çeşit seçin`;
   } else if (Object.keys(bolumlerData).length > 0) {
     const toplamSecim = Object.values(secimler).reduce((sum, list) => sum + list.length, 0);
     btn.disabled = toplamSecim === 0;
-    btn.textContent = toplamSecim === 0 ? 'En az 1 seçenek seçin' : `Sipariş Ver — ${toplam} TL`;
+    btn.textContent = toplamSecim === 0 ? 'En az 1 seçenek seçin' : `Sepete Ekle — ${toplam} TL`;
   } else {
     btn.disabled = false;
-    btn.textContent = `Sipariş Ver — ${toplam} TL`;
+    btn.textContent = `Sepete Ekle — ${toplam} TL`;
   }
 }
 
@@ -382,11 +382,22 @@ window.sepeteEkleVeGit = function() {
   sepet.push({ id: urunData.id||urunId, katId, isim: isimDetay, katIsim: document.getElementById('urun-kat').textContent, emoji: urunData.emoji||'🍦', foto: urunData.foto||'', fiyat, adet: 1, bolumDetay: bolumDetay.join(' | '), not, eklenme: Date.now() });
   localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
   const btn = document.getElementById('sepet-btn');
-  btn.classList.add('success'); btn.textContent = 'Eklendi!';
-  setTimeout(() => { window.location.href = 'siparis.html'; }, 700);
+  btn.classList.add('success'); btn.textContent = 'Sepete Eklendi!';
+  setTimeout(() => { history.back(); }, 700);
 };
 
 function showError() { document.getElementById('loading-screen').style.display = 'none'; document.getElementById('error-screen').style.display = 'flex'; }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  t.classList.add('show');
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => { t.style.display = 'none'; }, 400);
+  }, 3000);
+}
 
 yukle();
 </script>
