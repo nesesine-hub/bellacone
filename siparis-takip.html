@@ -160,7 +160,7 @@
   <div class="search-box">
     <label class="search-label">Sipariş Numarası</label>
     <div class="search-row">
-      <input class="search-input" id="no-input" type="text" placeholder="BL-1234" maxlength="7">
+      <input class="search-input" id="no-input" type="text" placeholder="BL-1234 veya 1234" maxlength="7">
       <button class="search-btn" onclick="ara()">Sorgula</button>
     </div>
     <div class="search-hint" id="search-hint">Sipariş onay ekranındaki numarayı girin</div>
@@ -191,9 +191,9 @@
     authDomain: "bellacone-7ee34.firebaseapp.com",
     databaseURL: "https://bellacone-7ee34-default-rtdb.firebaseio.com",
     projectId: "bellacone-7ee34",
-    storageBucket: "bellacone-7ee34.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    storageBucket: "bellacone-7ee34.firebasestorage.app",
+    messagingSenderId: "41187589256",
+    appId: "1:41187589256:web:75e6f2f3c3360c9a3bf33d"
   });
   const db = getDatabase(app);
 
@@ -272,7 +272,7 @@
   }
 
   window.ara = async function() {
-    const rawInput = document.getElementById('no-input').value.trim().toUpperCase();
+    const rawInput = document.getElementById('no-input').value.trim().toUpperCase().replace(/^#/, '');
     const siparisNo = rawInput.startsWith('BL-') ? rawInput : 'BL-' + rawInput;
     const hint = document.getElementById('search-hint');
 
