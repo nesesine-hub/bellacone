@@ -171,6 +171,20 @@
   .foto-onizleme { margin-top: 0.75rem; display: none; }
   .foto-onizleme img { width: 100%; max-height: 160px; object-fit: cover; border-radius: 10px; border: 1px solid var(--soft); }
   .foto-onizleme .foto-onizleme-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .siparis-card { border: 1px solid var(--soft); border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 10px; background: #fff; }
+  .siparis-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .siparis-no { font-weight: 700; font-size: 15px; color: var(--accent); }
+  .siparis-zaman { font-size: 11px; color: var(--muted); }
+  .siparis-musteri { font-size: 13px; color: var(--text); margin-bottom: 6px; }
+  .siparis-urunler { font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.6; }
+  .siparis-tutar { font-size: 14px; font-weight: 600; color: var(--brown); }
+  .durum-select { border: 1.5px solid var(--soft); border-radius: 8px; padding: 5px 8px; font-size: 12px; font-family: 'DM Sans', sans-serif; background: #fff; cursor: pointer; }
+  .s-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:500; }
+  .s-bekliyor { background:rgba(234,170,64,0.15); color:#b8860b; }
+  .s-hazirlaniyor { background:rgba(212,79,130,0.12); color:#d44f82; }
+  .s-yolda { background:rgba(50,13,30,0.08); color:#320d1e; }
+  .s-teslim { background:rgba(80,180,100,0.12); color:#2d7a3a; }
 </style>
 </head>
 <body>
@@ -221,6 +235,7 @@
   <button class="tab" onclick="switchTab('foto', this)">Fotoğraflar</button>
   <button class="tab" onclick="switchTab('qr', this)">QR Kodlar</button>
   <button class="tab" onclick="switchTab('ayarlar', this)">Ayarlar</button>
+  <button class="tab" onclick="switchTab('siparisler', this)">🛒 Siparişler</button>
 </div>
 
 <!-- AYARLAR PANELİ -->
@@ -516,13 +531,29 @@
     <div class="qr-grid" id="qr-grid"></div>
   </div>
 </div>
+
+<div class="panel" id="panel-siparisler">
+  <div class="section-card">
+    <div class="section-header">
+      <h2>Siparişler</h2>
+      <select id="siparis-filtre" onchange="siparisleriFiltrele()" style="border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:13px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--text);">
+        <option value="hepsi">Tümü</option>
+        <option value="bekliyor">Alındı</option>
+        <option value="hazirlaniyor">Hazırlanıyor</option>
+        <option value="yolda">Yolda</option>
+        <option value="teslim">Teslim Edildi</option>
+      </select>
+    </div>
+    <div id="siparis-list"><div class="loading">Yükleniyor...</div></div>
+  </div>
+</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getDatabase, ref, push, set, remove, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+  import { getDatabase, ref, push, set, remove, update, onValue, query, orderByChild, limitToLast } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
   const firebaseConfig = {
     apiKey: "AIzaSyC18gKyPhFWEWH_244nDLOW0nQE2QgS6kA",
@@ -1606,6 +1637,7 @@
     document.getElementById('panel-' + tab).classList.add('active');
     el.classList.add('active');
     if (tab === 'stok') stokKategorileriDoldur();
+    if (tab === 'siparisler') siparisleriRender();
     if (tab === 'lezzetler') {
       lzGo('kategoriler');
       lzRenderKategoriler();
@@ -1726,6 +1758,69 @@
     showToast('Çeşit silindi');
     cesitModalKapat();
     lzRenderDondurma(katId);
+  };
+
+
+  // ===== SİPARİŞLER =====
+  let tumSiparisler = {};
+
+  // Firebase'den siparişleri dinle
+  onValue(ref(db, 'online_siparisler'), snap => {
+    tumSiparisler = snap.val() || {};
+    if (document.getElementById('panel-siparisler').classList.contains('active')) {
+      siparisleriRender();
+    }
+  });
+
+  function siparisleriRender() {
+    const filtre = document.getElementById('siparis-filtre')?.value || 'hepsi';
+    const list = document.getElementById('siparis-list');
+    let items = Object.entries(tumSiparisler)
+      .map(([id, s]) => ({ ...s, _id: id }))
+      .filter(s => filtre === 'hepsi' || s.durum === filtre)
+      .sort((a, b) => new Date(b.zaman) - new Date(a.zaman));
+
+    if (!items.length) {
+      list.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:1rem 0;">Sipariş bulunamadı.</p>';
+      return;
+    }
+
+    const DURUM_LABELS = { bekliyor: 'Alındı', hazirlaniyor: 'Hazırlanıyor', yolda: 'Yolda', teslim: 'Teslim Edildi' };
+    const DURUM_EMOJIS = { bekliyor: '✓', hazirlaniyor: '👨‍🍳', yolda: '🛵', teslim: '🎉' };
+
+    list.innerHTML = items.map(s => {
+      const urunStr = (s.urunler || []).map(u => u.isim + (u.adet > 1 ? ' ×' + u.adet : '')).join(' · ');
+      const durum = s.durum || 'bekliyor';
+      return `<div class="siparis-card">
+        <div class="siparis-card-head">
+          <div>
+            <span class="siparis-no">#${s.siparisNo || '—'}</span>
+            <span class="siparis-zaman" style="margin-left:8px;">${s.zamanStr || ''}</span>
+          </div>
+          <span class="s-badge s-${durum}">${DURUM_EMOJIS[durum] || ''} ${DURUM_LABELS[durum] || durum}</span>
+        </div>
+        <div class="siparis-musteri">👤 ${s.musteri?.ad || '—'} · 📞 ${s.musteri?.tel || '—'}</div>
+        <div class="siparis-musteri">📍 ${s.adres?.adres || '—'}${s.adres?.daire ? ', D:' + s.adres.daire : ''}</div>
+        <div class="siparis-urunler">${urunStr}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span class="siparis-tutar">${s.toplamFiyat} ₺ · ${s.odeme || ''}</span>
+          <select class="durum-select" onchange="durumGuncelle('${s._id}', this.value)">
+            <option value="bekliyor"    ${durum==='bekliyor'    ?'selected':''}>✓ Alındı</option>
+            <option value="hazirlaniyor" ${durum==='hazirlaniyor'?'selected':''}>👨‍🍳 Hazırlanıyor</option>
+            <option value="yolda"       ${durum==='yolda'       ?'selected':''}>🛵 Yolda</option>
+            <option value="teslim"      ${durum==='teslim'      ?'selected':''}>🎉 Teslim Edildi</option>
+          </select>
+        </div>
+        ${s.not ? `<div style="margin-top:6px;font-size:12px;color:var(--muted);">Not: ${s.not}</div>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  window.siparisleriFiltrele = siparisleriRender;
+
+  window.durumGuncelle = async function(id, yeniDurum) {
+    await update(ref(db, 'online_siparisler/' + id), { durum: yeniDurum });
+    showToast('Durum güncellendi ✓');
   };
 
 </script>

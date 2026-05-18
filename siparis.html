@@ -309,8 +309,16 @@
   <div class="success-modal">
     <div class="success-icon">🎉</div>
     <h2>Siparişiniz <em>Alındı!</em></h2>
+    <div style="background:var(--cream,#fef2f7);border-radius:12px;padding:12px 20px;margin:0.75rem 0;text-align:center;">
+      <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted,#8a3860);margin-bottom:4px;">Sipariş Numaranız</div>
+      <div id="success-siparis-no" style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--accent,#d44f82);letter-spacing:0.05em;">#BL-0000</div>
+      <div style="font-size:12px;color:var(--muted,#8a3860);margin-top:4px;">Bu numarayı not alın</div>
+    </div>
     <p>Siparişiniz alındı ve en kısa sürede hazırlanarak adresinize teslim edilecektir. Sizi arayabiliriz, telefonunuzu açık tutun.</p>
-    <a href="lezzetler.html" class="btn-go">Alışverişe Devam Et</a>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:0.5rem;">
+      <a id="btn-takip" href="siparis-takip.html" class="btn-go" style="background:var(--accent,#d44f82);">Siparişi Takip Et →</a>
+      <a href="lezzetler.html" class="btn-go" style="background:transparent;border:1.5px solid var(--accent,#d44f82);color:var(--accent,#d44f82);">Alışverişe Devam</a>
+    </div>
   </div>
 </div>
 
@@ -519,9 +527,22 @@
       zamanStr: new Date().toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
     };
 
+    // Sipariş numarası üret: BL-XXXX (4 haneli rastgele)
+    const siparisNo = 'BL-' + String(Math.floor(1000 + Math.random() * 9000));
+    siparisVerisi.siparisNo = siparisNo;
+
     try {
-      await push(ref(db, 'online_siparisler'), siparisVerisi);
+      const siparisRef = await push(ref(db, 'online_siparisler'), siparisVerisi);
+      const siparisId = siparisRef.key;
+      // localStorage'a kaydet (takip için)
+      localStorage.setItem('bellacone_son_siparis', JSON.stringify({
+        siparisNo, siparisId,
+        zaman: siparisVerisi.zaman
+      }));
       localStorage.removeItem('bellacone_sepet');
+      // Success overlay'i göster
+      document.getElementById('success-siparis-no').textContent = '#' + siparisNo;
+      document.getElementById('btn-takip').href = 'siparis-takip.html?no=' + siparisNo + '&id=' + siparisId;
       document.getElementById('success-overlay').classList.add('open');
     } catch(e) {
       btn.disabled = false;
