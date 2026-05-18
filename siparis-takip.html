@@ -198,19 +198,25 @@
   const db = getDatabase(app);
 
   const DURUMLAR = [
-    { key: 'bekliyor',      label: 'Alindi',        emoji: '✓' },
+    { key: 'bekliyor',      label: 'Alindi',        emoji: '&#10003;' },
     { key: 'hazirlaniyor',  label: 'Hazirlaniyor',  emoji: '&#x1F468;&#x200D;&#x1F373;' },
     { key: 'yolda',         label: 'Yolda',         emoji: '&#x1F6F5;' },
     { key: 'teslim',        label: 'Teslim Edildi', emoji: '&#x1F389;' }
   ];
 
+  // Garson paneli 'teslim_edildi', admin 'teslim' kullanıyor — ikisini normalize et
+  function normalizeDurum(d) {
+    if (d === 'teslim_edildi') return 'teslim';
+    return d || 'bekliyor';
+  }
+
   function durumIndex(d) {
-    const idx = DURUMLAR.findIndex(function(x) { return x.key === d; });
+    const idx = DURUMLAR.findIndex(function(x) { return x.key === normalizeDurum(d); });
     return idx >= 0 ? idx : 0;
   }
 
   function renderSonuc(siparis) {
-    const dIdx = durumIndex(siparis.durum || 'bekliyor');
+    const dIdx = durumIndex(normalizeDurum(siparis.durum || 'bekliyor'));
 
     let stepsHTML = '';
     for (let i = 0; i < DURUMLAR.length; i++) {

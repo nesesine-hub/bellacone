@@ -184,7 +184,7 @@
   .s-bekliyor { background:rgba(234,170,64,0.15); color:#b8860b; }
   .s-hazirlaniyor { background:rgba(212,79,130,0.12); color:#d44f82; }
   .s-yolda { background:rgba(50,13,30,0.08); color:#320d1e; }
-  .s-teslim { background:rgba(80,180,100,0.12); color:#2d7a3a; }
+  .s-teslim_edildi { background:rgba(80,180,100,0.12); color:#2d7a3a; }
 </style>
 </head>
 <body>
@@ -1808,7 +1808,7 @@
             <option value="bekliyor"    ${durum==='bekliyor'    ?'selected':''}>✓ Alındı</option>
             <option value="hazirlaniyor" ${durum==='hazirlaniyor'?'selected':''}>👨‍🍳 Hazırlanıyor</option>
             <option value="yolda"       ${durum==='yolda'       ?'selected':''}>🛵 Yolda</option>
-            <option value="teslim"      ${durum==='teslim'      ?'selected':''}>🎉 Teslim Edildi</option>
+            <option value="teslim_edildi" ${(durum==='teslim'||durum==='teslim_edildi')      ?'selected':''}>🎉 Teslim Edildi</option>
           </select>
         </div>
         ${s.not ? `<div style="margin-top:6px;font-size:12px;color:var(--muted);">Not: ${s.not}</div>` : ''}
