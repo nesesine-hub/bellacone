@@ -82,14 +82,14 @@
     /* Mobil nav: burger sol | logo orta | sepet sağ */
     nav {
       padding: 0.85rem 1.25rem;
-      display: grid;
+      display: grid !important;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
     }
-    .burger { display: flex !important; order: 0; justify-self: start; }
-    .nav-logo { order: 1; justify-self: center; }
+    .burger { display: flex !important; order: 0 !important; justify-self: start; }
+    .nav-logo { order: 1 !important; justify-self: center !important; }
     .nav-links { display: none !important; }
-    .nav-cart-btn { order: 2; justify-self: end; margin-left: 0; }
+    .nav-cart-btn { order: 2 !important; justify-self: end !important; margin-left: 0; }
 
     .nav-links { display: none; }
     .page-hero { padding: 8rem 1.5rem 3rem; }
