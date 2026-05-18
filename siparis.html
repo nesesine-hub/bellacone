@@ -354,24 +354,25 @@
     const map = {};
     sepet.forEach(item => {
       const temizIsim = (item.isim || '').replace(/\s*\(\d+ top\)/g, '');
-      const adet = item.adet || 1;
-      const birim = item.fiyatBirim || (item.fiyat / adet);
-      // Anahtar: ürün id + kaç topluk paket olduğu
-      const key = (item.katId || '') + '||' + (item.id || temizIsim) + '||' + adet;
+      const topAdet = item.adet || 1;
+      const birimFiyat = item.fiyatBirim || (item.fiyat / topAdet);
+      // Anahtar: ürün id + top sayısı (farklı top sayıları ayrı satır)
+      const key = (item.katId || '') + '||' + (item.id || temizIsim) + '||' + topAdet;
       if (map[key]) {
-        // Aynı top sayılı aynı ürün → adeti ve fiyatı topla
-        map[key].miktar = (map[key].miktar || 1) + 1;
-        map[key].fiyat += birim * adet;
+        map[key].miktar += 1;
       } else {
-        map[key] = { ...item, isim: temizIsim, adet, fiyat: birim * adet, fiyatBirim: birim, miktar: 1, _key: key };
+        map[key] = { ...item, isim: temizIsim, adet: topAdet, fiyatBirim: birimFiyat, miktar: 1, _key: key };
       }
     });
+    // Gösterilecek fiyat: birimFiyat * topAdet * miktar
+    Object.values(map).forEach(x => { x.satirFiyat = x.fiyatBirim * x.adet * x.miktar; });
     return Object.values(map);
   }
 
   function renderSepet() {
     const itemsEl = document.getElementById('summary-items');
-    const araToplam = sepet.reduce((s, i) => s + i.fiyat * i.adet, 0);
+    const birlesmis = birlestirilmisSepet();
+    const araToplam = birlesmis.reduce((s, i) => s + i.satirFiyat, 0);
     const genel = araToplam + teslimatUcreti;
 
     document.getElementById('ara-toplam').textContent = araToplam + ' ₺';
@@ -393,19 +394,17 @@
       return;
     }
 
-    const birlesmis = birlestirilmisSepet();
-    itemsEl.innerHTML = birlesmis.map((item, i) => {
-      // Kaç adet bu paketten var (miktar), kaç topluk paket (adet)
+    itemsEl.innerHTML = birlesmis.map((item) => {
       const miktar = item.miktar || 1;
       const topLabel = item.adet > 1 ? ` · ${item.adet} top` : '';
-      const miktarLabel = miktar > 1 ? `${miktar}×` : '';
+      const miktarLabel = miktar > 1 ? `${miktar}× ` : '';
       return `
       <div class="summary-item">
         <div class="summary-item-img">
           ${item.foto ? `<img src="${item.foto}" alt="${item.isim}" onerror="this.style.display='none'">` : item.emoji}
         </div>
         <div class="summary-item-info">
-          <div class="summary-item-name">${miktarLabel} ${item.isim}${topLabel}</div>
+          <div class="summary-item-name">${miktarLabel}${item.isim}${topLabel}</div>
           <div class="summary-item-cat">${item.katIsim}</div>
           <div class="summary-item-qty">
             <button class="sq-btn" onclick="miktarDegistir('${item._key}',-1)">−</button>
@@ -414,27 +413,25 @@
             <button class="sq-del" onclick="sil('${item._key}')">✕</button>
           </div>
         </div>
-        <div class="summary-item-price">${item.fiyat} ₺</div>
+        <div class="summary-item-price">${item.satirFiyat} ₺</div>
       </div>`;
     }).join('');
   }
 
-  // Miktar değiştir: aynı top-sayılı paketten kaç tane olduğunu değiştir
   window.miktarDegistir = function(key, d) {
     const birlesmis = birlestirilmisSepet();
     const grup = birlesmis.find(x => x._key === key);
     if (!grup) return;
     const yeniMiktar = Math.max(1, (grup.miktar || 1) + d);
-    const topAdet = grup.adet; // kaç topluk paket (1 top, 2 top vs)
-    const birimFiyat = grup.fiyatBirim;
     // Sepetten bu key'e ait tüm kayıtları sil
     sepet = sepet.filter(x => {
       const temiz = (x.isim||'').replace(/\s*\(\d+ top\)/g, '');
-      const xKey = (x.katId||'')+'||'+(x.id||temiz)+'||'+(x.adet||1);
-      return xKey !== key;
+      return ((x.katId||'')+'||'+(x.id||temiz)+'||'+(x.adet||1)) !== key;
     });
-    // Tek temiz kayıt olarak ekle
-    sepet.push({ ...grup, adet: topAdet, fiyat: birimFiyat * topAdet * yeniMiktar, fiyatBirim: birimFiyat, miktar: yeniMiktar });
+    // Yeni miktarda tek kayıt ekle (fiyat = birimFiyat × topAdet; miktar kadar tekrar push)
+    for (let m = 0; m < yeniMiktar; m++) {
+      sepet.push({ ...grup, adet: grup.adet, fiyat: grup.fiyatBirim * grup.adet, fiyatBirim: grup.fiyatBirim, miktar: 1 });
+    }
     localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
     window.dispatchEvent(new Event('bellaconeCartUpdate'));
     renderSepet();
@@ -487,7 +484,7 @@
     const btn = document.getElementById('siparis-btn');
     btn.disabled = true; btn.textContent = 'Gönderiliyor...';
 
-    const araToplam = sepet.reduce((s, i) => s + i.fiyat * i.adet, 0);
+    const araToplam = birlestirilmisSepet().reduce((s, i) => s + i.satirFiyat, 0);
     const siparisVerisi = {
       tip: 'online',
       musteri: { ad, tel },
@@ -498,7 +495,7 @@
         tarif: document.getElementById('tarif').value.trim()
       },
       odeme: odemeYontemi === 'nakit' ? 'Nakit' : 'Kredi/Banka Kartı',
-      urunler: birlestirilmisSepet().map(i => ({ isim: (i.miktar>1?i.miktar+'× ':'')+i.isim+(i.adet>1?' ('+i.adet+' top)':''), katIsim: i.katIsim, fiyat: i.fiyat, adet: i.miktar||1 })),
+      urunler: birlestirilmisSepet().map(i => ({ isim: (i.miktar>1?i.miktar+'× ':'')+i.isim+(i.adet>1?' ('+i.adet+' top)':''), katIsim: i.katIsim, fiyat: i.satirFiyat, adet: i.miktar||1 })),
       not: document.getElementById('siparis-not').value.trim(),
       araToplam,
       teslimatUcreti,
