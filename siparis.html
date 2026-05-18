@@ -365,8 +365,10 @@
       }
     });
     // Gösterilecek fiyat: birimFiyat * topAdet * miktar
-    Object.values(map).forEach(x => { x.satirFiyat = x.fiyatBirim * x.adet * x.miktar; });
-    return Object.values(map);
+    const result = Object.values(map);
+    result.forEach(x => { x.satirFiyat = x.fiyatBirim * x.adet * x.miktar; });
+    result.sort((a, b) => (a.isim||'').localeCompare(b.isim||'', 'tr') || a.adet - b.adet);
+    return result;
   }
 
   function renderSepet() {
