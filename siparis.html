@@ -349,6 +349,23 @@
 
   renderSepet();
 
+  // Aynı isimli ürünleri birleştir
+  function birlestirilmisSepet() {
+    const map = {};
+    sepet.forEach(item => {
+      // Dondurma top sayısını isimden sıyırarak birleştirme anahtarı oluştur
+      const key = (item.katId || '') + '||' + (item.id || item.isim);
+      if (map[key]) {
+        map[key].adet += item.adet || 1;
+        map[key].fiyatBirim = map[key].fiyat / (map[key].adet - (item.adet||1)) || item.fiyat;
+        map[key].fiyat += item.fiyat;
+      } else {
+        map[key] = { ...item, adet: item.adet || 1, fiyatBirim: item.fiyat / (item.adet||1), _key: key };
+      }
+    });
+    return Object.values(map);
+  }
+
   function renderSepet() {
     const itemsEl = document.getElementById('summary-items');
     const araToplam = sepet.reduce((s, i) => s + i.fiyat * i.adet, 0);
@@ -373,35 +390,45 @@
       return;
     }
 
-    itemsEl.innerHTML = sepet.map((item, i) => `
+    const birlesmis = birlestirilmisSepet();
+    itemsEl.innerHTML = birlesmis.map((item, i) => `
       <div class="summary-item">
         <div class="summary-item-img">
           ${item.foto ? `<img src="${item.foto}" alt="${item.isim}" onerror="this.style.display='none'">` : item.emoji}
         </div>
         <div class="summary-item-info">
-          <div class="summary-item-name">${item.isim}</div>
+          <div class="summary-item-name">${item.isim.replace(/\s*\(\d+ top\)/, '')}</div>
           <div class="summary-item-cat">${item.katIsim}</div>
           <div class="summary-item-qty">
-            <button class="sq-btn" onclick="qtyDegistir(${i},-1)">−</button>
+            <button class="sq-btn" onclick="qtyDegistir('${item._key}',-1)">−</button>
             <span class="sq-val">${item.adet}</span>
-            <button class="sq-btn" onclick="qtyDegistir(${i},1)">+</button>
-            <button class="sq-del" onclick="sil(${i})">✕</button>
+            <button class="sq-btn" onclick="qtyDegistir('${item._key}',1)">+</button>
+            <button class="sq-del" onclick="sil('${item._key}')">✕</button>
           </div>
         </div>
-        <div class="summary-item-price">${item.fiyat * item.adet} ₺</div>
+        <div class="summary-item-price">${item.fiyat} ₺</div>
       </div>
     `).join('');
   }
 
-  window.qtyDegistir = function(idx, d) {
-    sepet[idx].adet = Math.max(1, sepet[idx].adet + d);
+  window.qtyDegistir = function(key, d) {
+    const birlesmis = birlestirilmisSepet();
+    const grup = birlesmis.find(x => x._key === key);
+    if (!grup) return;
+    const birimFiyat = grup.fiyatBirim;
+    const yeniAdet = Math.max(1, grup.adet + d);
+    // Sepetten bu key'e ait tüm kayıtları sil, tek kayıt olarak yaz
+    sepet = sepet.filter(x => ((x.katId||'')+'||'+(x.id||x.isim)) !== key);
+    sepet.push({ ...grup, adet: yeniAdet, fiyat: birimFiyat * yeniAdet, isim: grup.isim.replace(/\s*\(\d+ top\)/, '') });
     localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
+    window.dispatchEvent(new Event('bellaconeCartUpdate'));
     renderSepet();
   };
 
-  window.sil = function(idx) {
-    sepet.splice(idx, 1);
+  window.sil = function(key) {
+    sepet = sepet.filter(x => ((x.katId||'')+'||'+(x.id||x.isim)) !== key);
     localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
+    window.dispatchEvent(new Event('bellaconeCartUpdate'));
     if (!sepet.length) {
       document.getElementById('bos-sepet-uyari').style.display = 'block';
       document.getElementById('siparis-form').style.display = 'none';
@@ -452,7 +479,7 @@
         tarif: document.getElementById('tarif').value.trim()
       },
       odeme: odemeYontemi === 'nakit' ? 'Nakit' : 'Kredi/Banka Kartı',
-      urunler: sepet.map(i => ({ isim: i.isim, katIsim: i.katIsim, fiyat: i.fiyat, adet: i.adet })),
+      urunler: birlestirilmisSepet().map(i => ({ isim: i.isim.replace(/\s*\(\d+ top\)/, ''), katIsim: i.katIsim, fiyat: i.fiyat, adet: i.adet })),
       not: document.getElementById('siparis-not').value.trim(),
       araToplam,
       teslimatUcreti,
