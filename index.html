@@ -903,7 +903,10 @@
       document.body.style.overflow = '';
       document.body.style.position = '';
       document.body.style.width = '';
+      document.body.style.top = '';
+      window.scrollTo({ top: 0, behavior: 'instant' });
       gone = true;
+      return;
     }
 
     function hideSplash() {
@@ -935,9 +938,11 @@
     document.onkeydown = function() { hideSplash(); document.onkeydown = null; };
 
     // Splash açıkken arka planda scroll olmasın
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
+    if (!gone) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    }
     var ty0 = 0;
     splash.addEventListener('touchstart', function(e){ ty0 = e.touches[0].clientY; }, {passive:true});
     splash.addEventListener('touchend',   function(e){
