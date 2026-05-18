@@ -198,77 +198,84 @@
   const db = getDatabase(app);
 
   const DURUMLAR = [
-    { key: 'bekliyor',      label: 'Alındı',       emoji: '✓' },
-    { key: 'hazirlaniyor', label: 'Hazırlanıyor', emoji: '👨‍🍳' },
-    { key: 'yolda',        label: 'Yolda',         emoji: '🛵' },
-    { key: 'teslim',       label: 'Teslim Edildi', emoji: '🎉' }
+    { key: 'bekliyor',      label: 'Alindi',        emoji: '✓' },
+    { key: 'hazirlaniyor',  label: 'Hazirlaniyor',  emoji: '&#x1F468;&#x200D;&#x1F373;' },
+    { key: 'yolda',         label: 'Yolda',         emoji: '&#x1F6F5;' },
+    { key: 'teslim',        label: 'Teslim Edildi', emoji: '&#x1F389;' }
   ];
 
   function durumIndex(d) {
-    return DURUMLAR.findIndex(x => x.key === d);
+    const idx = DURUMLAR.findIndex(function(x) { return x.key === d; });
+    return idx >= 0 ? idx : 0;
   }
 
   function renderSonuc(siparis) {
     const dIdx = durumIndex(siparis.durum || 'bekliyor');
 
-    const stepsHTML = DURUMLAR.map((d, i) => {
+    let stepsHTML = '';
+    for (let i = 0; i < DURUMLAR.length; i++) {
+      const d = DURUMLAR[i];
       const cls = i < dIdx ? 'done' : i === dIdx ? 'active' : '';
-      return \`<div class="step \${cls}">
-        <div class="step-dot">\${i <= dIdx ? d.emoji : '○'}</div>
-        <div class="step-label">\${d.label}</div>
-      </div>\`;
-    }).join('');
+      const dotContent = i <= dIdx ? d.emoji : 'o';
+      stepsHTML += '<div class="step ' + cls + '">' +
+        '<div class="step-dot">' + dotContent + '</div>' +
+        '<div class="step-label">' + d.label + '</div>' +
+        '</div>';
+    }
 
-    const badgeCls = \`durum-\${siparis.durum || 'bekliyor'}\`;
-    const badgeLabel = DURUMLAR[dIdx]?.label || siparis.durum;
+    const badgeCls = 'durum-' + (siparis.durum || 'bekliyor');
+    const badgeLabel = DURUMLAR[dIdx] ? DURUMLAR[dIdx].label : siparis.durum;
+    const badgeEmoji = DURUMLAR[dIdx] ? DURUMLAR[dIdx].emoji : '';
 
-    const urunlerHTML = (siparis.urunler || []).map(u =>
-      \`<div class="urun-row">
-        <span class="urun-isim">\${u.isim}\${u.adet > 1 ? ' × ' + u.adet : ''}</span>
-        <span class="urun-fiyat">\${u.fiyat} ₺</span>
-      </div>\`
-    ).join('');
+    let urunlerHTML = '';
+    const urunler = siparis.urunler || [];
+    for (let i = 0; i < urunler.length; i++) {
+      const u = urunler[i];
+      urunlerHTML += '<div class="urun-row">' +
+        '<span class="urun-isim">' + u.isim + (u.adet > 1 ? ' x' + u.adet : '') + '</span>' +
+        '<span class="urun-fiyat">' + u.fiyat + ' TL</span>' +
+        '</div>';
+    }
 
-    const zamanStr = siparis.zamanStr || new Date(siparis.zaman).toLocaleString('tr-TR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const zamanStr = siparis.zamanStr || new Date(siparis.zaman).toLocaleString('tr-TR', {
+      day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+
+    const teslimatStr = siparis.teslimatUcreti > 0 ? siparis.teslimatUcreti + ' TL' : 'Ucretsiz';
+    const notHTML = siparis.not ? '<div class="info-item" style="grid-column:span 2"><div class="info-item-label">Not</div><div class="info-item-val">' + siparis.not + '</div></div>' : '';
+    const daireStr = siparis.adres && siparis.adres.daire ? ', Daire: ' + siparis.adres.daire : '';
+    const adresStr = (siparis.adres && siparis.adres.adres) ? siparis.adres.adres + daireStr : '-';
+
+    const html = '<div class="result-card">' +
+      '<div class="result-header">' +
+        '<div>' +
+          '<div class="result-no">#' + (siparis.siparisNo || '—') + '</div>' +
+          '<div class="result-zaman">' + zamanStr + '</div>' +
+        '</div>' +
+        '<span class="durum-badge ' + badgeCls + '">' + badgeEmoji + ' ' + badgeLabel + '</span>' +
+      '</div>' +
+      '<div class="steps">' + stepsHTML + '</div>' +
+      '<div class="urun-list">' + urunlerHTML + '</div>' +
+      '<div class="totals">' +
+        '<div class="total-row"><span>Ara Toplam</span><span>' + siparis.araToplam + ' TL</span></div>' +
+        '<div class="total-row"><span>Teslimat</span><span>' + teslimatStr + '</span></div>' +
+        '<div class="total-row main"><span>Toplam</span><span>' + siparis.toplamFiyat + ' TL</span></div>' +
+      '</div>' +
+      '<div class="info-grid">' +
+        '<div class="info-item"><div class="info-item-label">Musteri</div><div class="info-item-val">' + (siparis.musteri ? siparis.musteri.ad : '-') + '</div></div>' +
+        '<div class="info-item"><div class="info-item-label">Odeme</div><div class="info-item-val">' + (siparis.odeme || '-') + '</div></div>' +
+        '<div class="info-item" style="grid-column:span 2"><div class="info-item-label">Adres</div><div class="info-item-val">' + adresStr + '</div></div>' +
+        notHTML +
+      '</div>' +
+    '</div>';
 
     document.getElementById('result').style.display = 'block';
-    document.getElementById('result').innerHTML = \`
-      <div class="result-card">
-        <div class="result-header">
-          <div>
-            <div class="result-no">#\${siparis.siparisNo}</div>
-            <div class="result-zaman">\${zamanStr}</div>
-          </div>
-          <span class="durum-badge \${badgeCls}">\${DURUMLAR[dIdx]?.emoji} \${badgeLabel}</span>
-        </div>
+    document.getElementById('result').innerHTML = html;
+  }
 
-        <div class="steps">\${stepsHTML}</div>
-
-        <div class="urun-list">
-          \${urunlerHTML}
-        </div>
-        <div class="totals">
-          <div class="total-row"><span>Ara Toplam</span><span>\${siparis.araToplam} ₺</span></div>
-          <div class="total-row"><span>Teslimat</span><span>\${siparis.teslimatUcreti > 0 ? siparis.teslimatUcreti + ' ₺' : 'Ücretsiz'}</span></div>
-          <div class="total-row main"><span>Toplam</span><span>\${siparis.toplamFiyat} ₺</span></div>
-        </div>
-        <div class="info-grid">
-          <div class="info-item">
-            <div class="info-item-label">Müşteri</div>
-            <div class="info-item-val">\${siparis.musteri?.ad || '-'}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-item-label">Ödeme</div>
-            <div class="info-item-val">\${siparis.odeme || '-'}</div>
-          </div>
-          <div class="info-item" style="grid-column:span 2">
-            <div class="info-item-label">Adres</div>
-            <div class="info-item-val">\${siparis.adres?.adres || '-'}\${siparis.adres?.daire ? ', Daire: ' + siparis.adres.daire : ''}</div>
-          </div>
-          \${siparis.not ? \`<div class="info-item" style="grid-column:span 2"><div class="info-item-label">Not</div><div class="info-item-val">\${siparis.not}</div></div>\` : ''}
-        </div>
-      </div>
-    \`;
+  function showNotFound() {
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('result').innerHTML = '<div class="result-card not-found"><div class="not-found-icon">&#x1F50D;</div><p>Bu numarayla siparis bulunamadi.<br>Numarayi kontrol edip tekrar deneyin.</p></div>';
   }
 
   window.ara = async function() {
@@ -278,66 +285,105 @@
 
     if (!rawInput || rawInput.length < 3) {
       hint.style.color = 'var(--accent)';
-      hint.textContent = 'Lütfen geçerli bir sipariş numarası girin (örn: BL-1234)';
+      hint.textContent = 'Gecerli bir siparis numarasi girin (ornek: BL-1234 veya 1234)';
       return;
     }
     hint.style.color = 'var(--muted)';
-    hint.textContent = 'Aranıyor...';
+    hint.textContent = 'Araniyor...';
     document.getElementById('result').style.display = 'none';
 
     try {
       const snap = await get(ref(db, 'online_siparisler'));
-      if (!snap.exists()) { showNotFound(); hint.textContent = ''; return; }
-      const bulunan = Object.values(snap.val()).find(s => s.siparisNo === siparisNo);
       hint.textContent = '';
-      if (!bulunan) { showNotFound(); return; }
+      if (!snap.exists()) { showNotFound(); return; }
+      const tum = snap.val();
+      const entries = Object.values(tum);
+      const bulunan = entries.find(function(s) { return s.siparisNo === siparisNo; });
+      if (!bulunan) {
+        console.log('Aranan:', siparisNo, '| Mevcut numaralar:', entries.map(function(s){ return s.siparisNo || '(yok)'; }));
+        showNotFound();
+        return;
+      }
       renderSonuc(bulunan);
     } catch(e) {
       hint.style.color = 'var(--accent)';
-      hint.textContent = 'Bir hata oluştu, tekrar deneyin.';
-      console.error(e);
+      hint.textContent = 'Hata: ' + (e.message || 'Bilinmeyen hata');
+      console.error('Firebase hatasi:', e);
     }
   };
 
-  function showNotFound() {
-    document.getElementById('result').style.display = 'block';
-    document.getElementById('result').innerHTML = '<div class="result-card not-found"><div class="not-found-icon">🔍</div><p>Bu numarayla sipariş bulunamadı.<br>Numarayı kontrol edip tekrar deneyin.</p></div>';
-  }
-
-  // URL'de ?no= varsa otomatik ara
+  // URL parametresi varsa otomatik ara
   const params = new URLSearchParams(location.search);
   const noParam = params.get('no');
   if (noParam) {
     document.getElementById('no-input').value = noParam;
-    setTimeout(ara, 400);
+    setTimeout(window.ara, 500);
   }
 
-  // Nav badge
-  (function(){
-    function getCart(){try{return JSON.parse(localStorage.getItem('bellacone_sepet')||'[]');}catch(e){return[];}}
-    function updateBadge(){var items=getCart();var total=items.reduce(function(s,i){return s+(i.adet||1);},0);var badge=document.getElementById('nav-cart-count');if(!badge)return;badge.textContent=total;if(total>0)badge.classList.add('show');else badge.classList.remove('show');}
-    document.addEventListener('DOMContentLoaded',updateBadge);
-    window.addEventListener('bellaconeCartUpdate',updateBadge);
+  // Nav sepet badge
+  (function() {
+    function getCart() { try { return JSON.parse(localStorage.getItem('bellacone_sepet') || '[]'); } catch(e) { return []; } }
+    function updateBadge() {
+      var items = getCart();
+      var total = items.reduce(function(s, i) { return s + (i.adet || 1); }, 0);
+      var badge = document.getElementById('nav-cart-count');
+      if (!badge) return;
+      badge.textContent = total;
+      if (total > 0) badge.classList.add('show'); else badge.classList.remove('show');
+    }
+    document.addEventListener('DOMContentLoaded', updateBadge);
+    window.addEventListener('bellaconeCartUpdate', updateBadge);
   })();
 
-  // Cart panel
-  window.openCart = function(){
-    var items=[];try{items=JSON.parse(localStorage.getItem('bellacone_sepet')||'[]');}catch(e){}
-    var body=document.getElementById('cart-body');
-    var footer=document.getElementById('cart-footer');
-    if(!items.length){body.innerHTML='<div class="cart-empty" style="text-align:center;padding:3rem 1rem;"><div style="font-size:48px;margin-bottom:1rem;">🛒</div><p style="color:var(--muted);font-size:14px;">Sepetiniz boş</p></div>';if(footer)footer.style.display='none';}
-    else{var html='';var total=0;items.forEach(function(item){var f=(item.fiyat||0);total+=f;html+='<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--cream2);align-items:center;"><span style="font-size:24px;">'+( item.emoji||'🍦')+'</span><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;color:var(--brown);">'+item.isim+'</div><div style="font-size:11px;color:var(--muted);">'+item.katIsim+'</div></div><span style="font-size:14px;font-weight:600;color:var(--accent);">'+f+' ₺</span></div>';});body.innerHTML=html;if(footer){footer.style.display='block';}}
+  // Sepet paneli
+  window.openCart = function() {
+    var items = []; try { items = JSON.parse(localStorage.getItem('bellacone_sepet') || '[]'); } catch(e) {}
+    var body = document.getElementById('cart-body');
+    var footer = document.getElementById('cart-footer');
+    if (!items.length) {
+      body.innerHTML = '<div class="cart-empty" style="text-align:center;padding:3rem 1rem;"><div style="font-size:48px;margin-bottom:1rem;">&#x1F6D2;</div><p style="color:var(--muted);font-size:14px;">Sepetiniz bos</p></div>';
+      if (footer) footer.style.display = 'none';
+    } else {
+      var html = ''; var total = 0;
+      items.forEach(function(item) {
+        var f = item.fiyat || 0; total += f;
+        html += '<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--cream2);align-items:center;">' +
+          '<span style="font-size:24px;">' + (item.emoji || '&#x1F366;') + '</span>' +
+          '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;color:var(--brown);">' + item.isim + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);">' + item.katIsim + '</div></div>' +
+          '<span style="font-size:14px;font-weight:600;color:var(--accent);">' + f + ' TL</span></div>';
+      });
+      body.innerHTML = html;
+      if (footer) footer.style.display = 'block';
+    }
     document.getElementById('cart-overlay').classList.add('open');
     document.getElementById('cart-panel').classList.add('open');
-    document.body.style.overflow='hidden';
+    document.body.style.overflow = 'hidden';
   };
-  window.closeCart = function(){document.getElementById('cart-overlay').classList.remove('open');document.getElementById('cart-panel').classList.remove('open');document.body.style.overflow='';};
-  window.toggleMobile = function(){var m=document.getElementById('mobile-menu');var b=document.getElementById('burger-btn');m.classList.toggle('open');b.classList.toggle('open');document.body.style.overflow=m.classList.contains('open')?'hidden':'';};
-  window.closeMobile = function(){var m=document.getElementById('mobile-menu');var b=document.getElementById('burger-btn');m.classList.remove('open');b.classList.remove('open');document.body.style.overflow='';};
+  window.closeCart = function() {
+    document.getElementById('cart-overlay').classList.remove('open');
+    document.getElementById('cart-panel').classList.remove('open');
+    document.body.style.overflow = '';
+  };
+  window.toggleMobile = function() {
+    var m = document.getElementById('mobile-menu');
+    var b = document.getElementById('burger-btn');
+    m.classList.toggle('open');
+    b.classList.toggle('open');
+    document.body.style.overflow = m.classList.contains('open') ? 'hidden' : '';
+  };
+  window.closeMobile = function() {
+    var m = document.getElementById('mobile-menu');
+    var b = document.getElementById('burger-btn');
+    m.classList.remove('open');
+    b.classList.remove('open');
+    document.body.style.overflow = '';
+  };
 
-  // Enter tuşu
-  document.addEventListener('DOMContentLoaded', function(){
-    document.getElementById('no-input').addEventListener('keydown', function(e){if(e.key==='Enter')ara();});
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('no-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') window.ara();
+    });
   });
 </script>
 </body>
