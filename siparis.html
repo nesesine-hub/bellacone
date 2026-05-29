@@ -183,6 +183,12 @@
   .cart-siparis-btn:hover { background: var(--brown, #320d1e); transform: translateY(-1px); }
   .cart-clear-btn { display: block; width: 100%; background: none; border: none; color: var(--muted, #8a3860); font-size: 12px; cursor: pointer; margin-top: 10px; font-family: 'DM Sans', sans-serif; padding: 4px; transition: color 0.2s; }
   .cart-clear-btn:hover { color: var(--accent, #d44f82); }
+
+  .siparis-kapali-banner { display: none; background: #fff3cd; border: 1.5px solid #f0c040; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: none; align-items: center; gap: 12px; }
+  .siparis-kapali-banner.show { display: flex !important; }
+  .siparis-kapali-icon { font-size: 28px; flex-shrink: 0; }
+  .siparis-kapali-text { font-size: 14px; color: #7a5a00; line-height: 1.5; }
+  .siparis-kapali-text strong { display: block; font-size: 15px; margin-bottom: 2px; }
 </style>
 </head>
 <body>
@@ -227,7 +233,15 @@
       <a href="lezzetler.html" class="btn-go">Lezzetleri Keşfet →</a>
     </div>
 
-    <div id="siparis-form">
+    <div class="siparis-kapali-banner" id="siparis-kapali-banner">
+  <div class="siparis-kapali-icon">🚫</div>
+  <div class="siparis-kapali-text">
+    <strong>Online Sipariş Şu An Kapalı</strong>
+    Kurye hizmetimiz geçici olarak durdurulmuştur. Lütfen daha sonra tekrar deneyin veya bizi arayın.
+  </div>
+</div>
+
+<div id="siparis-form" >
       <!-- 1. İletişim -->
       <div class="form-card">
         <div class="form-card-title"><span class="num">1</span> İletişim Bilgileri</div>
@@ -355,6 +369,22 @@
   let teslimatUcreti = 0;
 
   // Ayarları Firebase'den oku
+  // Online sipariş durumunu kontrol et
+  onValue(ref(db, 'ayarlar/onlineSiparis'), (snap) => {
+    const acik = snap.exists() ? snap.val() : true;
+    const banner = document.getElementById('siparis-kapali-banner');
+    const btn = document.getElementById('siparis-btn');
+    if (banner) {
+      if (acik) banner.classList.remove('show');
+      else banner.classList.add('show');
+    }
+    if (btn && !acik) {
+      btn.disabled = true;
+      btn.textContent = 'Sipariş Alınmıyor';
+      btn.style.opacity = '0.5';
+    }
+  });
+
   onValue(ref(db, 'ayarlar'), snap => {
     const a = snap.val() || {};
     minSiparis = a.minSiparis || 0;
