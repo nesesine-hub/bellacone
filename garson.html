@@ -453,14 +453,21 @@
 
   window.onlineFisYazdir = function(o) {
     if (typeof o === 'string') o = JSON.parse(o);
-    const sipNo = '#' + new Date().toISOString().slice(2,10).replace(/-/g,'') + '-' + String(Math.floor(Math.random()*9999)).padStart(4,'0');
+    const sipNo = o.siparisNo ? '#' + o.siparisNo : '#' + new Date().toISOString().slice(2,10).replace(/-/g,'') + '-' + String(Math.floor(Math.random()*9999)).padStart(4,'0');
     const tarih = new Date().toLocaleString('tr-TR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
     const urunler = o.urunler || [];
     const satirlar = urunler.map(u => {
       const isim = (u.isim || '').toUpperCase().substring(0,22).padEnd(22);
       const adet = String(u.adet || 1).padStart(2);
-      const toplam = String(((u.fiyat||0)*(u.adet||1)).toFixed(2)).padStart(8);
-      return `${isim} ${adet} ${toplam}`;
+      const toplam = String(((u.fiyat||0)).toFixed(2)).padStart(8);
+      let satirStr = isim + ' ' + adet + toplam;
+      // Malzemeleri/seçimleri ürün altına ekle
+      if (u.bolumDetay) {
+        const malzemeler = u.bolumDetay.split(',').map(m => m.trim()).filter(Boolean);
+        malzemeler.forEach(m => { satirStr += '\n  - ' + m; });
+      }
+      if (u.not) { satirStr += '\n  Not: ' + u.not; }
+      return satirStr;
     }).join('\n');
     const fis = `<html><head><meta charset="UTF-8"><style>
       *{margin:0;padding:0;box-sizing:border-box;}
@@ -487,7 +494,7 @@
     ${o.adres?.tarif?`<div>Tarif: ${o.adres.tarif}</div>`:''}
     <div>Ödeme: ${o.odeme||''}</div>
     <div class="dashed"></div>
-    <pre>Ürün                   Adet   Toplam</pre>
+    <pre>Ürün                   Adet  Toplam</pre>
     <pre>--------------------------------------</pre>
     <pre>${satirlar}</pre>
     <div class="line"></div>
@@ -615,7 +622,7 @@
   window.fisYazdir = function(masa, kalemler) {
     const parsed = typeof kalemler === 'string' ? JSON.parse(kalemler) : kalemler;
     const toplam = parsed.reduce((s, o) => s + (o.toplamFiyat || 0), 0);
-    const sipNo = '#' + new Date().toISOString().slice(2,10).replace(/-/g,'') + '-' + String(Math.floor(Math.random()*9999)).padStart(4,'0');
+    const sipNo = o.siparisNo ? '#' + o.siparisNo : '#' + new Date().toISOString().slice(2,10).replace(/-/g,'') + '-' + String(Math.floor(Math.random()*9999)).padStart(4,'0');
     const tarih = new Date().toLocaleString('tr-TR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
     const satirlar = parsed.map(o => {

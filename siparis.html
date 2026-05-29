@@ -547,7 +547,7 @@
         tarif: document.getElementById('tarif').value.trim()
       },
       odeme: odemeYontemi === 'nakit' ? 'Nakit' : 'Kredi/Banka Kartı',
-      urunler: birlestirilmisSepet().map(i => ({ isim: (i.miktar>1?i.miktar+'× ':'')+i.isim+(i.adet>1?' ('+i.adet+' top)':''), katIsim: i.katIsim, fiyat: i.satirFiyat, adet: i.miktar||1 })),
+      urunler: birlestirilmisSepet().map(i => ({ isim: (i.miktar>1?i.miktar+'× ':'')+i.isim+(i.adet>1?' ('+i.adet+' top)':''), katIsim: i.katIsim, fiyat: i.satirFiyat, adet: i.miktar||1, bolumDetay: i.bolumDetay||'' })),
       not: document.getElementById('siparis-not').value.trim(),
       araToplam,
       teslimatUcreti,
