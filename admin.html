@@ -623,7 +623,8 @@
     row.innerHTML = `
       <div style="display:flex;gap:8px;align-items:center;flex:1;flex-wrap:wrap;">
         <input id="kat-edit-emoji-${id}" type="text" value="${kat.emoji || ''}" style="width:50px;border:1px solid var(--soft);border-radius:8px;padding:6px;font-size:18px;text-align:center;" maxlength="2">
-        <input id="kat-edit-isim-${id}" type="text" value="${kat.isim}" style="flex:1;border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:14px;font-family:'DM Sans',sans-serif;">
+        <input id="kat-edit-isim-${id}" type="text" value="${kat.isim}" style="flex:1;min-width:120px;border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:14px;font-family:'DM Sans',sans-serif;">
+        <input id="kat-edit-foto-${id}" type="text" value="${kat.foto || ''}" placeholder="Görsel URL" style="flex:2;min-width:160px;border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--muted);">
         <button onclick="katKaydet('${id}')" style="padding:6px 14px;background:var(--brown);color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;">Kaydet</button>
         <button onclick="renderKategorilerList()" style="padding:6px 14px;background:transparent;color:var(--muted);border:1px solid var(--soft);border-radius:8px;font-size:13px;cursor:pointer;">İptal</button>
       </div>
@@ -633,9 +634,11 @@
   window.katKaydet = async function(id) {
     const emoji = document.getElementById('kat-edit-emoji-' + id).value.trim();
     const isim = document.getElementById('kat-edit-isim-' + id).value.trim();
+    const fotoEl = document.getElementById('kat-edit-foto-' + id);
+    const foto = fotoEl ? fotoEl.value.trim() : '';
     if (!isim) { showToast('İsim boş olamaz'); return; }
     const kat = kategoriler.find(k => k.id === id);
-    const guncellenmis = { ...kat, isim, emoji };
+    const guncellenmis = { ...kat, isim, emoji, foto };
     const yeniListe = kategoriler.map(k => k.id === id ? guncellenmis : k);
     const obj = {};
     yeniListe.forEach(k => { obj[k.id] = k; });
