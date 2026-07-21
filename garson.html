@@ -453,22 +453,24 @@
 
   window.onlineFisYazdir = function(o) {
     if (typeof o === 'string') o = JSON.parse(o);
-    const sipNo = 'Masa-' + masa + '-' + new Date().toISOString().slice(2,10).replace(/-/g,'');
+    const sipNo = o.siparisNo ? '#' + o.siparisNo : '#' + new Date().toISOString().slice(2,10).replace(/-/g,'');
     const tarih = new Date().toLocaleString('tr-TR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
     const urunler = o.urunler || [];
-    const satirlar = urunler.map(u => {
-      const isim = (u.isim || '').toUpperCase().substring(0,22).padEnd(22);
-      const adet = String(u.adet || 1).padStart(2);
-      const toplam = String(((u.fiyat||0)).toFixed(2)).padStart(8);
-      let satirStr = isim + ' ' + adet + toplam;
-      // Malzemeleri/seçimleri ürün altına ekle
+    const urunBloklariHTML = urunler.map(u => {
+      let blok = `<div class="urun-satir">
+        <span>${(u.isim || '').toUpperCase()} × ${u.adet || 1}</span>
+        <span>${(u.fiyat||0).toFixed(2)} TL</span>
+      </div>`;
+      const maddeler = [];
       if (u.bolumDetay) {
-        const malzemeler = u.bolumDetay.split(',').map(m => m.trim()).filter(Boolean);
-        malzemeler.forEach(m => { satirStr += '\n  - ' + m; });
+        u.bolumDetay.split(',').map(m => m.trim()).filter(Boolean).forEach(m => maddeler.push(m));
       }
-      if (u.not) { satirStr += '\n  Not: ' + u.not; }
-      return satirStr;
-    }).join('\n');
+      if (u.not) maddeler.push('Not: ' + u.not);
+      if (maddeler.length) {
+        blok += '<ul class="madde-list">' + maddeler.map(m => `<li>${m}</li>`).join('') + '</ul>';
+      }
+      return blok;
+    }).join('<div class="dashed" style="margin:8px 0;"></div>');
     const fis = `<html><head><meta charset="UTF-8"><style>
       *{margin:0;padding:0;box-sizing:border-box;}
       body{font-family:'Courier New',monospace;font-size:13px;font-weight:bold;width:280px;padding:10px;}
@@ -478,6 +480,10 @@
       .row{display:flex;justify-content:space-between;}
       pre{font-family:'Courier New',monospace;font-size:12px;font-weight:bold;white-space:pre;}
       .toplam{font-size:15px;font-weight:bold;}
+      .urun-satir{display:flex;justify-content:space-between;font-size:14px;font-weight:bold;margin-top:4px;}
+      .madde-list{list-style:none;margin:4px 0 0 0;padding:0;}
+      .madde-list li{font-size:13px;font-weight:bold;padding:2px 0 2px 10px;position:relative;}
+      .madde-list li::before{content:'•';position:absolute;left:0;}
     </style></head><body>
     <div class="center" style="font-size:18px;font-weight:bold;letter-spacing:1px;">BellaCone</div>
     <div class="center">Tel: 0533 510 95 59</div>
@@ -494,9 +500,7 @@
     ${o.adres?.tarif?`<div>Tarif: ${o.adres.tarif}</div>`:''}
     <div>Ödeme: ${o.odeme||''}</div>
     <div class="dashed"></div>
-    <pre>Ürün                   Adet  Toplam</pre>
-    <pre>--------------------------------------</pre>
-    <pre>${satirlar}</pre>
+    ${urunBloklariHTML}
     <div class="line"></div>
     <div class="row toplam"><span>TOPLAM:</span><span>${(o.toplamFiyat||0).toFixed(2)} TL</span></div>
     ${o.not?`<div class="dashed"></div><div>Not: ${o.not}</div>`:''}
@@ -635,13 +639,30 @@
     const sipNo = 'Masa-' + masa + '-' + new Date().toISOString().slice(2,10).replace(/-/g,'');
     const tarih = new Date().toLocaleString('tr-TR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
-    const satirlar = parsed.map(o => {
-      const isim = (o.urun || '').toUpperCase().substring(0, 20).padEnd(20);
-      const adet = String(o.miktar || 1).padStart(2);
-      const fiyat = String((o.toplamFiyat || 0).toFixed(2)).padStart(8);
-      const satir_toplam = String((o.toplamFiyat || 0).toFixed(2)).padStart(8);
-      return `${isim} ${adet} ${fiyat} ${satir_toplam}`;
-    }).join('\n');
+    // Her ürün için: isim/adet/fiyat satırı + altında madde madde seçimler (HTML olarak, pre değil)
+    const urunBloklariHTML = parsed.map(o => {
+      const isim = (o.urun || '').toUpperCase();
+      const kategori = o.kategori ? o.kategori + ' — ' : '';
+      let blok = `<div class="urun-satir">
+        <span>${kategori}${isim} × ${o.miktar || 1}</span>
+        <span>${(o.toplamFiyat || 0).toFixed(2)} TL</span>
+      </div>`;
+
+      const maddeler = [];
+      if (o.toplar && o.toplar.length) {
+        o.toplar.forEach((t, i) => maddeler.push(`${i+1}. ${t}`));
+      }
+      if (o.secimMetni) {
+        o.secimMetni.split(' | ').forEach(s => maddeler.push(s));
+      }
+      if (o.not) {
+        maddeler.push('Not: ' + o.not);
+      }
+      if (maddeler.length) {
+        blok += '<ul class="madde-list">' + maddeler.map(m => `<li>${m}</li>`).join('') + '</ul>';
+      }
+      return blok;
+    }).join('<div class="dashed" style="margin:8px 0;"></div>');
 
     const fis = `
       <html><head><meta charset="UTF-8">
@@ -654,6 +675,10 @@
         .row { display: flex; justify-content: space-between; }
         pre { font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; white-space: pre; }
         .toplam { font-size: 15px; font-weight: bold; }
+        .urun-satir { display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; margin-top: 4px; }
+        .madde-list { list-style: none; margin: 4px 0 0 0; padding: 0; }
+        .madde-list li { font-size: 13px; font-weight: bold; padding: 2px 0 2px 10px; position: relative; }
+        .madde-list li::before { content: '•'; position: absolute; left: 0; }
       </style>
       </head><body>
       <div class="center" style="font-size:18px;font-weight:bold;letter-spacing:1px;">BellaCone</div>
@@ -665,9 +690,8 @@
       <div>Masa: Masa ${masa}</div>
       <div>Tarih: ${tarih}</div>
       <div class="dashed"></div>
-      <pre>Ürün                 Adet   Fiyat   Toplam</pre>
-      <pre>--------------------------------------------</pre>
-      <pre>${satirlar}</pre>
+      <div class="dashed"></div>
+      ${urunBloklariHTML}
       <div class="line"></div>
       <div class="row toplam"><span>TOPLAM:</span><span>${toplam.toFixed(2)} TL</span></div>
       <div class="dashed"></div>
