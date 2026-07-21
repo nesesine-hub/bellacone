@@ -453,7 +453,7 @@
 
   window.onlineFisYazdir = function(o) {
     if (typeof o === 'string') o = JSON.parse(o);
-    const sipNo = o.siparisNo ? '#' + o.siparisNo : '#' + new Date().toISOString().slice(2,10).replace(/-/g,'') + '-' + String(Math.floor(Math.random()*9999)).padStart(4,'0');
+    const sipNo = 'Masa-' + masa + '-' + new Date().toISOString().slice(2,10).replace(/-/g,'');
     const tarih = new Date().toLocaleString('tr-TR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
     const urunler = o.urunler || [];
     const satirlar = urunler.map(u => {
@@ -565,6 +565,10 @@
     });
 
     // Masa grupları
+    // Global map: masa -> kalemler (fiş yazdırma için, HTML attribute'a JSON gömmek yerine)
+    window._masaKalemMap = {};
+    siraliMasalar.forEach(([masa, kalemler]) => { window._masaKalemMap[masa] = kalemler; });
+
     siraliMasalar.forEach(([masa, kalemler]) => {
       const masaToplam = kalemler.reduce((s, o) => s + (o.toplamFiyat || 0), 0);
       const hepsiOdendi = kalemler.every(o => o.durum === 'odeme_alindi');
@@ -577,7 +581,7 @@
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:13px;font-weight:600;color:var(--accent);">${masaToplam} ₺</span>
             <span style="font-size:11px;color:var(--muted);">${kalemler.length} kalem</span>
-            <button onclick="fisYazdir('${masa}', ${JSON.stringify(kalemler).replace(/"/g,'&quot;')})" style="padding:5px 12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;">🖨 Fiş</button>
+            <button onclick="fisYazdirMasa('${masa}')" style="padding:5px 12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;">🖨 Fiş</button>
           </div>
         </div>
         <!-- KALEMLERİ -->
@@ -619,10 +623,16 @@
     renderOrders();
   };
 
+  window.fisYazdirMasa = function(masa) {
+    const kalemler = (window._masaKalemMap || {})[masa];
+    if (!kalemler || !kalemler.length) { alert('Bu masa için kalem bulunamadı'); return; }
+    window.fisYazdir(masa, kalemler);
+  };
+
   window.fisYazdir = function(masa, kalemler) {
-    const parsed = typeof kalemler === 'string' ? JSON.parse(kalemler) : kalemler;
+    const parsed = kalemler;
     const toplam = parsed.reduce((s, o) => s + (o.toplamFiyat || 0), 0);
-    const sipNo = o.siparisNo ? '#' + o.siparisNo : '#' + new Date().toISOString().slice(2,10).replace(/-/g,'') + '-' + String(Math.floor(Math.random()*9999)).padStart(4,'0');
+    const sipNo = 'Masa-' + masa + '-' + new Date().toISOString().slice(2,10).replace(/-/g,'');
     const tarih = new Date().toLocaleString('tr-TR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
     const satirlar = parsed.map(o => {
