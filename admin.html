@@ -185,6 +185,11 @@
   .toggle-status { font-size: 13px; font-weight: 600; margin-left: 10px; min-width: 50px; }
   .toggle-status.acik { color: var(--green, #3a9b65); }
   .toggle-status.kapali { color: var(--red, #c0392b); }
+
+  .foto-input-wrap { display: flex; gap: 6px; align-items: center; }
+  .foto-input-wrap input[type="text"] { flex: 1; }
+  .foto-upload-btn { flex-shrink: 0; padding: 8px 10px; background: var(--soft); border: 1px solid var(--soft); border-radius: 8px; cursor: pointer; font-size: 16px; transition: background 0.2s; }
+  .foto-upload-btn:hover { background: var(--accent); }
 </style>
 </head>
 <body>
@@ -316,7 +321,7 @@
       <div style="display:grid;grid-template-columns:60px 1fr 1fr;gap:10px;margin-bottom:1rem;">
         <div class="form-group"><label>Emoji</label><input class="form-input emoji-select" id="lz-kat-emoji" type="text" value="🍦" maxlength="2"></div>
         <div class="form-group"><label>Kategori Adı</label><input class="form-input" id="lz-kat-isim" type="text" placeholder="Örn: Waffle"></div>
-        <div class="form-group"><label>Fotoğraf URL</label><input class="form-input" id="lz-kat-foto" type="text" placeholder="https://... veya dosya adı"></div>
+        <div class="form-group"><label>Fotoğraf URL</label><div class="foto-input-wrap"><input class="form-input" id="lz-kat-foto" type="text" placeholder="https://... veya dosya adı"><button type="button" class="foto-upload-btn" onclick="pickFotoFile('lz-kat-foto')" title="Bilgisayardan seç">📁</button></div></div>
       </div>
       <div style="display:flex;gap:8px;">
         <button class="lz-save-btn" onclick="lzKatKaydet()">Kaydet</button>
@@ -350,7 +355,7 @@
           </div>
           <div class="form-group" style="margin-bottom:0.75rem;">
             <label>Fotoğraf URL</label>
-            <input class="form-input" id="lz-d-foto" type="text" placeholder="https://... veya GitHub dosya adı" oninput="lzFotoOnizle(this.value)">
+            <div class="foto-input-wrap"><input class="form-input" id="lz-d-foto" type="text" placeholder="https://... veya GitHub dosya adı" oninput="lzFotoOnizle(this.value)"><button type="button" class="foto-upload-btn" onclick="pickFotoFile('lz-d-foto', lzFotoOnizle)" title="Bilgisayardan seç">📁</button></div>
           </div>
           <div class="lz-status-toggle">
             <label class="toggle"><input type="checkbox" id="lz-d-aktif" checked><span class="toggle-slider"></span></label>
@@ -424,7 +429,7 @@
     <div class="form-row">
       <div class="form-group" style="flex:0 0 60px;"><label>Emoji</label><input class="form-input emoji-select" id="k-emoji" type="text" value="🍦" maxlength="2"></div>
       <div class="form-group"><label>Kategori Adı</label><input class="form-input" id="k-isim" type="text" placeholder="Örn: Profiterol"></div>
-      <div class="form-group"><label>Fotoğraf URL (opsiyonel)</label><input class="form-input" id="k-foto" type="text" placeholder="https://... veya dosya adı"></div>
+      <div class="form-group"><label>Fotoğraf URL (opsiyonel)</label><div class="foto-input-wrap"><input class="form-input" id="k-foto" type="text" placeholder="https://... veya dosya adı"><button type="button" class="foto-upload-btn" onclick="pickFotoFile('k-foto')" title="Bilgisayardan seç">📁</button></div></div>
       <button class="add-btn" onclick="addKategori()">Ekle</button>
     </div>
     <p style="font-size:12px; color:var(--muted); margin-bottom:0.75rem;">Fotoğraf için: GitHub'a yükle → dosya adını yaz (örn: dondurma.jpg)</p>
@@ -460,7 +465,7 @@
           <button class="add-btn" onclick="addUrun()">Ekle</button>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Fotoğraf URL (lezzetler sayfası için)</label><input class="form-input" id="u-foto" type="text" placeholder="https://... veya GitHub dosya adı"></div>
+          <div class="form-group"><label>Fotoğraf URL (lezzetler sayfası için)</label><div class="foto-input-wrap"><input class="form-input" id="u-foto" type="text" placeholder="https://... veya GitHub dosya adı"><button type="button" class="foto-upload-btn" onclick="pickFotoFile('u-foto')" title="Bilgisayardan seç">📁</button></div></div>
           <div class="form-group"><label>Açıklama (opsiyonel)</label><input class="form-input" id="u-aciklama" type="text" placeholder="Kısa ürün açıklaması..."></div>
         </div>
         <div class="item-list" id="urun-list"></div>
@@ -568,6 +573,49 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
+  // ===== BİLGİSAYARDAN FOTOĞRAF SEÇME =====
+  // Herhangi bir "Fotoğraf URL" input'unun yanına konan 📁 butonuna basınca çalışır.
+  // Seçilen görsel base64'e çevrilip ilgili input'un value'suna yazılır (URL yazar gibi).
+  window._fotoFileTarget = null;
+  window._fotoFileCallback = null;
+
+  window.pickFotoFile = function(targetInputId, afterCallback) {
+    window._fotoFileTarget = targetInputId;
+    window._fotoFileCallback = afterCallback || null;
+    const picker = document.getElementById('global-foto-picker');
+    if (picker) picker.click();
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const picker = document.getElementById('global-foto-picker');
+    if (!picker) return;
+    picker.addEventListener('change', function(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      if (file.size > 4 * 1024 * 1024) {
+        showToast('Görsel çok büyük (max 4MB)');
+        e.target.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const targetId = window._fotoFileTarget;
+        const input = targetId ? document.getElementById(targetId) : null;
+        if (input) {
+          input.value = evt.target.result; // base64 data URL
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (typeof window._fotoFileCallback === 'function') {
+          window._fotoFileCallback(evt.target.result);
+        }
+        showToast('✓ Görsel yüklendi');
+      };
+      reader.onerror = function() { showToast('Görsel okunamadı'); };
+      reader.readAsDataURL(file);
+      e.target.value = '';
+    });
+  });
+
   let topFiyat = 80; // varsayılan, Firebase'den güncellenir
   onValue(ref(db, 'ayarlar/topFiyat'), snap => { if (snap.exists()) topFiyat = snap.val(); });
 
@@ -624,7 +672,8 @@
       <div style="display:flex;gap:8px;align-items:center;flex:1;flex-wrap:wrap;">
         <input id="kat-edit-emoji-${id}" type="text" value="${kat.emoji || ''}" style="width:50px;border:1px solid var(--soft);border-radius:8px;padding:6px;font-size:18px;text-align:center;" maxlength="2">
         <input id="kat-edit-isim-${id}" type="text" value="${kat.isim}" style="flex:1;min-width:120px;border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:14px;font-family:'DM Sans',sans-serif;">
-        <input id="kat-edit-foto-${id}" type="text" value="${kat.foto || ''}" placeholder="Görsel URL" style="flex:2;min-width:160px;border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--muted);">
+        <input id="kat-edit-foto-${id}" type="text" value="${kat.foto || ''}" placeholder="Görsel URL" style="flex:2;min-width:140px;border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--muted);">
+        <button type="button" class="foto-upload-btn" onclick="pickFotoFile('kat-edit-foto-${id}')" title="Bilgisayardan seç">📁</button>
         <button onclick="katKaydet('${id}')" style="padding:6px 14px;background:var(--brown);color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;">Kaydet</button>
         <button onclick="renderKategorilerList()" style="padding:6px 14px;background:transparent;color:var(--muted);border:1px solid var(--soft);border-radius:8px;font-size:13px;cursor:pointer;">İptal</button>
       </div>
@@ -635,10 +684,10 @@
     const emoji = document.getElementById('kat-edit-emoji-' + id).value.trim();
     const isim = document.getElementById('kat-edit-isim-' + id).value.trim();
     const fotoEl = document.getElementById('kat-edit-foto-' + id);
-    const foto = fotoEl ? fotoEl.value.trim() : '';
+    const fotoVal = fotoEl ? fotoEl.value.trim() : '';
     if (!isim) { showToast('İsim boş olamaz'); return; }
     const kat = kategoriler.find(k => k.id === id);
-    const guncellenmis = { ...kat, isim, emoji, foto };
+    const guncellenmis = { ...kat, isim, emoji, foto: fotoVal };
     const yeniListe = kategoriler.map(k => k.id === id ? guncellenmis : k);
     const obj = {};
     yeniListe.forEach(k => { obj[k.id] = k; });
@@ -657,6 +706,7 @@
         </div>
         <div class="foto-input-row">
           <input class="foto-input" id="foto-input-${k.id}" type="text" placeholder="https://i.imgur.com/... veya görsel linki" value="${k.foto || ''}" oninput="fotoOnizle('${k.id}')" />
+          <button type="button" class="foto-upload-btn" onclick="pickFotoFile('foto-input-${k.id}', () => fotoOnizle('${k.id}'))" title="Bilgisayardan seç">📁</button>
           <button class="foto-kaydet-btn" onclick="fotoKaydet('${k.id}')">Kaydet</button>
         </div>
         <div class="foto-onizleme" id="foto-onizleme-${k.id}" ${k.foto ? 'style="display:block"' : ''}>
@@ -1808,5 +1858,7 @@
     <input type="hidden" id="cesit-edit-id">
   </div>
 </div>
+
+<input type="file" id="global-foto-picker" accept="image/*" style="display:none">
 </body>
 </html>
