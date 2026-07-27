@@ -804,6 +804,15 @@
             <button class="del-btn" onclick="delBolum('${bolumKey}')" title="Bölümü sil">×</button>
           </div>
         </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fff;border:1px solid var(--soft);border-radius:8px;padding:8px 10px;margin-bottom:0.6rem;">
+          <span style="font-size:11px;color:var(--muted);font-weight:600;">ÜCRETSİZ LİMİT</span>
+          <input type="number" min="0" id="bolum-limit-${bolumKey}" value="${bolum.ucretsizLimit ?? 0}" style="width:60px;border:1px solid var(--soft);border-radius:6px;padding:4px 8px;font-size:13px;font-family:'DM Sans',sans-serif;" placeholder="0">
+          <span style="font-size:11px;color:var(--muted);">seçimden sonra</span>
+          <input type="number" min="0" id="bolum-ucret-${bolumKey}" value="${bolum.ekUcret ?? 0}" style="width:70px;border:1px solid var(--soft);border-radius:6px;padding:4px 8px;font-size:13px;font-family:'DM Sans',sans-serif;" placeholder="0">
+          <span style="font-size:11px;color:var(--muted);">₺ / adet</span>
+          <button onclick="bolumLimitKaydet('${bolumKey}')" style="padding:4px 12px;background:var(--brown);color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">Kaydet</button>
+          ${(bolum.ucretsizLimit > 0 && bolum.ekUcret > 0) ? `<span style="font-size:11px;color:var(--accent);font-weight:600;">✓ İlk ${bolum.ucretsizLimit} ücretsiz, sonrası +${bolum.ekUcret}₺</span>` : `<span style="font-size:11px;color:var(--muted);opacity:0.7;">Limitsiz (hepsi ücretsiz)</span>`}
+        </div>
         <div class="form-row" style="margin-bottom:0.5rem;">
           <div class="form-group"><input class="form-input" id="bolum-inp-${bolumKey}" type="text" placeholder="${bolum.isim} ekle..."></div>
           <button class="add-btn" onclick="addBolumSecenek('${bolumKey}')">Ekle</button>
@@ -963,6 +972,18 @@
     parent.insertBefore(inp, span.nextSibling);
     parent.insertBefore(kaydetBtn, inp.nextSibling);
     parent.insertBefore(iptalBtn, kaydetBtn.nextSibling);
+  };
+
+  window.bolumLimitKaydet = async function(bolumKey) {
+    if (!aktifKatId) return;
+    const limit = parseInt(document.getElementById('bolum-limit-' + bolumKey).value) || 0;
+    const ucret = parseFloat(document.getElementById('bolum-ucret-' + bolumKey).value) || 0;
+    await set(ref(db, `menu/${aktifKatId}/bolumler/${bolumKey}/ucretsizLimit`), limit);
+    await set(ref(db, `menu/${aktifKatId}/bolumler/${bolumKey}/ekUcret`), ucret);
+    loadKatIcerik(aktifKatId);
+    showToast(limit > 0 && ucret > 0
+      ? `İlk ${limit} seçim ücretsiz, sonrası +${ucret}₺`
+      : 'Limit kaldırıldı (tüm seçimler ücretsiz)');
   };
 
   window.toggleTopIcinKullan = async function(bolumKey, aktif) {

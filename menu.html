@@ -53,6 +53,8 @@
   .urun-card.selected { border-color: var(--accent); background: #fff1e8; }
   .urun-icon { font-size: 26px; margin-bottom: 6px; }
   .urun-foto { width: 100%; height: 110px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; display: block; background: var(--soft); }
+  .limit-bilgi { font-size: 11px; color: var(--muted); background: #fff8f0; border: 1px solid var(--soft); border-radius: 8px; padding: 5px 10px; margin-bottom: 8px; display: inline-block; }
+  .limit-bilgi.asildi { color: var(--accent); border-color: var(--accent); background: #fff1e8; font-weight: 600; }
   .urun-card { overflow: hidden; }
   .urun-name { font-size: 13px; font-weight: 500; color: var(--text); }
   .urun-price { font-size: 12px; color: var(--accent); font-weight: 500; margin-top: 2px; }
@@ -319,7 +321,11 @@
         const aktifler = secenekler.filter(s => !(typeof s==='object' ? s.pasif : false));
         const pasifler = secenekler.filter(s => (typeof s==='object' ? s.pasif : false));
         if (!secenekler.length) return;
-        html += `<div class="section-title">${bolum.isim}</div><div class="chips">`;
+        html += `<div class="section-title">${bolum.isim}</div>`;
+        if (bolum.ucretsizLimit > 0 && bolum.ekUcret > 0) {
+          html += `<div class="limit-bilgi" id="limit-bilgi-${bolumKey}">İlk ${bolum.ucretsizLimit} seçim ücretsiz · sonraki her seçim +${bolum.ekUcret}₺</div>`;
+        }
+        html += `<div class="chips">`;
         aktifler.forEach(s => {
           const isim = typeof s==='object' ? s.isim : s;
           const ekFiyat = typeof s==='object' && s.ekFiyat ? ` +${s.ekFiyat}₺` : '';
@@ -361,7 +367,11 @@
         const aktifler = secenekler.filter(s => !(typeof s==='object' ? s.pasif : false));
         const pasifler = secenekler.filter(s => (typeof s==='object' ? s.pasif : false));
         if (!secenekler.length) return;
-        html += `<div class="section-title">${bolum.isim}</div><div class="chips">`;
+        html += `<div class="section-title">${bolum.isim}</div>`;
+        if (bolum.ucretsizLimit > 0 && bolum.ekUcret > 0) {
+          html += `<div class="limit-bilgi" id="limit-bilgi-${bolumKey}">İlk ${bolum.ucretsizLimit} seçim ücretsiz · sonraki her seçim +${bolum.ekUcret}₺</div>`;
+        }
+        html += `<div class="chips">`;
         aktifler.forEach(s => {
           const isim = typeof s==='object' ? s.isim : s;
           const ekFiyat = typeof s==='object' && s.ekFiyat ? ` +${s.ekFiyat}₺` : '';
@@ -493,7 +503,30 @@
     const idx = arr.findIndex(s => s.isim === val);
     if (idx === -1) arr.push({ isim: val, ekFiyat: Number(ekFiyat)||0 });
     else arr.splice(idx, 1);
+    limitBilgiGuncelle(bolumKey);
   };
+
+  // Bölüm limit uyarısını canlı güncelle
+  function limitBilgiGuncelle(bolumKey) {
+    const data = menuData[aktifKategori?.id] || {};
+    const bolum = (data.bolumler || {})[bolumKey];
+    if (!bolum) return;
+    const limit = bolum.ucretsizLimit || 0;
+    const ucret = bolum.ekUcret || 0;
+    if (!(limit > 0 && ucret > 0)) return;
+    const el = document.getElementById('limit-bilgi-' + bolumKey);
+    if (!el) return;
+    const secili = (state.secimler[bolumKey] || []).length;
+    if (secili > limit) {
+      const asan = secili - limit;
+      el.textContent = `${secili} seçim · ${asan} ekstra × ${ucret}₺ = +${asan * ucret}₺`;
+      el.classList.add('asildi');
+    } else {
+      const kalan = limit - secili;
+      el.textContent = `İlk ${limit} seçim ücretsiz · ${kalan} hakkınız kaldı · sonrası +${ucret}₺`;
+      el.classList.remove('asildi');
+    }
+  }
 
   window.changeMiktar = function(d) {
     state.miktar = Math.max(1, state.miktar + d);
@@ -540,9 +573,20 @@
     const secimMetni = Object.entries(state.secimler)
       .filter(([,arr]) => arr.length > 0)
       .map(([bolumKey, arr]) => {
-        const bolumIsim = bolumler[bolumKey]?.isim || bolumKey;
+        const bolumCfg = bolumler[bolumKey] || {};
+        const bolumIsim = bolumCfg.isim || bolumKey;
+        // Seçeneklerin kendi ek ücretleri
         arr.forEach(s => { ekFiyatToplam += s.ekFiyat || 0; });
-        return bolumIsim + ': ' + arr.map(s => s.isim + (s.ekFiyat ? ` +${s.ekFiyat}₺` : '')).join(', ');
+        // Bölüm limiti aşıldıysa aşan her seçim için ek ücret
+        const limit = bolumCfg.ucretsizLimit || 0;
+        const asimUcret = bolumCfg.ekUcret || 0;
+        let limitNotu = '';
+        if (limit > 0 && asimUcret > 0 && arr.length > limit) {
+          const asanAdet = arr.length - limit;
+          ekFiyatToplam += asanAdet * asimUcret;
+          limitNotu = ` (${asanAdet} ekstra × ${asimUcret}₺)`;
+        }
+        return bolumIsim + ': ' + arr.map(s => s.isim + (s.ekFiyat ? ` +${s.ekFiyat}₺` : '')).join(', ') + limitNotu;
       }).join(' | ');
 
     const not = document.getElementById('siparis-not')?.value?.trim() || '';

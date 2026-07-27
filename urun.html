@@ -30,6 +30,8 @@
   .urun-aciklama { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 1.25rem; }
   .bolum-card { background: var(--white); border: 1.5px solid var(--cream2); border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
   .bolum-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+  .limit-bilgi { font-size: 11px; color: var(--muted); background: var(--cream); border: 1px solid var(--cream2); border-radius: 8px; padding: 5px 10px; margin-bottom: 0.6rem; display: inline-block; }
+  .limit-bilgi.asildi { color: var(--accent); border-color: var(--accent); font-weight: 600; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
   .chip { padding: 8px 16px; border: 1.5px solid var(--cream2); border-radius: 999px; font-size: 13px; cursor: pointer; background: var(--cream); color: var(--text); transition: all 0.15s; font-family: 'DM Sans', sans-serif; user-select: none; }
   .chip:hover { border-color: var(--accent); }
@@ -71,56 +73,6 @@
   }
   .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(60px); background: var(--brown); color: #fff; padding: 10px 22px; border-radius: 999px; font-size: 13px; z-index: 999; transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; white-space: nowrap; }
   .toast.show { transform: translateX(-50%) translateY(0); }
-
-  /* SEPET İKONU NAV */
-  .nav-cart-btn { position: relative; background: none; border: none; cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center; color: var(--brown2); transition: color 0.2s; margin-left: 0.5rem; }
-  .nav-cart-btn:hover { color: var(--accent); }
-  .nav-cart-btn svg { width: 22px; height: 22px; }
-  .nav-cart-count { position: absolute; top: -2px; right: -4px; background: var(--accent); color: #fff; border-radius: 999px; font-size: 10px; font-weight: 700; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; padding: 0 3px; opacity: 0; transform: scale(0.7); transition: all 0.2s; }
-  .nav-cart-count.show { opacity: 1; transform: scale(1); }
-  /* SEPET PANELİ */
-  .cart-overlay { position: fixed; inset: 0; background: rgba(50,13,30,0.35); z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-  .cart-overlay.open { opacity: 1; pointer-events: all; }
-  .cart-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 360px; max-width: 95vw; background: var(--white, #fffafc); z-index: 2001; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.35s cubic-bezier(.4,0,.2,1); box-shadow: -4px 0 40px rgba(50,13,30,0.12); }
-  .cart-panel.open { transform: translateX(0); }
-  .cart-panel-head { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--cream2, #fac8df); }
-  .cart-panel-head h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; color: var(--brown, #320d1e); }
-  .cart-close { background: none; border: none; cursor: pointer; font-size: 22px; color: var(--muted, #8a3860); line-height: 1; padding: 4px; }
-  .cart-close:hover { color: var(--accent, #d44f82); }
-  .cart-body { flex: 1; overflow-y: auto; padding: 1.25rem 1.5rem; }
-  .cart-empty { text-align: center; padding: 4rem 1rem; }
-  .cart-empty-icon { font-size: 48px; margin-bottom: 1rem; }
-  .cart-empty p { font-size: 14px; color: var(--muted, #8a3860); line-height: 1.6; }
-  .cart-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--cream2, #fac8df); }
-  .cart-item-emoji { font-size: 28px; flex-shrink: 0; width: 44px; height: 44px; background: var(--cream, #fef2f7); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-  .cart-item-info { flex: 1; min-width: 0; }
-  .cart-item-name { font-size: 14px; font-weight: 500; color: var(--brown, #320d1e); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .cart-item-detail { font-size: 11px; color: var(--muted, #8a3860); line-height: 1.5; }
-  .cart-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
-  .cart-item-price { font-size: 14px; font-weight: 600; color: var(--accent, #d44f82); }
-  .cart-item-remove { background: none; border: none; cursor: pointer; font-size: 16px; color: var(--cream2, #fac8df); line-height: 1; padding: 2px; transition: color 0.2s; }
-  .cart-item-remove:hover { color: var(--accent, #d44f82); }
-  .cart-footer { padding: 1.25rem 1.5rem; border-top: 1px solid var(--cream2, #fac8df); }
-  .cart-total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-  .cart-total-label { font-size: 14px; color: var(--muted, #8a3860); }
-  .cart-total-val { font-size: 20px; font-weight: 600; color: var(--brown, #320d1e); font-family: 'Cormorant Garamond', serif; }
-  .cart-siparis-btn { display: block; width: 100%; background: var(--accent, #d44f82); color: #fff; border: none; border-radius: 999px; padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.3s; text-align: center; text-decoration: none; }
-  .cart-siparis-btn:hover { background: var(--brown, #320d1e); transform: translateY(-1px); }
-  .cart-clear-btn { display: block; width: 100%; background: none; border: none; color: var(--muted, #8a3860); font-size: 12px; cursor: pointer; margin-top: 10px; font-family: 'DM Sans', sans-serif; padding: 4px; transition: color 0.2s; }
-  .cart-clear-btn:hover { color: var(--accent, #d44f82); }
-
-  @media (max-width: 900px) {
-    nav {
-      padding: 0.85rem 1.25rem;
-      display: grid !important;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-    }
-    .burger { display: flex !important; order: 0 !important; justify-self: start; }
-    .nav-logo { order: 1 !important; justify-self: center !important; }
-    .nav-links { display: none !important; }
-    .nav-cart-btn { order: 2 !important; justify-self: end !important; margin-left: 0; }
-  }
 </style>
 </head>
 <body>
@@ -270,7 +222,9 @@ function renderBolumler() {
       if (!secs.length) return;
       const div = document.createElement('div');
       div.className = 'bolum-card';
-      div.innerHTML = `<div class="bolum-title">${b.isim}</div><div class="chips">${secs.map(s => {
+      const limitHTML = (b.ucretsizLimit > 0 && b.ekUcret > 0)
+        ? `<div class="limit-bilgi" id="limit-bilgi-${bKey}">İlk ${b.ucretsizLimit} seçim ücretsiz · sonrası +${b.ekUcret}TL</div>` : '';
+      div.innerHTML = `<div class="bolum-title">${b.isim}</div>${limitHTML}<div class="chips">${secs.map(s => {
         const ekF = s.ekFiyat ? ` +${s.ekFiyat}TL` : '';
         return `<span class="chip" onclick="toggleChip(this,'${bKey}','${s.isim}',${s.ekFiyat||0})">${s.isim}${ekF}</span>`;
       }).join('')}</div>`;
@@ -285,7 +239,9 @@ function renderBolumler() {
       if (!secs.length) return;
       const div = document.createElement('div');
       div.className = 'bolum-card';
-      div.innerHTML = `<div class="bolum-title">${b.isim}</div><div class="chips">${secs.map(s => {
+      const limitHTML = (b.ucretsizLimit > 0 && b.ekUcret > 0)
+        ? `<div class="limit-bilgi" id="limit-bilgi-${bKey}">İlk ${b.ucretsizLimit} seçim ücretsiz · sonrası +${b.ekUcret}TL</div>` : '';
+      div.innerHTML = `<div class="bolum-title">${b.isim}</div>${limitHTML}<div class="chips">${secs.map(s => {
         const ekF = s.ekFiyat ? ` +${s.ekFiyat}TL` : '';
         return `<span class="chip" onclick="toggleChip(this,'${bKey}','${s.isim}',${s.ekFiyat||0})">${s.isim}${ekF}</span>`;
       }).join('')}</div>`;
@@ -367,6 +323,25 @@ window.toggleChip = function(el, bolumKey, isim, ekFiyat) {
   hesaplaFiyat();
 };
 
+// Bölüm limit uyarısını canlı güncelle
+function limitBilgiGuncelle(bKey) {
+  const b = bolumlerData[bKey];
+  if (!b) return;
+  const limit = b.ucretsizLimit || 0;
+  const ucret = b.ekUcret || 0;
+  const el = document.getElementById('limit-bilgi-' + bKey);
+  if (!el || !(limit > 0 && ucret > 0)) return;
+  const secili = (secimler[bKey] || []).length;
+  if (secili > limit) {
+    const asan = secili - limit;
+    el.textContent = `${secili} seçim · ${asan} ekstra × ${ucret}TL = +${asan * ucret}TL`;
+    el.classList.add('asildi');
+  } else {
+    el.textContent = `İlk ${limit} seçim ücretsiz · ${limit - secili} hakkınız kaldı · sonrası +${ucret}TL`;
+    el.classList.remove('asildi');
+  }
+}
+
 function hesaplaFiyat() {
   let toplam = 0;
   if (isDondurma) {
@@ -380,10 +355,18 @@ function hesaplaFiyat() {
   }
   Object.entries(secimler).forEach(([bKey, list]) => {
     const b = bolumlerData[bKey];
+    // Seçeneklerin kendi ek ücretleri
     list.forEach(isim => {
       const s = Object.values(b?.secenekler||{}).find(x => x.isim === isim);
       toplam += s?.ekFiyat||0;
     });
+    // Bölüm ücretsiz limiti aşıldıysa aşan seçimler için ek ücret
+    const limit = b?.ucretsizLimit || 0;
+    const asimUcret = b?.ekUcret || 0;
+    if (limit > 0 && asimUcret > 0 && list.length > limit) {
+      toplam += (list.length - limit) * asimUcret;
+    }
+    limitBilgiGuncelle(bKey);
   });
   document.getElementById('fiyat-goster').textContent = toplam + ' TL';
   const btn = document.getElementById('sepet-btn');
@@ -431,7 +414,6 @@ window.sepeteEkleVeGit = function() {
   const sepet = JSON.parse(localStorage.getItem('bellacone_sepet') || '[]');
   sepet.push({ id: urunData.id||urunId, katId, isim: isimDetay, katIsim: document.getElementById('urun-kat').textContent, emoji: urunData.emoji||'🍦', foto: urunData.foto||'', fiyat, adet: 1, bolumDetay: bolumDetay.join(' | '), not, eklenme: Date.now() });
   localStorage.setItem('bellacone_sepet', JSON.stringify(sepet));
-  window.dispatchEvent(new Event('bellaconeCartUpdate'));
   const btn = document.getElementById('sepet-btn');
   btn.classList.add('success'); btn.textContent = 'Sepete Eklendi!';
   setTimeout(() => { btn.classList.remove('success'); btn.textContent = `Sepete Ekle — ${fiyat} TL`; }, 2000);
@@ -451,110 +433,6 @@ function showToast(msg) {
 }
 
 yukle();
-</script>
-
-<!-- SEPET PANELİ -->
-<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
-<div class="cart-panel" id="cart-panel">
-  <div class="cart-panel-head">
-    <h3>Sepetim 🛒</h3>
-    <button class="cart-close" onclick="closeCart()">✕</button>
-  </div>
-  <div class="cart-body" id="cart-body"></div>
-  <div class="cart-footer" id="cart-footer" style="display:none;">
-    <div class="cart-total-row">
-      <span class="cart-total-label">Toplam</span>
-      <span class="cart-total-val" id="cart-total-val">0 ₺</span>
-    </div>
-    <a href="siparis.html" class="cart-siparis-btn">Siparişe Git →</a>
-    <button class="cart-clear-btn" onclick="sepetiBosalt()">Sepeti Temizle</button>
-  </div>
-</div>
-
-<script>
-(function() {
-  function getCartItems() {
-    try { return JSON.parse(localStorage.getItem('bellacone_sepet') || '[]'); } catch(e) { return []; }
-  }
-  function updateNavBadge() {
-    var items = getCartItems();
-    var total = items.reduce(function(s,i){ return s + (i.adet||1); }, 0);
-    var badge = document.getElementById('nav-cart-count');
-    if (!badge) return;
-    badge.textContent = total;
-    if (total > 0) badge.classList.add('show');
-    else badge.classList.remove('show');
-  }
-  function renderCart() {
-    var items = getCartItems();
-    var body = document.getElementById('cart-body');
-    var footer = document.getElementById('cart-footer');
-    if (!body) return;
-    if (items.length === 0) {
-      body.innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">🛒</div><p>Sepetiniz boş.<br>Lezzetler sayfasından ürün ekleyin!</p></div>';
-      if (footer) footer.style.display = 'none';
-      return;
-    }
-    var html = '';
-    var toplam = 0;
-    items.forEach(function(item, idx) {
-      var fiyat = (item.fiyat||0) * (item.adet||1);
-      toplam += fiyat;
-      var detail = [];
-      if (item.bolumDetay) detail.push(item.bolumDetay);
-      if (item.not) detail.push('Not: ' + item.not);
-      if (item.adet > 1) detail.push(item.adet + ' adet');
-      html += '<div class="cart-item">';
-      html += '<div class="cart-item-emoji">' + (item.emoji||'🍦') + '</div>';
-      html += '<div class="cart-item-info">';
-      html += '<div class="cart-item-name">' + (item.isim||'Ürün') + '</div>';
-      if (detail.length) html += '<div class="cart-item-detail">' + detail.join('<br>') + '</div>';
-      html += '</div>';
-      html += '<div class="cart-item-right">';
-      html += '<span class="cart-item-price">' + fiyat + ' ₺</span>';
-      html += '<button class="cart-item-remove" onclick="removeCartItem(' + idx + ')">✕</button>';
-      html += '</div>';
-      html += '</div>';
-    });
-    body.innerHTML = html;
-    if (footer) {
-      footer.style.display = 'block';
-      var tv = document.getElementById('cart-total-val');
-      if (tv) tv.textContent = toplam + ' ₺';
-    }
-  }
-  window.openCart = function() {
-    renderCart();
-    document.getElementById('cart-overlay').classList.add('open');
-    document.getElementById('cart-panel').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  };
-  window.closeCart = function() {
-    document.getElementById('cart-overlay').classList.remove('open');
-    document.getElementById('cart-panel').classList.remove('open');
-    document.body.style.overflow = '';
-  };
-  window.removeCartItem = function(idx) {
-    var items = getCartItems();
-    items.splice(idx, 1);
-    localStorage.setItem('bellacone_sepet', JSON.stringify(items));
-    renderCart();
-    updateNavBadge();
-  };
-  window.sepetiBosalt = function() {
-    localStorage.removeItem('bellacone_sepet');
-    renderCart();
-    updateNavBadge();
-  };
-  document.addEventListener('DOMContentLoaded', function() {
-    updateNavBadge();
-  });
-  window.addEventListener('storage', updateNavBadge);
-  window.addEventListener('bellaconeCartUpdate', function() {
-    updateNavBadge();
-    if (document.getElementById('cart-panel').classList.contains('open')) renderCart();
-  });
-})();
 </script>
 </body>
 </html>
