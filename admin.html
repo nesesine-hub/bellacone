@@ -978,11 +978,15 @@
   function renderUrunList(obj) {
     const list = document.getElementById('urun-list');
     const items = Object.entries(obj);
+    // Global map: ürün foto'larını düzenlerken güvenle okumak için
+    window._urunlerMap = obj || {};
     if (!items.length) { list.innerHTML = '<span class="empty-list">Henüz ürün eklenmedi</span>'; return; }
     list.innerHTML = items.map(([key, u]) => `
       <div class="item-row" id="urun-row-${key}" style="${u.pasif ? 'opacity:0.5' : ''}">
         <div class="item-left">
-          <span class="item-emoji">${u.emoji || '🍦'}</span>
+          ${u.foto
+            ? `<img src="${u.foto}" alt="" style="width:38px;height:38px;border-radius:8px;object-fit:cover;flex-shrink:0;" onerror="this.outerHTML='<span class=\'item-emoji\'>${u.emoji || '🍦'}</span>'">`
+            : `<span class="item-emoji">${u.emoji || '🍦'}</span>`}
           <div class="item-info">
             <span class="item-name">${u.isim}</span>
             <span class="item-price">${u.fiyat > 0 ? u.fiyat + ' ₺ · ' : ''}${u.stok !== undefined ? `Stok: <b>${u.stok}</b>` : 'Stoksuz'}</span>
@@ -1007,24 +1011,33 @@
 
   window.urunDuzenle = function(key, isim, fiyat, emoji) {
     const row = document.getElementById('urun-row-' + key);
+    const mevcutFoto = ((window._urunlerMap || {})[key] || {}).foto || '';
     row.innerHTML = `
       <div style="display:flex;gap:6px;align-items:center;flex:1;flex-wrap:wrap;">
         <input id="uedit-emoji-${key}" type="text" value="${emoji}" style="width:46px;border:1px solid var(--soft);border-radius:8px;padding:6px;font-size:18px;text-align:center;" maxlength="2">
-        <input id="uedit-isim-${key}" type="text" value="${isim}" style="flex:1;min-width:120px;border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:14px;font-family:'DM Sans',sans-serif;">
-        <input id="uedit-fiyat-${key}" type="number" value="${fiyat}" style="width:80px;border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:14px;">
+        <input id="uedit-isim-${key}" type="text" value="${isim}" style="flex:1;min-width:110px;border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:14px;font-family:'DM Sans',sans-serif;">
+        <input id="uedit-fiyat-${key}" type="number" value="${fiyat}" style="width:78px;border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:14px;">
+        <input id="uedit-foto-${key}" type="text" placeholder="Görsel URL" style="flex:2;min-width:140px;border:1px solid var(--soft);border-radius:8px;padding:6px 10px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--muted);">
+        <button type="button" class="foto-upload-btn" onclick="pickFotoFile('uedit-foto-${key}')" title="Bilgisayardan seç">📁</button>
         <button onclick="urunKaydet('${key}')" style="padding:6px 14px;background:var(--brown);color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">Kaydet</button>
         <button onclick="loadKatIcerik('${aktifKatId}')" style="padding:6px 14px;background:transparent;color:var(--muted);border:1px solid var(--soft);border-radius:8px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">İptal</button>
       </div>`;
+    // Mevcut foto değerini JS ile ata (base64 tırnak sorunlarını önlemek için)
+    const fotoInput = document.getElementById('uedit-foto-' + key);
+    if (fotoInput) fotoInput.value = mevcutFoto;
   };
 
   window.urunKaydet = async function(key) {
     const emoji = document.getElementById('uedit-emoji-' + key).value.trim();
     const isim = document.getElementById('uedit-isim-' + key).value.trim();
     const fiyat = parseFloat(document.getElementById('uedit-fiyat-' + key).value);
+    const fotoEl = document.getElementById('uedit-foto-' + key);
+    const foto = fotoEl ? fotoEl.value.trim() : '';
     if (!isim || isNaN(fiyat)) { showToast('İsim ve fiyat girin'); return; }
     await set(ref(db, `menu/${aktifKatId}/urunler/${key}/isim`), isim);
     await set(ref(db, `menu/${aktifKatId}/urunler/${key}/fiyat`), fiyat);
     await set(ref(db, `menu/${aktifKatId}/urunler/${key}/emoji`), emoji);
+    await set(ref(db, `menu/${aktifKatId}/urunler/${key}/foto`), foto);
     loadKatIcerik(aktifKatId);
     showToast('Ürün güncellendi');
   };
