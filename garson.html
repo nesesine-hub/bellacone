@@ -458,7 +458,7 @@
     const urunler = o.urunler || [];
     const urunBloklariHTML = urunler.map(u => {
       let blok = `<div class="urun-satir">
-        <span>${(u.isim || '').toUpperCase()} × ${u.adet || 1}</span>
+        <span>${u.isim || ''} × ${u.adet || 1}</span>
         <span>${(u.fiyat||0).toFixed(2)} TL</span>
       </div>`;
       const maddeler = [];
@@ -480,7 +480,7 @@
       .row{display:flex;justify-content:space-between;margin:5px 0;}
       pre{font-family:'Courier New',monospace;font-size:16px;font-weight:800;white-space:pre;line-height:1.6;}
       .toplam{font-size:20px;font-weight:800;}
-      .urun-satir{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;font-size:24px;font-weight:800;margin-top:12px;gap:6px 12px;word-break:break-word;}
+      .urun-satir{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;font-size:21px;font-weight:800;margin-top:12px;gap:6px 12px;word-break:break-word;}
       .urun-satir span:first-child{flex:1 1 auto;min-width:0;}
       .urun-satir span:last-child{flex-shrink:0;white-space:nowrap;}
       .madde-list{list-style:none;margin:6px 0 8px 0;padding:0;}
@@ -643,7 +643,7 @@
 
     // Her ürün için: isim/adet/fiyat satırı + altında madde madde seçimler (HTML olarak, pre değil)
     const urunBloklariHTML = parsed.map(o => {
-      const isim = (o.urun || '').toUpperCase();
+      const isim = o.urun || '';
       const kategori = o.kategori ? o.kategori + ' — ' : '';
       let blok = `<div class="urun-satir">
         <span>${kategori}${isim} × ${o.miktar || 1}</span>
@@ -677,7 +677,7 @@
         .row { display: flex; justify-content: space-between; margin: 5px 0; }
         pre { font-family: 'Courier New', monospace; font-size: 16px; font-weight: 800; white-space: pre; line-height: 1.6; }
         .toplam { font-size: 20px; font-weight: 800; }
-        .urun-satir { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; font-size: 24px; font-weight: 800; margin-top: 12px; gap: 6px 12px; word-break: break-word; }
+        .urun-satir { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; font-size: 21px; font-weight: 800; margin-top: 12px; gap: 6px 12px; word-break: break-word; }
         .urun-satir span:first-child { flex: 1 1 auto; min-width: 0; }
         .urun-satir span:last-child { flex-shrink: 0; white-space: nowrap; }
         .madde-list { list-style: none; margin: 6px 0 8px 0; padding: 0; }
