@@ -354,7 +354,7 @@
             <span id="lz-detail-emoji-prev">🍦</span>
           </div>
           <div class="form-group" style="margin-bottom:0.75rem;">
-            <label>Fotoğraf URL</label>
+            <label>Fotoğraf URL <span style="font-weight:400;opacity:0.7;">(hem QR menü hem lezzetler sayfası)</span></label>
             <div class="foto-input-wrap"><input class="form-input" id="lz-d-foto" type="text" placeholder="https://... veya GitHub dosya adı" oninput="lzFotoOnizle(this.value)"><button type="button" class="foto-upload-btn" onclick="pickFotoFile('lz-d-foto', lzFotoOnizle)" title="Bilgisayardan seç">📁</button></div>
           </div>
           <div class="lz-status-toggle">
@@ -465,7 +465,7 @@
           <button class="add-btn" onclick="addUrun()">Ekle</button>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Fotoğraf URL (lezzetler sayfası için)</label><div class="foto-input-wrap"><input class="form-input" id="u-foto" type="text" placeholder="https://... veya GitHub dosya adı"><button type="button" class="foto-upload-btn" onclick="pickFotoFile('u-foto')" title="Bilgisayardan seç">📁</button></div></div>
+          <div class="form-group"><label>Fotoğraf URL <span style="font-weight:400;opacity:0.7;">(hem QR menü hem lezzetler sayfası)</span></label><div class="foto-input-wrap"><input class="form-input" id="u-foto" type="text" placeholder="https://... veya GitHub dosya adı"><button type="button" class="foto-upload-btn" onclick="pickFotoFile('u-foto')" title="Bilgisayardan seç">📁</button></div></div>
           <div class="form-group"><label>Açıklama (opsiyonel)</label><input class="form-input" id="u-aciklama" type="text" placeholder="Kısa ürün açıklaması..."></div>
         </div>
         <div class="item-list" id="urun-list"></div>
@@ -558,7 +558,7 @@
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getDatabase, ref, push, set, remove, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+  import { getDatabase, ref, push, set, remove, onValue, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
   const firebaseConfig = {
     apiKey: "AIzaSyC18gKyPhFWEWH_244nDLOW0nQE2QgS6kA",
@@ -572,6 +572,40 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
+
+  // ===== ÜRÜN GÖRSELİ SENKRONİZASYONU =====
+  // Ürünler iki ayrı Firebase yolunda tutuluyor:
+  //   menu/{katId}/urunler/{id}   → QR menü + lezzetler kart listesi
+  //   menu/urunler/{katId}/{id}   → Lezzetleri Yönet (detay/bölümler)
+  // İkisi isimle eşleşiyor. Bu fonksiyon görseli her iki tarafa da yazar,
+  // böylece tek bir yerden değiştirmek her iki sayfayı da günceller.
+  async function urunFotoSenkronize(katId, urunIsim, foto) {
+    if (!katId || !urunIsim) return;
+    try {
+      // 1) menu/{katId}/urunler → isimle eşleşen kaydı bul, foto yaz
+      const snapA = await get(ref(db, `menu/${katId}/urunler`));
+      if (snapA.exists()) {
+        const obj = snapA.val();
+        for (const [key, u] of Object.entries(obj)) {
+          if ((u.isim || '').trim() === urunIsim.trim()) {
+            await set(ref(db, `menu/${katId}/urunler/${key}/foto`), foto);
+          }
+        }
+      }
+      // 2) menu/urunler/{katId} → isimle eşleşen kaydı bul, foto yaz
+      const snapB = await get(ref(db, `menu/urunler/${katId}`));
+      if (snapB.exists()) {
+        const obj = snapB.val();
+        for (const [key, u] of Object.entries(obj)) {
+          if ((u.isim || '').trim() === urunIsim.trim()) {
+            await set(ref(db, `menu/urunler/${katId}/${key}/foto`), foto);
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Foto senkronizasyon hatası:', e);
+    }
+  }
 
   // ===== BİLGİSAYARDAN FOTOĞRAF SEÇME =====
   // Herhangi bir "Fotoğraf URL" input'unun yanına konan 📁 butonuna basınca çalışır.
@@ -1038,6 +1072,8 @@
     await set(ref(db, `menu/${aktifKatId}/urunler/${key}/fiyat`), fiyat);
     await set(ref(db, `menu/${aktifKatId}/urunler/${key}/emoji`), emoji);
     await set(ref(db, `menu/${aktifKatId}/urunler/${key}/foto`), foto);
+    // Görseli Lezzetleri Yönet tarafına da yaz (tek kontrol noktası)
+    await urunFotoSenkronize(aktifKatId, isim, foto);
     loadKatIcerik(aktifKatId);
     showToast('Ürün güncellendi');
   };
@@ -1138,6 +1174,7 @@
     if (foto) urunObj.foto = foto;
     if (aciklama) urunObj.aciklama = aciklama;
     await set(ref(db, 'menu/' + aktifKatId + '/urunler/' + id), urunObj);
+    if (foto) await urunFotoSenkronize(aktifKatId, isim, foto);
     document.getElementById('u-isim').value = '';
     document.getElementById('u-fiyat').value = '';
     if (document.getElementById('u-foto')) document.getElementById('u-foto').value = '';
@@ -1670,7 +1707,8 @@
     }
 
     await set(ref(db, `menu/urunler/${katId}/${id}`), urun);
-    // Lezzetler sayfasının okuduğu path'e de yaz
+    // Görseli QR menü tarafına da yaz (tek kontrol noktası)
+    await urunFotoSenkronize(katId, urun.isim, urun.foto);
     await set(ref(db, `menu/${katId}/urunler/${id}/foto`), urun.foto);
     await set(ref(db, `menu/${katId}/urunler/${id}/isim`), urun.isim);
     await set(ref(db, `menu/${katId}/urunler/${id}/fiyat`), urun.fiyat);
