@@ -458,8 +458,8 @@
     const urunler = o.urunler || [];
     const urunBloklariHTML = urunler.map(u => {
       let blok = `<div class="urun-satir">
-        <span>${u.isim || ''} × ${u.adet || 1}</span>
-        <span>${(u.fiyat||0).toFixed(2)} TL</span>
+        <span style="font-size:21px;font-weight:800;">${u.isim || ''} × ${u.adet || 1}</span>
+        <span style="font-size:21px;font-weight:800;">${(u.fiyat||0).toFixed(2)} TL</span>
       </div>`;
       const maddeler = [];
       if (u.bolumDetay) {
@@ -467,7 +467,7 @@
       }
       if (u.not) maddeler.push('Not: ' + u.not);
       if (maddeler.length) {
-        blok += '<ul class="madde-list">' + maddeler.map(m => `<li>${m}</li>`).join('') + '</ul>';
+        blok += '<ul class="madde-list">' + maddeler.map(m => `<li style="font-size:21px;font-weight:800;">${m}</li>`).join('') + '</ul>';
       }
       return blok;
     }).join('<div class="dashed" style="margin:8px 0;"></div>');
@@ -646,8 +646,8 @@
       const isim = o.urun || '';
       const kategori = o.kategori ? o.kategori + ' — ' : '';
       let blok = `<div class="urun-satir">
-        <span>${kategori}${isim} × ${o.miktar || 1}</span>
-        <span>${(o.toplamFiyat || 0).toFixed(2)} TL</span>
+        <span style="font-size:21px;font-weight:800;">${kategori}${isim} × ${o.miktar || 1}</span>
+        <span style="font-size:21px;font-weight:800;">${(o.toplamFiyat || 0).toFixed(2)} TL</span>
       </div>`;
 
       const maddeler = [];
@@ -661,7 +661,7 @@
         maddeler.push('Not: ' + o.not);
       }
       if (maddeler.length) {
-        blok += '<ul class="madde-list">' + maddeler.map(m => `<li>${m}</li>`).join('') + '</ul>';
+        blok += '<ul class="madde-list">' + maddeler.map(m => `<li style="font-size:21px;font-weight:800;">${m}</li>`).join('') + '</ul>';
       }
       return blok;
     }).join('<div class="dashed" style="margin:8px 0;"></div>');
