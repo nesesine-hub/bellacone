@@ -473,19 +473,21 @@
     }).join('<div class="dashed" style="margin:8px 0;"></div>');
     const fis = `<html><head><meta charset="UTF-8"><style>
       *{margin:0;padding:0;box-sizing:border-box;}
-      body{font-family:'Courier New',monospace;font-size:16px;font-weight:800;width:320px;padding:14px;line-height:1.5;}
+      body{font-family:'Courier New',monospace;font-size:17px;font-weight:800;width:360px;padding:16px;line-height:1.5;}
       .center{text-align:center;}
-      .line{border-top:3px solid #000;margin:10px 0;}
-      .dashed{border-top:2px dashed #000;margin:10px 0;}
-      .row{display:flex;justify-content:space-between;margin:4px 0;}
-      pre{font-family:'Courier New',monospace;font-size:15px;font-weight:800;white-space:pre;line-height:1.6;}
-      .toplam{font-size:19px;font-weight:800;}
-      .urun-satir{display:flex;justify-content:space-between;font-size:17px;font-weight:800;margin-top:10px;gap:10px;}
+      .line{border-top:3px solid #000;margin:12px 0;}
+      .dashed{border-top:2px dashed #000;margin:12px 0;}
+      .row{display:flex;justify-content:space-between;margin:5px 0;}
+      pre{font-family:'Courier New',monospace;font-size:16px;font-weight:800;white-space:pre;line-height:1.6;}
+      .toplam{font-size:20px;font-weight:800;}
+      .urun-satir{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;font-size:24px;font-weight:800;margin-top:12px;gap:6px 12px;word-break:break-word;}
+      .urun-satir span:first-child{flex:1 1 auto;min-width:0;}
+      .urun-satir span:last-child{flex-shrink:0;white-space:nowrap;}
       .madde-list{list-style:none;margin:6px 0 8px 0;padding:0;}
-      .madde-list li{font-size:15px;font-weight:800;padding:4px 0 4px 16px;position:relative;line-height:1.5;}
+      .madde-list li{font-size:15px;font-weight:800;padding:4px 0 4px 18px;position:relative;line-height:1.5;word-break:break-word;}
       .madde-list li::before{content:'•';position:absolute;left:2px;font-size:17px;}
     </style></head><body>
-    <div class="center" style="font-size:18px;font-weight:bold;letter-spacing:1px;">BellaCone</div>
+    <div class="center" style="font-size:24px;font-weight:800;letter-spacing:1px;">BellaCone</div>
     <div class="center">Tel: 0533 510 95 59</div>
     <div class="line"></div>
     <div class="center">ONLİNE SİPARİŞ FİŞİ</div>
@@ -668,20 +670,22 @@
       <html><head><meta charset="UTF-8">
       <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: 'Courier New', monospace; font-size: 25px; font-weight: 800; width: 320px; padding: 14px; line-height: 1.5; }
+        body { font-family: 'Courier New', monospace; font-size: 17px; font-weight: 800; width: 360px; padding: 16px; line-height: 1.5; }
         .center { text-align: center; }
-        .line { border-top: 3px solid #000; margin: 10px 0; }
-        .dashed { border-top: 2px dashed #000; margin: 10px 0; }
-        .row { display: flex; justify-content: space-between; margin: 4px 0; }
-        pre { font-family: 'Courier New', monospace; font-size: 15px; font-weight: 800; white-space: pre; line-height: 1.6; }
-        .toplam { font-size: 19px; font-weight: 800; }
-        .urun-satir { display: flex; justify-content: space-between; font-size: 17px; font-weight: 800; margin-top: 10px; gap: 10px; }
+        .line { border-top: 3px solid #000; margin: 12px 0; }
+        .dashed { border-top: 2px dashed #000; margin: 12px 0; }
+        .row { display: flex; justify-content: space-between; margin: 5px 0; }
+        pre { font-family: 'Courier New', monospace; font-size: 16px; font-weight: 800; white-space: pre; line-height: 1.6; }
+        .toplam { font-size: 20px; font-weight: 800; }
+        .urun-satir { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; font-size: 24px; font-weight: 800; margin-top: 12px; gap: 6px 12px; word-break: break-word; }
+        .urun-satir span:first-child { flex: 1 1 auto; min-width: 0; }
+        .urun-satir span:last-child { flex-shrink: 0; white-space: nowrap; }
         .madde-list { list-style: none; margin: 6px 0 8px 0; padding: 0; }
-        .madde-list li { font-size: 15px; font-weight: 800; padding: 4px 0 4px 16px; position: relative; line-height: 1.5; }
+        .madde-list li { font-size: 15px; font-weight: 800; padding: 4px 0 4px 18px; position: relative; line-height: 1.5; word-break: break-word; }
         .madde-list li::before { content: '•'; position: absolute; left: 2px; font-size: 17px; }
       </style>
       </head><body>
-      <div class="center" style="font-size:30px;font-weight:900;letter-spacing:2px;">BellaCone</div>
+      <div class="center" style="font-size:24px;font-weight:800;letter-spacing:1px;">BellaCone</div>
       <div class="center">Tel: 0533 510 95 59</div>
       <div class="line"></div>
       <div class="center bold">ADİSYON FİŞİ</div>
