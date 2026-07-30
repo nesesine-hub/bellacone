@@ -120,10 +120,17 @@
   <img src="bellacone_logo.png" alt="Bellacone" />
 </div>
 
-<div class="masa-bar">
+<div class="masa-bar" id="masa-bar">
   <label>Masa No</label>
+  <select id="masa-select" style="display:none;flex:1;border:1.5px solid var(--soft);border-radius:10px;padding:8px 12px;font-size:14px;background:#fff;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;">
+    <option value="">Masa seçin...</option>
+  </select>
   <input type="text" id="masa-input" placeholder="Örn: 5" />
   <span class="masa-pill" id="masa-pill">—</span>
+</div>
+<div id="garson-bar" style="display:none;background:var(--accent);color:#fff;padding:8px 1.25rem;font-size:13px;font-weight:600;align-items:center;justify-content:space-between;gap:10px;">
+  <span>👨‍🍳 Garson Modu — Sözlü sipariş girişi</span>
+  <a href="garson.html" style="color:#fff;text-decoration:none;background:rgba(255,255,255,0.25);padding:4px 12px;border-radius:999px;font-size:12px;">← Panele Dön</a>
 </div>
 
 <!-- ANA KATEGORİ -->
@@ -240,6 +247,48 @@
   document.getElementById('masa-input').addEventListener('input', function() {
     document.getElementById('masa-pill').textContent = this.value ? 'Masa ' + this.value : '—';
   });
+
+  // ===== GARSON MODU =====
+  // menu.html?garson=1 ile açılınca aktif masalar dropdown'da listelenir,
+  // listede yoksa elle masa no yazılabilir.
+  const garsonMode = urlParams.get('garson') === '1';
+  if (garsonMode) {
+    const gb = document.getElementById('garson-bar');
+    gb.style.display = 'flex';
+    const sel = document.getElementById('masa-select');
+    sel.style.display = 'block';
+    document.getElementById('masa-input').placeholder = 'Yeni masa no...';
+    document.getElementById('masa-input').style.maxWidth = '110px';
+
+    // Aktif masaları Firebase'den çek
+    onValue(ref(db, 'siparisler'), (snap) => {
+      const data = snap.val() || {};
+      const aktifMasalar = [...new Set(
+        Object.values(data)
+          .filter(o => o.durum !== 'teslim_edildi' && o.durum !== 'iptal')
+          .map(o => o.masa)
+          .filter(Boolean)
+      )].sort((a, b) => String(a).localeCompare(String(b), 'tr', { numeric: true }));
+
+      const mevcut = sel.value;
+      sel.innerHTML = '<option value="">— Masa seçin —</option>' +
+        aktifMasalar.map(m => `<option value="${m}">Masa ${m} (açık adisyon)</option>`).join('');
+      if (mevcut && aktifMasalar.includes(mevcut)) sel.value = mevcut;
+    });
+
+    // Dropdown seçilince input'a yaz
+    sel.addEventListener('change', function() {
+      if (this.value) {
+        document.getElementById('masa-input').value = this.value;
+        document.getElementById('masa-pill').textContent = 'Masa ' + this.value;
+      }
+    });
+
+    // Elle yazılınca dropdown'ı temizle
+    document.getElementById('masa-input').addEventListener('input', function() {
+      if (this.value && sel.value !== this.value) sel.value = '';
+    });
+  }
 
   // Tarayıcı geri butonu yönetimi
   history.pushState({ screen: 'home' }, '', '');
@@ -699,9 +748,14 @@
       }
       sepet = [];
       guncelleSepetFab();
-      showToast('✓ Siparişiniz alındı!');
+      showToast(garsonMode ? `✓ Masa ${masa} adisyonuna eklendi` : '✓ Siparişiniz alındı!');
       showScreen('home');
-      if (masaUrl) {
+      if (garsonMode) {
+        // Garson modunda bir sonraki sipariş için masa alanını temizle
+        document.getElementById('masa-input').value = '';
+        document.getElementById('masa-select').value = '';
+        document.getElementById('masa-pill').textContent = '—';
+      } else if (masaUrl) {
         document.getElementById('masa-input').value = decodeURIComponent(masaUrl);
         document.getElementById('masa-pill').textContent = masaGoster || decodeURIComponent(masaUrl);
       }

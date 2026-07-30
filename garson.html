@@ -31,6 +31,8 @@
   /* HEADER */
   .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .header-left { display: flex; align-items: center; gap: 10px; }
+  .yeni-siparis-btn { background: var(--green); color: #fff; text-decoration: none; padding: 7px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; transition: opacity 0.2s; font-family: 'DM Sans', sans-serif; }
+  .yeni-siparis-btn:hover { opacity: 0.85; }
   .header h1 { font-size: 17px; font-weight: 600; }
   .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
@@ -138,6 +140,7 @@
       <h1>Garson Ekranı</h1>
     </div>
     <div class="stat-pills">
+      <a href="menu.html?garson=1" class="yeni-siparis-btn">+ Yeni Sipariş</a>
       <span class="pill pill-bekliyor" id="stat-bekliyor">0 bekliyor</span>
       <span class="pill pill-hazir" id="stat-hazir">0 hazır</span>
       <span class="pill pill-odeme" id="stat-odeme">0 ödeme</span>
@@ -467,7 +470,7 @@
       }
       if (u.not) maddeler.push('Not: ' + u.not);
       if (maddeler.length) {
-        blok += '<ul class="madde-list">' + maddeler.map(m => `<li style="font-size:21px;font-weight:800;">${m}</li>`).join('') + '</ul>';
+        blok += '<ul class="madde-list">' + maddeler.map(m => `<li style="font-size:21px;font-weight:800;">${String(m).toUpperCase()}</li>`).join('') + '</ul>';
       }
       return blok;
     }).join('<div class="dashed" style="margin:8px 0;"></div>');
@@ -661,7 +664,7 @@
         maddeler.push('Not: ' + o.not);
       }
       if (maddeler.length) {
-        blok += '<ul class="madde-list">' + maddeler.map(m => `<li style="font-size:21px;font-weight:800;">${m}</li>`).join('') + '</ul>';
+        blok += '<ul class="madde-list">' + maddeler.map(m => `<li style="font-size:21px;font-weight:800;">${String(m).toUpperCase()}</li>`).join('') + '</ul>';
       }
       return blok;
     }).join('<div class="dashed" style="margin:8px 0;"></div>');
