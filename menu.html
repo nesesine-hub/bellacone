@@ -54,6 +54,15 @@
   .urun-icon { font-size: 26px; margin-bottom: 6px; }
   .urun-foto { width: 100%; height: 110px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; display: block; background: var(--soft); }
   .limit-bilgi { font-size: 11px; color: var(--muted); background: #fff8f0; border: 1px solid var(--soft); border-radius: 8px; padding: 5px 10px; margin-bottom: 8px; display: inline-block; }
+  /* Sepette adet ayarlama */
+  .sepet-adet-kontrol { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .sepet-adet-kontrol > button { width: 30px; height: 30px; border: 1.5px solid var(--soft); background: var(--card); color: var(--accent); border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer; line-height: 1; transition: all 0.15s; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; justify-content: center; }
+  .sepet-adet-kontrol > button:hover { border-color: var(--accent); background: var(--soft); }
+  .sepet-adet-kontrol > button:active { transform: scale(0.94); }
+  .sepet-adet-kontrol > input { width: 46px; height: 30px; border: 1.5px solid var(--soft); border-radius: 8px; background: var(--card); color: var(--text); text-align: center; font-size: 14px; font-weight: 700; font-family: 'DM Sans', sans-serif; outline: none; -moz-appearance: textfield; }
+  .sepet-adet-kontrol > input::-webkit-outer-spin-button, .sepet-adet-kontrol > input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .sepet-adet-kontrol > input:focus { border-color: var(--accent); }
+  .sepet-birim-fiyat { font-size: 12px; color: var(--muted); }
   .limit-bilgi.asildi { color: var(--accent); border-color: var(--accent); background: #fff1e8; font-weight: 600; }
   .urun-card { overflow: hidden; }
   .urun-name { font-size: 13px; font-weight: 500; color: var(--text); }
@@ -642,19 +651,37 @@
     const not = document.getElementById('siparis-not')?.value?.trim() || '';
     const toplamFiyat = (fiyat + ekFiyatToplam) * state.miktar;
 
-    sepet.push({
-      kategori: aktifKategori.isim,
-      urun: urunIsim,
-      fiyat: fiyat + ekFiyatToplam,
-      miktar: state.miktar,
-      toplamFiyat,
-      toplar: topBilgi,
-      secimMetni,
-      not
-    });
+    const birimFiyat = fiyat + ekFiyatToplam;
+    // Aynı ürün (aynı seçimler + aynı not) sepette varsa üstüne ekle, yeni satır açma
+    const ayniIdx = sepet.findIndex(s =>
+      s.kategori === aktifKategori.isim &&
+      s.urun === urunIsim &&
+      s.fiyat === birimFiyat &&
+      (s.secimMetni || '') === (secimMetni || '') &&
+      (s.not || '') === (not || '')
+    );
+
+    if (ayniIdx >= 0) {
+      sepet[ayniIdx].miktar += state.miktar;
+      sepet[ayniIdx].toplamFiyat = Math.round(sepet[ayniIdx].fiyat * sepet[ayniIdx].miktar * 100) / 100;
+    } else {
+      sepet.push({
+        kategori: aktifKategori.isim,
+        urun: urunIsim,
+        fiyat: birimFiyat,
+        miktar: state.miktar,
+        toplamFiyat,
+        toplar: topBilgi,
+        secimMetni,
+        not
+      });
+    }
 
     guncelleSepetFab();
-    showToast(`✓ Sepete eklendi (${sepet.length} ürün)`);
+    const eklenenAdet = state.miktar;
+    showToast(ayniIdx >= 0
+      ? `✓ ${eklenenAdet} adet daha eklendi (toplam ${sepet[ayniIdx].miktar})`
+      : `✓ Sepete eklendi (${sepet.length} ürün)`);
 
     // State sıfırla
     state = { urun: null, toplar: [], secimler: {}, miktar: 1 };
@@ -693,10 +720,16 @@
     icerik.innerHTML = sepet.map((item, i) => `
       <div class="sepet-item">
         <div class="sepet-item-top">
-          <div>
-            <div class="sepet-item-isim">${item.kategori} — ${item.urun} × ${item.miktar}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="sepet-item-isim">${item.kategori} — ${item.urun}</div>
             ${item.secimMetni ? `<div class="sepet-item-detay">${item.secimMetni}</div>` : ''}
             ${item.not ? `<div class="sepet-item-detay" style="color:var(--accent);">Not: ${item.not}</div>` : ''}
+            <div class="sepet-adet-kontrol">
+              <button onclick="sepetAdetDegistir(${i},-1)" title="Azalt">−</button>
+              <input type="number" min="1" value="${item.miktar}" onchange="sepetAdetAyarla(${i}, this.value)" onclick="this.select()">
+              <button onclick="sepetAdetDegistir(${i},1)" title="Arttır">+</button>
+              <span class="sepet-birim-fiyat">× ${item.fiyat} ₺</span>
+            </div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
             <span class="sepet-item-fiyat">${item.toplamFiyat} ₺</span>
@@ -715,6 +748,27 @@
     sepet.splice(idx, 1);
     guncelleSepetFab();
     renderSepet();
+  };
+
+  // Sepette adet ayarlama — birim fiyat korunarak toplam yeniden hesaplanır
+  function sepetAdetGuncelle(idx, yeniMiktar) {
+    const item = sepet[idx];
+    if (!item) return;
+    yeniMiktar = Math.max(1, parseInt(yeniMiktar) || 1);
+    item.miktar = yeniMiktar;
+    item.toplamFiyat = Math.round(item.fiyat * yeniMiktar * 100) / 100;
+    guncelleSepetFab();
+    renderSepet();
+  }
+
+  window.sepetAdetDegistir = function(idx, delta) {
+    const item = sepet[idx];
+    if (!item) return;
+    sepetAdetGuncelle(idx, (item.miktar || 1) + delta);
+  };
+
+  window.sepetAdetAyarla = function(idx, deger) {
+    sepetAdetGuncelle(idx, deger);
   };
 
   // SİPARİŞ VER
