@@ -152,6 +152,7 @@
 <!-- SEPET EKRANI -->
 <div class="screen" id="screen-sepet">
   <div class="detail-header">
+    <button class="back-btn" onclick="geriGit()">← Geri</button>
     <span class="detail-title">🛒 Sepetim</span>
   </div>
   <div class="section" style="padding-top:1.25rem;">
@@ -749,6 +750,7 @@
       sepet = [];
       guncelleSepetFab();
       showToast(garsonMode ? `✓ Masa ${masa} adisyonuna eklendi` : '✓ Siparişiniz alındı!');
+      ekranGecmisi = ['home'];
       showScreen('home');
       if (garsonMode) {
         // Garson modunda bir sonraki sipariş için masa alanını temizle
@@ -766,7 +768,12 @@
   };
 
   // EKRAN YÖNETİMİ
+  // Ekran geçmişi — geri butonunun doğru yere dönmesi için
+  let ekranGecmisi = ['home'];
+
   function showScreen(name) {
+    const mevcut = ekranGecmisi[ekranGecmisi.length - 1];
+    if (mevcut !== name) ekranGecmisi.push(name);
     showScreenDirect(name);
     history.pushState({ screen: name }, '', '');
     document.getElementById('bottom-bar').style.display = name === 'detail' ? 'flex' : 'none';
@@ -781,7 +788,25 @@
     window.scrollTo(0, 0);
   }
 
-  window.goHome = function() { showScreen('home'); };
+  // Akıllı geri: bir önceki ekrana döner, geçmiş yoksa ana sayfaya
+  window.geriGit = function() {
+    ekranGecmisi.pop(); // mevcut ekranı çıkar
+    const oncekiEkran = ekranGecmisi[ekranGecmisi.length - 1] || 'home';
+    // Kategori detayına dönülüyorsa ve kategori kaybolmuşsa ana sayfaya git
+    if (oncekiEkran === 'detail' && !aktifKategori) {
+      ekranGecmisi = ['home'];
+      showScreenDirect('home');
+      history.pushState({ screen: 'home' }, '', '');
+      return;
+    }
+    showScreenDirect(oncekiEkran);
+    history.pushState({ screen: oncekiEkran }, '', '');
+  };
+
+  window.goHome = function() {
+    ekranGecmisi = ['home'];
+    showScreen('home');
+  };
 
   // SORUN BİLDİR
   window.sorunAc = function() { document.getElementById('sorun-modal').classList.add('open'); };

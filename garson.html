@@ -32,6 +32,14 @@
   .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .header-left { display: flex; align-items: center; gap: 10px; }
   .yeni-siparis-btn { background: var(--green); color: #fff; text-decoration: none; padding: 7px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; transition: opacity 0.2s; font-family: 'DM Sans', sans-serif; }
+  /* Adet ayarlama kontrolü */
+  .adet-kontrol { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; flex-shrink: 0; background: var(--surface); }
+  .adet-kontrol button { width: 26px; height: 26px; border: none; background: transparent; color: var(--accent); font-size: 16px; font-weight: 700; cursor: pointer; line-height: 1; transition: background 0.15s; font-family: 'DM Sans', sans-serif; }
+  .adet-kontrol button:hover { background: var(--surface2); }
+  .adet-kontrol button:active { background: var(--border); }
+  .adet-kontrol input { width: 38px; height: 26px; border: none; border-left: 1px solid var(--border); border-right: 1px solid var(--border); background: transparent; color: var(--text); text-align: center; font-size: 13px; font-weight: 700; font-family: 'DM Sans', sans-serif; outline: none; -moz-appearance: textfield; }
+  .adet-kontrol input::-webkit-outer-spin-button, .adet-kontrol input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .adet-kontrol input:focus { background: var(--surface2); }
   .yeni-siparis-btn:hover { opacity: 0.85; }
   .header h1 { font-size: 17px; font-weight: 600; }
   .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; }
@@ -267,7 +275,7 @@
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getDatabase, ref, onValue, update, remove, push, set } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+  import { getDatabase, ref, onValue, update, remove, push, set, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
   const firebaseConfig = {
     apiKey: "AIzaSyC18gKyPhFWEWH_244nDLOW0nQE2QgS6kA",
@@ -429,17 +437,67 @@
         <div style="border-top:1px solid var(--border);padding-top:8px;margin-bottom:8px;">${urunListesi}</div>
         ${o.not ? `<div style="font-size:12px;color:var(--accent);margin-bottom:6px;">Not: ${o.not}</div>` : ''}
         <div class="zaman-row" style="margin-bottom:8px;">${o.zamanStr || ''} · <strong style="color:var(--accent);">${o.toplamFiyat} ₺</strong></div>
+        ${o.kuryeDurum ? `<div style="font-size:11px;margin-bottom:8px;padding:4px 10px;border-radius:999px;display:inline-block;${o.kuryeDurum.gonderildi ? 'background:rgba(58,155,101,0.15);color:#3a9b65;' : 'background:rgba(224,100,60,0.15);color:#e0643c;'}">${o.kuryeDurum.gonderildi ? '🛵 Kuryeye iletildi' : '⚠ Kuryeye iletilemedi'}</div>` : ''}
         <div class="card-actions">
           ${o.durum === 'bekliyor' ? `<button class="act-btn primary" onclick="onlineDurumGuncelle('${o.key}','hazirlaniyor')">Hazırlanıyor</button>` : ''}
           ${o.durum === 'hazirlaniyor' ? `<button class="act-btn blue" onclick="onlineDurumGuncelle('${o.key}','yolda')">Yola Çıktı</button>` : ''}
           ${o.durum === 'yolda' ? `<button class="act-btn purple" onclick="onlineDurumGuncelle('${o.key}','teslim_edildi')">Teslim Edildi</button>` : ''}
           ${o.durum !== 'bekliyor' ? `<button class="act-btn geri" onclick="onlineDurumGuncelle('${o.key}','bekliyor')">Geri Al</button>` : ''}
           <button class="act-btn" style="background:var(--green);" onclick="onlineFisYazdir(${JSON.stringify(o).replace(/"/g,'&quot;')})">🖨 Fiş</button>
+          ${(o.kuryeDurum && !o.kuryeDurum.gonderildi) ? `<button class="act-btn" style="background:#e0643c;" onclick="kuryeTekrarGonder('${o.key}')">🛵 Kuryeye Tekrar Gönder</button>` : ''}
           <button class="act-btn" onclick="onlineSil('${o.key}')">Sil</button>
         </div>
       </div>`;
     }).join('');
   }
+
+  // Kurye firmasına manuel tekrar gönderim
+  window.kuryeTekrarGonder = async function(key) {
+    try {
+      const [ayarSnap, sipSnap] = await Promise.all([
+        get(ref(db, 'ayarlar/kurye')),
+        get(ref(db, 'online_siparisler/' + key))
+      ]);
+      if (!ayarSnap.exists()) { alert('Kurye ayarları bulunamadı'); return; }
+      const k = ayarSnap.val();
+      if (!k.url) { alert('Kurye API adresi tanımlı değil'); return; }
+      const s = sipSnap.val();
+      if (!s) { alert('Sipariş bulunamadı'); return; }
+
+      const payload = {
+        siparisNo: s.siparisNo || '',
+        subeKodu: k.subeKodu || '',
+        zaman: s.zaman || new Date().toISOString(),
+        musteri: { ad: s.musteri?.ad || '', telefon: s.musteri?.tel || '' },
+        teslimat: {
+          adres: s.adres?.adres || '',
+          daire: s.adres?.daire || '',
+          tarif: s.adres?.tarif || ''
+        },
+        urunler: (s.urunler || []).map(u => ({ isim: u.isim, adet: u.adet || 1, fiyat: u.fiyat || 0 })),
+        odeme: {
+          tip: s.odeme || '',
+          araToplam: s.araToplam || 0,
+          teslimatUcreti: s.teslimatUcreti || 0,
+          toplam: s.toplamFiyat || 0
+        }
+      };
+
+      const headers = { 'Content-Type': 'application/json' };
+      if (k.authTip === 'bearer' && k.token) headers['Authorization'] = 'Bearer ' + k.token;
+      else if (k.authTip === 'apikey' && k.token) headers[k.headerAdi || 'X-API-Key'] = k.token;
+      else if (k.authTip === 'basic' && k.token) headers['Authorization'] = 'Basic ' + btoa(k.token);
+      if (k.ekHeaderlar) { try { Object.assign(headers, JSON.parse(k.ekHeaderlar)); } catch(e) {} }
+
+      const res = await fetch(k.url, { method: k.metod || 'POST', headers, body: JSON.stringify(payload) });
+      await update(ref(db, 'online_siparisler/' + key), {
+        kuryeDurum: { gonderildi: res.ok, httpKod: res.status, zaman: new Date().toISOString() }
+      });
+      alert(res.ok ? '✓ Kuryeye iletildi' : `✕ Gönderilemedi (HTTP ${res.status})`);
+    } catch(e) {
+      alert('Hata: ' + (e.message || e));
+    }
+  };
 
   window.onlineDurumGuncelle = async function(key, durum) {
     await update(ref(db, 'online_siparisler/' + key), { durum });
@@ -587,10 +645,12 @@
         <!-- MASA BAŞLIĞI -->
         <div style="background:var(--surface2); padding:10px 14px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border);">
           <div class="masa-num">Masa ${masa}</div>
-          <div style="display:flex;align-items:center;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <span style="font-size:13px;font-weight:600;color:var(--accent);">${masaToplam} ₺</span>
             <span style="font-size:11px;color:var(--muted);">${kalemler.length} kalem</span>
             <button onclick="fisYazdirMasa('${masa}')" style="padding:5px 12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;">🖨 Fiş</button>
+            ${!hepsiOdendi ? `<button onclick="masaTopluOdeme('${masa}')" style="padding:5px 12px;background:var(--purple);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;">✓ Hesabı Kapat</button>` : ''}
+            <button onclick="masaTopluSil('${masa}')" style="padding:5px 12px;background:transparent;color:#e0643c;border:1px solid #e0643c;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;">🗑 Masayı Temizle</button>
           </div>
         </div>
         <!-- KALEMLERİ -->
@@ -601,7 +661,14 @@
             return `<div style="padding:10px 14px;border-bottom:${idx < kalemler.length-1 ? '1px solid var(--border)' : 'none'};">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
                 <div style="flex:1;">
-                  <div class="dondurma-row">${o.kategori ? o.kategori + ' — ' : ''}${o.urun} × ${o.miktar}</div>
+                  <div class="dondurma-row" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <span style="flex:1;min-width:0;">${o.kategori ? o.kategori + ' — ' : ''}${o.urun}</span>
+                    <span class="adet-kontrol">
+                      <button onclick="adetDegistir('${o.key}',-1)" title="Azalt">−</button>
+                      <input type="number" min="1" value="${o.miktar || 1}" onchange="adetAyarla('${o.key}', this.value)" onclick="this.select()">
+                      <button onclick="adetDegistir('${o.key}',1)" title="Arttır">+</button>
+                    </span>
+                  </div>
                   ${o.toplar && o.toplar.length ? `<div class="detail-row">${o.toplar.map((t,i) => `<span style="background:rgba(212,79,130,0.15);color:#d44f82;border-radius:5px;padding:1px 6px;font-size:10px;margin:1px;">${i+1}. ${t}</span>`).join('')}</div>` : ''}
                   ${o.secimMetni ? `<div class="detail-row" style="margin-top:4px;">${o.secimMetni.split(' | ').map(s => `<div style="padding:2px 0;">• ${s}</div>`).join('')}</div>` : ''}
                   ${o.not ? `<div class="detail-row" style="color:#d44f82;">Not: ${o.not}</div>` : ''}
@@ -727,6 +794,74 @@
 
   window.sil = async function(key) {
     await remove(ref(db, 'siparisler/' + key));
+  };
+
+  // ===== MASA TOPLU İŞLEMLERİ =====
+  // Masadaki tüm kalemleri "ödeme alındı" yapar (toplu hesap kapatma)
+  window.masaTopluOdeme = async function(masa) {
+    const kalemler = (window._masaKalemMap || {})[masa];
+    if (!kalemler || !kalemler.length) { alert('Bu masada kalem bulunamadı'); return; }
+    const acikKalemler = kalemler.filter(o => o.durum !== 'odeme_alindi');
+    if (!acikKalemler.length) { alert('Bu masanın hesabı zaten kapalı'); return; }
+    const toplam = kalemler.reduce((s, o) => s + (o.toplamFiyat || 0), 0);
+    if (!confirm(`Masa ${masa} — ${acikKalemler.length} kalem, toplam ${toplam} ₺\n\nHesabı kapatmak istediğinize emin misiniz?`)) return;
+
+    await Promise.all(acikKalemler.map(o =>
+      update(ref(db, 'siparisler/' + o.key), { durum: 'odeme_alindi' })
+    ));
+    await push(ref(db, 'islem_gecmisi'), {
+      islem: 'Toplu ödeme alındı',
+      detay: `Masa ${masa} — ${acikKalemler.length} kalem · ${toplam}₺`,
+      zaman: new Date().toISOString(),
+      zamanStr: new Date().toLocaleString('tr-TR')
+    });
+  };
+
+  // Masadaki tüm kalemleri siler (masayı boşaltma)
+  window.masaTopluSil = async function(masa) {
+    const kalemler = (window._masaKalemMap || {})[masa];
+    if (!kalemler || !kalemler.length) { alert('Bu masada kalem bulunamadı'); return; }
+    const toplam = kalemler.reduce((s, o) => s + (o.toplamFiyat || 0), 0);
+    const odenmemis = kalemler.filter(o => o.durum !== 'odeme_alindi').length;
+    let uyari = `Masa ${masa} — ${kalemler.length} kalem, toplam ${toplam} ₺\n\nTÜM kalemler silinecek. Bu işlem geri alınamaz.`;
+    if (odenmemis > 0) uyari += `\n\n⚠ DİKKAT: ${odenmemis} kalemin ödemesi henüz alınmamış!`;
+    if (!confirm(uyari + '\n\nDevam edilsin mi?')) return;
+
+    await Promise.all(kalemler.map(o => remove(ref(db, 'siparisler/' + o.key))));
+    await push(ref(db, 'islem_gecmisi'), {
+      islem: 'Masa temizlendi',
+      detay: `Masa ${masa} — ${kalemler.length} kalem silindi · ${toplam}₺`,
+      zaman: new Date().toISOString(),
+      zamanStr: new Date().toLocaleString('tr-TR')
+    });
+  };
+
+  // ===== ADET AYARLAMA =====
+  // Birim fiyatı koruyarak adet ve toplam fiyatı günceller
+  async function adetGuncelle(key, yeniMiktar) {
+    yeniMiktar = Math.max(1, parseInt(yeniMiktar) || 1);
+    const snap = await get(ref(db, 'siparisler/' + key));
+    const o = snap.val();
+    if (!o) return;
+    const eskiMiktar = o.miktar || 1;
+    // Birim fiyat: kayıtlıysa onu kullan, değilse mevcut toplamdan hesapla
+    const birimFiyat = o.birimFiyat != null ? o.birimFiyat : (o.toplamFiyat || 0) / eskiMiktar;
+    await update(ref(db, 'siparisler/' + key), {
+      miktar: yeniMiktar,
+      birimFiyat: birimFiyat,
+      toplamFiyat: Math.round(birimFiyat * yeniMiktar * 100) / 100
+    });
+  }
+
+  window.adetDegistir = async function(key, delta) {
+    const snap = await get(ref(db, 'siparisler/' + key));
+    const o = snap.val();
+    if (!o) return;
+    await adetGuncelle(key, (o.miktar || 1) + delta);
+  };
+
+  window.adetAyarla = async function(key, deger) {
+    await adetGuncelle(key, deger);
   };
 
   // RAPOR
