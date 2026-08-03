@@ -32,6 +32,38 @@
   .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .header-left { display: flex; align-items: center; gap: 10px; }
   .yeni-siparis-btn { background: var(--green); color: #fff; text-decoration: none; padding: 7px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; transition: opacity 0.2s; font-family: 'DM Sans', sans-serif; }
+  /* Yeni sipariş bildirimi — kart yanıp söner */
+  @keyframes yeniSiparisFlash {
+    0%, 100% {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 0 rgba(212,79,130,0.5);
+    }
+    50% {
+      border-color: #ffb3d1;
+      box-shadow: 0 0 0 6px rgba(212,79,130,0.15);
+    }
+  }
+  .yeni-siparis-flash {
+    animation: yeniSiparisFlash 1.1s ease-in-out infinite;
+    cursor: pointer;
+    position: relative;
+  }
+  .yeni-siparis-flash::before {
+    content: 'YENİ';
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 3px 9px;
+    border-radius: 0 8px 0 8px;
+    z-index: 2;
+    animation: yeniSiparisFlash 1.1s ease-in-out infinite;
+  }
+
   /* Adet ayarlama kontrolü */
   .adet-kontrol { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; flex-shrink: 0; background: var(--surface); }
   .adet-kontrol button { width: 26px; height: 26px; border: none; background: transparent; color: var(--accent); font-size: 16px; font-weight: 700; cursor: pointer; line-height: 1; transition: background 0.15s; font-family: 'DM Sans', sans-serif; }
@@ -331,17 +363,49 @@
     document.getElementById('alarm-bar')?.remove();
   };
 
+  // Yeni sipariş gelen masalar — kart yanıp söner, tıklanınca durur
+  window._yeniSiparisMasalar = new Set();
+
   // Siparişler
   onValue(ref(db, 'siparisler'), (snapshot) => {
     const data = snapshot.val() || {};
     const yeni = Object.entries(data).map(([key, val]) => ({ key, ...val }))
       .sort((a, b) => new Date(a.zaman) - new Date(b.zaman));
-    if (!isFirstLoad && yeni.length > allOrders.length) playSound();
+
+    if (!isFirstLoad && yeni.length > allOrders.length) {
+      playSound();
+      // Yeni eklenen kalemlerin masalarını işaretle
+      const eskiKeyler = new Set(allOrders.map(o => o.key));
+      const yeniMasalar = yeni.filter(o => !eskiKeyler.has(o.key) && o.masa).map(o => String(o.masa));
+      yeniMasalar.forEach(m => window._yeniSiparisMasalar.add(m));
+      // Render sonrası ilk yeni masaya kaydır
+      if (yeniMasalar.length) {
+        setTimeout(() => yeniMasayaKaydir(yeniMasalar[0]), 150);
+      }
+    }
+
     allOrders = yeni;
     isFirstLoad = false;
     renderOrders();
     renderStats();
   });
+
+  // Masa kartına tıklanınca yanıp sönmeyi durdur
+  window.masaOkundu = function(masa) {
+    if (!window._yeniSiparisMasalar.has(String(masa))) return;
+    window._yeniSiparisMasalar.delete(String(masa));
+    const kart = document.getElementById('masa-kart-' + masa);
+    if (kart) kart.classList.remove('yeni-siparis-flash');
+  };
+
+  // Yeni sipariş geldiğinde ilgili masaya kaydır (kullanıcı listenin altındaysa görmezden gelme)
+  function yeniMasayaKaydir(masa) {
+    const kart = document.getElementById('masa-kart-' + masa);
+    if (!kart) return;
+    const rect = kart.getBoundingClientRect();
+    const gorunuyorMu = rect.top >= 0 && rect.bottom <= window.innerHeight;
+    if (!gorunuyorMu) kart.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 
   // Online siparişler
   onValue(ref(db, 'online_siparisler'), (snapshot) => {
@@ -641,7 +705,8 @@
       const hepsiOdendi = kalemler.every(o => o.durum === 'odeme_alindi');
       const kartBorderRenk = hepsiOdendi ? 'var(--purple)' : kalemler.some(o => o.durum === 'bekliyor') ? 'var(--accent)' : 'var(--green)';
 
-      html += `<div class="order-card" style="border-color:${kartBorderRenk}; padding:0; overflow:hidden;">
+      const yeniSiparisVar = window._yeniSiparisMasalar?.has(String(masa));
+      html += `<div class="order-card${yeniSiparisVar ? ' yeni-siparis-flash' : ''}" id="masa-kart-${masa}" onclick="masaOkundu('${masa}')" style="border-color:${kartBorderRenk}; padding:0; overflow:hidden;">
         <!-- MASA BAŞLIĞI -->
         <div style="background:var(--surface2); padding:10px 14px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border);">
           <div class="masa-num">Masa ${masa}</div>
@@ -942,16 +1007,50 @@
     document.getElementById('gecmis-listesi').innerHTML = '<p style="color:var(--muted);font-size:13px;">Henüz işlem yok</p>';
   };
 
+  // Yeni sipariş bildirimi — yumuşak 3 notalı melodi (C6 → E6 → G6)
+  // Sinüs dalga + yavaş attack/release ile keskin "bip" yerine yumuşak çan sesi
   function playSound() {
     try {
-      const ctx = new AudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.value = 880;
-      gain.gain.setValueAtTime(0.3, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-      osc.start(); osc.stop(ctx.currentTime + 0.4);
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      // Do majör arpej — kulağa hoş gelen, rahatsız etmeyen bir dizilim
+      const notalar = [
+        { frekans: 1046.50, baslangic: 0.00, sure: 0.45 }, // C6
+        { frekans: 1318.51, baslangic: 0.13, sure: 0.45 }, // E6
+        { frekans: 1567.98, baslangic: 0.26, sure: 0.65 }  // G6
+      ];
+
+      notalar.forEach(n => {
+        const t0 = ctx.currentTime + n.baslangic;
+
+        // Ana ton
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = n.frekans;
+
+        // Yumuşak zarf: hızlı ama keskin olmayan attack, uzun release
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.exponentialRampToValueAtTime(0.28, t0 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + n.sure);
+
+        // Hafif oktav üstü harmonik — çan tınısı için
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.value = n.frekans * 2;
+        gain2.gain.setValueAtTime(0.0001, t0);
+        gain2.gain.exponentialRampToValueAtTime(0.06, t0 + 0.02);
+        gain2.gain.exponentialRampToValueAtTime(0.0001, t0 + n.sure * 0.7);
+
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc2.connect(gain2); gain2.connect(ctx.destination);
+
+        osc.start(t0);  osc.stop(t0 + n.sure);
+        osc2.start(t0); osc2.stop(t0 + n.sure);
+      });
+
+      // Melodi bitince audio context'i kapat (kaynak sızıntısı olmasın)
+      setTimeout(() => { try { ctx.close(); } catch(e) {} }, 1400);
     } catch(e) {}
   }
 </script>
