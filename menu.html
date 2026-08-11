@@ -245,6 +245,17 @@
     TOP_FIYAT = snap.val() ?? 80;
   });
 
+  // Masa numarasını tek biçime getirir — garson paneli ile aynı mantık
+  // "1", " 1", "01", "Masa 1" → hepsi "1" olur, adisyonlar bölünmez
+  function normalizeMasa(masa) {
+    if (masa == null) return '';
+    let m = String(masa).trim().toUpperCase();
+    m = m.replace(/^MASA\s*/i, '');
+    m = m.replace(/\s+/g, '');
+    if (/^\d+$/.test(m)) m = String(parseInt(m, 10));
+    return m;
+  }
+
   // URL params
   const urlParams = new URLSearchParams(window.location.search);
   const masaUrl = urlParams.get('masa');
@@ -773,7 +784,7 @@
 
   // SİPARİŞ VER
   window.siparisVer = async function() {
-    const masa = document.getElementById('masa-input').value;
+    const masa = normalizeMasa(document.getElementById('masa-input').value);
     if (!masa) { showToast('Lütfen masa numarası girin'); return; }
     if (!sepet.length) { showToast('Sepetiniz boş'); return; }
 
@@ -866,7 +877,7 @@
   window.sorunAc = function() { document.getElementById('sorun-modal').classList.add('open'); };
   window.sorunKapat = function() { document.getElementById('sorun-modal').classList.remove('open'); document.getElementById('sorun-text').value = ''; };
   window.sorunGonder = async function() {
-    const masa = document.getElementById('masa-input').value;
+    const masa = normalizeMasa(document.getElementById('masa-input').value);
     const mesaj = document.getElementById('sorun-text').value.trim();
     if (!mesaj) { showToast('Lütfen sorunu yazın'); return; }
     try {

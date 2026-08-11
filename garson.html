@@ -32,6 +32,30 @@
   .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .header-left { display: flex; align-items: center; gap: 10px; }
   .yeni-siparis-btn { background: var(--green); color: #fff; text-decoration: none; padding: 7px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; transition: opacity 0.2s; font-family: 'DM Sans', sans-serif; }
+  /* Kasa notları */
+  .kasa-notlar { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.25rem; margin-top: 1.25rem; }
+  .kasa-notlar-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; }
+  .kasa-notlar-head h3 { font-size: 15px; font-weight: 700; color: var(--text); }
+  .kasa-notlar-sayi { font-size: 11px; color: var(--muted); background: var(--surface2); padding: 3px 10px; border-radius: 999px; }
+  .kasa-not-ekle { display: flex; gap: 8px; margin-bottom: 0.85rem; }
+  .kasa-not-ekle input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 9px 14px; font-size: 13px; color: var(--text); font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; }
+  .kasa-not-ekle input:focus { border-color: var(--accent); }
+  .kasa-not-ekle button { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 9px 20px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: opacity 0.2s; }
+  .kasa-not-ekle button:hover { opacity: 0.85; }
+  .kasa-not-liste { display: flex; flex-direction: column; gap: 7px; max-height: 320px; overflow-y: auto; }
+  .kasa-not-item { display: flex; align-items: flex-start; gap: 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; transition: opacity 0.2s; }
+  .kasa-not-item.tamamlandi { opacity: 0.45; }
+  .kasa-not-item.tamamlandi .kasa-not-metin { text-decoration: line-through; }
+  .kasa-not-check { width: 19px; height: 19px; border: 2px solid var(--border); border-radius: 5px; cursor: pointer; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; transition: all 0.15s; background: transparent; }
+  .kasa-not-check:hover { border-color: var(--accent); }
+  .kasa-not-check.aktif { background: var(--green); border-color: var(--green); }
+  .kasa-not-govde { flex: 1; min-width: 0; }
+  .kasa-not-metin { font-size: 13px; color: var(--text); line-height: 1.45; word-break: break-word; }
+  .kasa-not-zaman { font-size: 10px; color: var(--muted); margin-top: 3px; }
+  .kasa-not-sil { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 0 4px; line-height: 1; flex-shrink: 0; transition: color 0.2s; }
+  .kasa-not-sil:hover { color: #e0643c; }
+  .kasa-not-bos { text-align: center; padding: 1.5rem 1rem; color: var(--muted); font-size: 13px; }
+
   /* Yeni sipariş bildirimi — kart yanıp söner */
   @keyframes yeniSiparisFlash {
     0%, 100% {
@@ -229,6 +253,19 @@
     <div class="orders-grid" id="orders-grid">
       <div class="empty"><div class="empty-icon">🍦</div><p>Siparişler yükleniyor...</p></div>
     </div>
+
+    <!-- KASA NOTLARI -->
+    <div class="kasa-notlar">
+      <div class="kasa-notlar-head">
+        <h3>📝 Kasa Notları</h3>
+        <span class="kasa-notlar-sayi" id="kasa-not-sayi">0 not</span>
+      </div>
+      <div class="kasa-not-ekle">
+        <input type="text" id="kasa-not-input" placeholder="Not yazın... (örn: Masa 5 hesabı bölünecek)" maxlength="200">
+        <button onclick="kasaNotEkle()">Ekle</button>
+      </div>
+      <div class="kasa-not-liste" id="kasa-not-liste"></div>
+    </div>
   </div>
 
   <!-- RAPOR PANELİ -->
@@ -363,6 +400,17 @@
     document.getElementById('alarm-bar')?.remove();
   };
 
+  // Masa numarasını tek biçime getirir: boşlukları temizler, baştaki sıfırları atar,
+  // büyük harfe çevirir. Böylece "1", " 1", "01", "masa 1" aynı adisyona düşer.
+  function normalizeMasa(masa) {
+    if (masa == null) return '';
+    let m = String(masa).trim().toUpperCase();
+    m = m.replace(/^MASA\s*/i, '');        // "Masa 5" → "5"
+    m = m.replace(/\s+/g, '');             // iç boşlukları sil
+    if (/^\d+$/.test(m)) m = String(parseInt(m, 10)); // "01" → "1"
+    return m;
+  }
+
   // Yeni sipariş gelen masalar — kart yanıp söner, tıklanınca durur
   window._yeniSiparisMasalar = new Set();
 
@@ -376,7 +424,7 @@
       playSound();
       // Yeni eklenen kalemlerin masalarını işaretle
       const eskiKeyler = new Set(allOrders.map(o => o.key));
-      const yeniMasalar = yeni.filter(o => !eskiKeyler.has(o.key) && o.masa).map(o => String(o.masa));
+      const yeniMasalar = yeni.filter(o => !eskiKeyler.has(o.key) && o.masa).map(o => normalizeMasa(o.masa));
       yeniMasalar.forEach(m => window._yeniSiparisMasalar.add(m));
       // Render sonrası ilk yeni masaya kaydır
       if (yeniMasalar.length) {
@@ -392,8 +440,9 @@
 
   // Masa kartına tıklanınca yanıp sönmeyi durdur
   window.masaOkundu = function(masa) {
-    if (!window._yeniSiparisMasalar.has(String(masa))) return;
-    window._yeniSiparisMasalar.delete(String(masa));
+    const m = normalizeMasa(masa);
+    if (!window._yeniSiparisMasalar.has(m)) return;
+    window._yeniSiparisMasalar.delete(m);
     const kart = document.getElementById('masa-kart-' + masa);
     if (kart) kart.classList.remove('yeni-siparis-flash');
   };
@@ -666,10 +715,10 @@
       return;
     }
 
-    // Masaya göre grupla
+    // Masaya göre grupla — masa no normalize edilir ki "1", " 1", "01" aynı adisyonda toplansın
     const masaGruplari = {};
     siparisler.forEach(o => {
-      const masaKey = String(o.masa);
+      const masaKey = normalizeMasa(o.masa);
       if (!masaGruplari[masaKey]) masaGruplari[masaKey] = [];
       masaGruplari[masaKey].push(o);
     });
@@ -705,7 +754,7 @@
       const hepsiOdendi = kalemler.every(o => o.durum === 'odeme_alindi');
       const kartBorderRenk = hepsiOdendi ? 'var(--purple)' : kalemler.some(o => o.durum === 'bekliyor') ? 'var(--accent)' : 'var(--green)';
 
-      const yeniSiparisVar = window._yeniSiparisMasalar?.has(String(masa));
+      const yeniSiparisVar = window._yeniSiparisMasalar?.has(normalizeMasa(masa));
       html += `<div class="order-card${yeniSiparisVar ? ' yeni-siparis-flash' : ''}" id="masa-kart-${masa}" onclick="masaOkundu('${masa}')" style="border-color:${kartBorderRenk}; padding:0; overflow:hidden;">
         <!-- MASA BAŞLIĞI -->
         <div style="background:var(--surface2); padding:10px 14px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border);">
@@ -1006,6 +1055,84 @@
     await set(ref(db, 'gecmis'), null);
     document.getElementById('gecmis-listesi').innerHTML = '<p style="color:var(--muted);font-size:13px;">Henüz işlem yok</p>';
   };
+
+  // ===== KASA NOTLARI =====
+  // Kasadaki kişinin kendine hatırlatma yazabileceği alan.
+  // Firebase'de tutulur, tüm cihazlarda anlık senkron olur.
+  let kasaNotlari = [];
+
+  onValue(ref(db, 'kasa_notlari'), (snap) => {
+    const data = snap.val() || {};
+    kasaNotlari = Object.entries(data)
+      .map(([key, n]) => ({ key, ...n }))
+      .sort((a, b) => {
+        // Tamamlanmamışlar üstte, sonra yeniden eskiye
+        if (a.tamamlandi !== b.tamamlandi) return a.tamamlandi ? 1 : -1;
+        return new Date(b.zaman) - new Date(a.zaman);
+      });
+    renderKasaNotlari();
+  });
+
+  function renderKasaNotlari() {
+    const liste = document.getElementById('kasa-not-liste');
+    const sayi = document.getElementById('kasa-not-sayi');
+    if (!liste) return;
+
+    const acikSayi = kasaNotlari.filter(n => !n.tamamlandi).length;
+    if (sayi) sayi.textContent = acikSayi > 0 ? acikSayi + ' açık not' : kasaNotlari.length + ' not';
+
+    if (!kasaNotlari.length) {
+      liste.innerHTML = '<div class="kasa-not-bos">Henüz not yok. Hatırlatmalarınızı buraya yazabilirsiniz.</div>';
+      return;
+    }
+
+    liste.innerHTML = kasaNotlari.map(n => `
+      <div class="kasa-not-item${n.tamamlandi ? ' tamamlandi' : ''}">
+        <button class="kasa-not-check${n.tamamlandi ? ' aktif' : ''}" onclick="kasaNotToggle('${n.key}', ${!n.tamamlandi})" title="${n.tamamlandi ? 'Geri al' : 'Tamamlandı işaretle'}">${n.tamamlandi ? '✓' : ''}</button>
+        <div class="kasa-not-govde">
+          <div class="kasa-not-metin">${escapeHtml(n.metin)}</div>
+          <div class="kasa-not-zaman">${n.zamanStr || ''}</div>
+        </div>
+        <button class="kasa-not-sil" onclick="kasaNotSil('${n.key}')" title="Sil">×</button>
+      </div>
+    `).join('');
+  }
+
+  function escapeHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s || '';
+    return d.innerHTML;
+  }
+
+  window.kasaNotEkle = async function() {
+    const input = document.getElementById('kasa-not-input');
+    const metin = input.value.trim();
+    if (!metin) return;
+    await push(ref(db, 'kasa_notlari'), {
+      metin,
+      tamamlandi: false,
+      zaman: new Date().toISOString(),
+      zamanStr: new Date().toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+    });
+    input.value = '';
+    input.focus();
+  };
+
+  window.kasaNotToggle = async function(key, yeniDurum) {
+    await update(ref(db, 'kasa_notlari/' + key), { tamamlandi: yeniDurum });
+  };
+
+  window.kasaNotSil = async function(key) {
+    await remove(ref(db, 'kasa_notlari/' + key));
+  };
+
+  // Enter ile not ekle
+  document.addEventListener('DOMContentLoaded', function() {
+    const inp = document.getElementById('kasa-not-input');
+    if (inp) inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') kasaNotEkle();
+    });
+  });
 
   // Yeni sipariş bildirimi — yumuşak 3 notalı melodi (C6 → E6 → G6)
   // Sinüs dalga + yavaş attack/release ile keskin "bip" yerine yumuşak çan sesi
